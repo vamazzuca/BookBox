@@ -1,4 +1,4 @@
-package com.example.bookbox;
+package com.cmput301f20t14.bookbox;
 
 import androidx.appcompat.app.AppCompatActivity;
 

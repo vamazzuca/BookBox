@@ -1,7 +1,6 @@
-package com.example.bookbox;
+package com.cmput301f20t14.bookbox;
 
 import org.junit.Test;
-
 import static org.junit.Assert.*;
 
 /**

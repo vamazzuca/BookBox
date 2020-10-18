@@ -1,4 +1,4 @@
-package com.example.bookbox;
+package com.cmput301f20t14.bookbox;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.example.bookbox", appContext.getPackageName());
+        assertEquals("com.cmput301f20t14.bookbox", appContext.getPackageName());
     }
 }
