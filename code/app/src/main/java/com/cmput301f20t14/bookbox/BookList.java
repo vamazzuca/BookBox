@@ -1,5 +1,5 @@
 /*
- * MainActivity.java
+ * BookList.java
  *
  * Version 1.0
  *
@@ -27,20 +27,30 @@
  */
 package com.cmput301f20t14.bookbox;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
+import java.util.ArrayList;
 
 /**
- * The Initial Login activity
+ * A base class to represent a list of books
  * @author Carter Sabadash
  * @version 2020.10.22
  */
-public class MainActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+public class BookList {
+    private ArrayList<Book> books;
+
+    /**
+     * Adds a book to the list
+     * @param book The book to be added
+     */
+    public void addBook(Book book){
+        books.add(book);
+    }
+
+    /**
+     * Removes a book from the list
+     * @param book The book to be removed
+     */
+    public void deleteBook(Book book){
+        books.remove(book);
     }
 }

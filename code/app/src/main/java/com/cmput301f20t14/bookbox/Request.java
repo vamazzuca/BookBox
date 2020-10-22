@@ -1,5 +1,5 @@
 /*
- * MainActivity.java
+ * Request.java
  *
  * Version 1.0
  *
@@ -27,20 +27,27 @@
  */
 package com.cmput301f20t14.bookbox;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
+import android.app.Notification;
+import android.location.Location;
 
 /**
- * The Initial Login activity
+ * A class to represent a request on a book; sends a notification to the user
  * @author Carter Sabadash
  * @version 2020.10.22
  */
-public class MainActivity extends AppCompatActivity {
+public class Request {
+    private User from;
+    private Book bookRequested;
+    private Location geoLocation;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    /**
+     * Initiates a request on a book and sends a notification to the book owner
+     * @param from The User making the request
+     * @param bookRequested The Book to be requested
+     */
+    public Request(User to, User from, Book bookRequested) {
+        // assert(bookRequested.getStatus == AVAILABLE || bookRequested.getStatus == REQUESTED);
+        this.from = from;
+        this.bookRequested = bookRequested;
     }
 }
