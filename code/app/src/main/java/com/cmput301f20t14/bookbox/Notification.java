@@ -10,8 +10,10 @@ package com.cmput301f20t14.bookbox;
  *      notification screen, then this will have to be made an abstract class and need to
  *      implement at least RequestNotification RequestAcceptedNotification
  *      (ReturnRequestedNotification, RequestDecllined (or just use default for this one)?) ?
+ * The details of this will probably change a lot... the purpose is to view notifications in the app
+ *
  */
-public class Notification {
+public abstract class Notification {
     private String description;
     private User from;
     private User to;
