@@ -33,9 +33,13 @@ import java.util.ArrayList;
  * A base class to represent a list of books
  * @author Carter Sabadash
  * @version 2020.10.22
+ *
+ * So far this assumes we will be using separate lists for owned and borrowed books
+ *      in which case subclasses should be made... for now, this serves as a template
+ *      that we can use while implementing other things
  */
 
-public class BookList {
+public abstract class BookList {
     private ArrayList<Book> books;
 
     /**
