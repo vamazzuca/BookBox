@@ -36,6 +36,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -85,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
                 final String password = passwordEditText.getText().toString();
 
                 if (username.length() == 0 || password.length() == 0){
+                    Toast.makeText(getApplicationContext(),
+                            "No User/Password entered", Toast.LENGTH_SHORT).show();
                     Log.d("LOGIN", "No User/Password");
                     return;
                 }
@@ -110,11 +113,15 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     // password is incorrect, prompt user
                                     Log.d("LOGIN", "Password Incorrect");
+                                    Toast.makeText(getApplicationContext(),
+                                            "Incorrect Password", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
                             } else {
                                 // user doesn't exist, prompt registration
                                 Log.d("LOGIN", "User Incorrect");
+                                Toast.makeText(getApplicationContext(),
+                                        "Incorrect Username", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
