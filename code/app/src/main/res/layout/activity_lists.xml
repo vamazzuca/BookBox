@@ -18,6 +18,7 @@
         tools:ignore="RelativeOverlap" />
 
     <LinearLayout
+        android:id="@+id/lists_linear_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -52,24 +53,12 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <ListView
+        android:id="@+id/main_page_books_listView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="90dp"
-        android:orientation="vertical">
-
-        <Spinner
-            android:id="@+id/status_filter_spinner"
-            android:layout_width="100dp"
-            android:layout_height="30sp"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="8dp"/>
-
-        <ListView
-            android:id="@+id/main_page_books_listView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+        android:layout_height="300dp"
+        android:layout_marginTop="80dp"
+        android:layout_below="@id/lists_linear_layout" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav_bar"
@@ -81,5 +70,7 @@
         app:itemIconSize="50sp"
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />
+
+
 
 </RelativeLayout>
