@@ -86,9 +86,12 @@
         android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
+        android:layout_marginEnd="48dp"
         android:text="@string/register_button"
         android:textColor="@color/colorDarkText"
         android:textSize="20sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/not_registered_yet"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/not_registered_yet" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
