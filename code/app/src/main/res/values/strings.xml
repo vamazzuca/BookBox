@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">BookBox</string>
+    <string name="welcome_message">Welcome to BookBox</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="log_in_button">Log in</string>
+    <string name="register_button">Register</string>
+    <string name="not_registered">Not registered?</string>
+    <string name="bookbox">BookBox</string>
+    <string name="lists">list</string>
+    <string name="home">home</string>
+    <string name="notifications">notifications</string>
+    <string name="profile">profile</string>
 </resources>
