@@ -14,7 +14,43 @@
         android:text="@string/bookbox"
         android:textColor="@color/colorPurpleTitle"
         android:textSize="35sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="RelativeOverlap" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/search"
+            android:src="@drawable/ic_search" />
+
+        <ImageButton
+            android:id="@+id/add_book_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/add_book"
+            android:src="@drawable/ic_add" />
+
+        <ImageButton
+            android:id="@+id/main_page_scan_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/scan_book"
+            android:src="@drawable/ic_camera" />
+
+    </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
@@ -25,5 +61,23 @@
         app:itemIconSize="50sp"
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp">
+
+        <Spinner
+            android:id="@+id/status_filter_spinner"
+            android:layout_width="100dp"
+            android:layout_height="30sp"
+            android:layout_gravity="center_horizontal"/>
+
+        <ListView
+            android:id="@+id/main_page_books_listView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30sp"/>
+    </FrameLayout>
 
 </RelativeLayout>
