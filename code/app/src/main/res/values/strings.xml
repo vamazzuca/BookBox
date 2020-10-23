@@ -11,4 +11,15 @@
     <string name="home">home</string>
     <string name="notifications">notifications</string>
     <string name="profile">profile</string>
+    <string name="search">Search</string>
+    <string name="add_book">Add Book</string>
+    <string name="scan_book">Scan Book</string>
+
+    <string-array name="filter_statuses">
+        <item>Filter by</item>
+        <item>Accepted</item>
+        <item>Available</item>
+        <item>Borrowed</item>
+        <item>Requested</item>
+    </string-array>
 </resources>
