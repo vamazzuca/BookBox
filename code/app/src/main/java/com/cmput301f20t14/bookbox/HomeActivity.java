@@ -1,5 +1,5 @@
 /*
- * RegisterUserActivity.java
+ * HomeActivity.java
  *
  * Version 1.0
  *
@@ -28,18 +28,30 @@
 package com.cmput301f20t14.bookbox;
 
 import android.os.Bundle;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
- * An Activity that will allow a user to register with a unique username
+ * This shows the Home Menu with a task bar at the bottom
+ * The Home Menu shows the users owned books (?)
+ * By navigating the task bar, the user can:
+ *  - View their profile
+ *  - View their notifications
+ *  - View their Library (Home Menu)
+ *  - View a menu where they can choose to view requests
+ *      & borrowed books
  * @author Carter Sabadash
  * @version 2020.10.22
  */
-import androidx.appcompat.app.AppCompatActivity;
+public class HomeActivity extends AppCompatActivity {
 
-public class RegisterUserActivity extends AppCompatActivity {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_page);
+
+        Log.d("Logged in!", "Yay!");
     }
 }

@@ -1,7 +1,33 @@
+/*
+ * MainActivity.java
+ *
+ * Version 1.0
+ *
+ * Date 2020.10.22
+ *
+ * Copyright 2020 Team 14
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.cmput301f20t14.bookbox;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -14,14 +40,17 @@ import android.widget.EditText;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+
+/**
+ * This is the initial activity that shows a login screen and allows
+ * for user registration (RegisterUserActivity). Upon success, retrieves
+ * user data and opens main menu (HomeActivity)
+ * @author Carter Sabadash
+ * @version 2020.10.22
+ */
 
 public class MainActivity extends AppCompatActivity {
     FirebaseFirestore database;
@@ -37,6 +66,15 @@ public class MainActivity extends AppCompatActivity {
         Button createUserButton = findViewById(R.id.register_button);
         Button logInButton = findViewById(R.id.login_button);
 
+        createUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Open RegisterUser activity
+                Intent intent = new Intent(view.getContext(), RegisterUserActivity.class);
+                view.getContext().startActivity(intent);
+            }
+        });
+
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -47,20 +85,19 @@ public class MainActivity extends AppCompatActivity {
                 final String password = passwordEditText.getText().toString();
 
                 if (username.length() == 0 || password.length() == 0){
-                    // prompt error message
-                    Log.d("No: ", "User/Password");
+                    Log.d("LOGIN", "No User/Password");
                     return;
                 }
 
-                // establish a connection to firebase, and verify that the user exists
-                // if they do, log in
-                // if they don't, or the password is wrong, show error message
-                    // (use a fragment, or look into adding text above the user/password boxes
+                // see if user exists in firebase, get password, and verify
+                // show appropriate message for wrong credentials
                 DocumentReference documentReference
                         = database.collection("users").document(username);
 
                 // if documentReference doesn't exist, get document -> document.exists() == False
-                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                documentReference.get().addOnCompleteListener(
+                        new OnCompleteListener<DocumentSnapshot>() {
+
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
@@ -68,17 +105,16 @@ public class MainActivity extends AppCompatActivity {
                             if (document.exists()) {
                                 // check that password is correct
                                 if (document.get("password").equals(password)) {
-                                    // password is correct, log in
-                                    Intent intent = new Intent(view.getContext(), MainMenuActivity.class);
-                                    view.getContext().startActivity(intent);
+                                    // password is correct, perform login operations
+                                    login(view);
                                 } else {
                                     // password is incorrect, prompt user
-                                    Log.d("Password: ", "Incorrect");
+                                    Log.d("LOGIN", "Password Incorrect");
                                     return;
                                 }
                             } else {
                                 // user doesn't exist, prompt registration
-                                Log.d("User", ": Incorrect");
+                                Log.d("LOGIN", "User Incorrect");
                                 return;
                             }
                         }
@@ -86,14 +122,12 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
 
-        createUserButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Open RegisterUser activity
-                Intent intent = new Intent(view.getContext(), RegisterUserActivity.class);
-                view.getContext().startActivity(intent);
-            }
-        });
+    private void login(View view){
+        // gets all data from firebase (user info, books, etc), then starts HomeActivity
+
+        Intent intent = new Intent(view.getContext(), HomeActivity.class);
+        view.getContext().startActivity(intent);
     }
 }
