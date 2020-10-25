@@ -9,6 +9,15 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+
+/**
+ * This is the activity where the user can view their
+ * notifications that they receive. In this activity, the notifications
+ * show that another user would like to borrow your book, and is notified
+ * if their own request can been accepted or declined
+ * @author Alex Mazzuca
+ * @version 2020.10.24
+ */
 public class ViewNotificationsActivity extends AppCompatActivity {
 
     @Override
@@ -38,7 +47,7 @@ public class ViewNotificationsActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewRequestsActivity.class ));
+                        startActivity(new Intent(getApplicationContext(), ViewListActivity.class ));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:

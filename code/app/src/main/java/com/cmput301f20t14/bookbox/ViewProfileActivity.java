@@ -9,6 +9,14 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * Here is where the user can view their own profile.
+ * Through this activity the user can view and edit
+ * their username, email address, phone number and
+ * profile photo
+ * @author Alex Mazzuca
+ * @version 2020.10.24
+ */
 public class ViewProfileActivity extends AppCompatActivity {
 
     @Override
@@ -36,7 +44,7 @@ public class ViewProfileActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewRequestsActivity.class ));
+                        startActivity(new Intent(getApplicationContext(), ViewListActivity.class ));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
