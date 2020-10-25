@@ -30,12 +30,16 @@ package com.cmput301f20t14.bookbox;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.Toast;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
@@ -47,10 +51,17 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  *  - View their Library (Home Menu)
  *  - View a menu where they can choose to view requests
  *      & borrowed books
+<<<<<<< HEAD
+ * @author Carter Sabadash
+ * @author Alex Mazzuca
+=======
  * @author Carter Sabadash, Alex Mazzuca
+>>>>>>> origin/master
  * @version 2020.10.24
  */
 public class HomeActivity extends AppCompatActivity {
+
+    public static final int REQUEST_CODE_SCANNING = 100;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,7 +71,7 @@ public class HomeActivity extends AppCompatActivity {
         Log.d("Logged in!", "Yay!");
 
         bottomNavigationView();
-
+        setUpScanningButton();
     }
 
     /**
@@ -79,17 +90,17 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewListActivity.class ));
+                        startActivity(new Intent(getApplicationContext(), ListsActivity.class ));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
                         return true;
                     case R.id.notification_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewNotificationsActivity.class));
+                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewProfileActivity.class));
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                 }
@@ -98,5 +109,40 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Setting up the onClick listener for the scanning button
+     * Listener launches the Scanning activity to obtain a book
+     * description by scanning the ISBN
+     * @author Olivier Vadiavaloo
+     * @version 2020.10.24
+     * */
+    private void setUpScanningButton() {
+        ImageButton camera = (ImageButton) findViewById(R.id.main_page_scan_button);
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, ScanningActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_SCANNING);
+            }
+        });
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            // returning from a scan
+            case REQUEST_CODE_SCANNING:
+                if (data != null && resultCode == CommonStatusCodes.SUCCESS) {
+                    // must launch viewing activity for user to be able to view book description
+                    Toast.makeText(this, "Launch viewing", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, data.getStringExtra("BARCODE"), Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            default:
+                Log.d("Wrong return", "Wrong return");
+        }
+    }
 }

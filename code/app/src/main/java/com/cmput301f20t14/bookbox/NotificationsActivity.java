@@ -10,19 +10,23 @@ import android.view.MenuItem;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
- * This activity displays the options to select and view the
- * different lists. The lists include, outgoing requests,
- * accepted requests and currently borrowed books.
+ * This is the activity where the user can view their
+ * notifications that they receive. In this activity, the notifications
+ * show that another user would like to borrow your book, and is notified
+ * if their own request can been accepted or declined
  * @author Alex Mazzuca
  * @version 2020.10.24
  */
-public class ViewListActivity extends AppCompatActivity {
+public class NotificationsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lists);
+        setContentView(R.layout.activity_notifications);
+
         bottomNavigationView();
+
     }
 
 
@@ -36,23 +40,23 @@ public class ViewListActivity extends AppCompatActivity {
     private void bottomNavigationView(){
         //Home Navigation bar implementation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
-        bottomNavigationView.setSelectedItemId(R.id.lists_bottom_nav);
+        bottomNavigationView.setSelectedItemId(R.id.notification_bottom_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
+                        startActivity(new Intent(getApplicationContext(), ListsActivity.class ));
+                        overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.notification_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewNotificationsActivity.class ));
-                        overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewProfileActivity.class));
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                 }

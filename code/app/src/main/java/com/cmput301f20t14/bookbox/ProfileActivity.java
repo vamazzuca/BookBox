@@ -9,25 +9,22 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-
 /**
- * This is the activity where the user can view their
- * notifications that they receive. In this activity, the notifications
- * show that another user would like to borrow your book, and is notified
- * if their own request can been accepted or declined
+ * Here is where the user can view their own profile.
+ * Through this activity the user can view and edit
+ * their username, email address, phone number and
+ * profile photo
  * @author Alex Mazzuca
  * @version 2020.10.24
  */
-public class ViewNotificationsActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notifications);
-
+        setContentView(R.layout.activity_profile);
         bottomNavigationView();
-
     }
 
 
@@ -41,13 +38,13 @@ public class ViewNotificationsActivity extends AppCompatActivity {
     private void bottomNavigationView(){
         //Home Navigation bar implementation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
-        bottomNavigationView.setSelectedItemId(R.id.notification_bottom_nav);
+        bottomNavigationView.setSelectedItemId(R.id.profile_bottom_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewListActivity.class ));
+                        startActivity(new Intent(getApplicationContext(), ListsActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
@@ -55,15 +52,14 @@ public class ViewNotificationsActivity extends AppCompatActivity {
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.notification_bottom_nav:
+                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class));
+                        overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewProfileActivity.class));
-                        overridePendingTransition(0,0);
                         return true;
                 }
                 return false;
             }
         });
     }
-
 }

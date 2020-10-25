@@ -10,20 +10,17 @@ import android.view.MenuItem;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
- * Here is where the user can view their own profile.
- * Through this activity the user can view and edit
- * their username, email address, phone number and
- * profile photo
+ * This activity displays the options to select and view the
+ * different lists. The lists include, outgoing requests,
+ * accepted requests and currently borrowed books.
  * @author Alex Mazzuca
  * @version 2020.10.24
  */
-public class ViewProfileActivity extends AppCompatActivity {
-
+public class ListsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_lists);
         bottomNavigationView();
     }
 
@@ -38,28 +35,29 @@ public class ViewProfileActivity extends AppCompatActivity {
     private void bottomNavigationView(){
         //Home Navigation bar implementation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
-        bottomNavigationView.setSelectedItemId(R.id.profile_bottom_nav);
+        bottomNavigationView.setSelectedItemId(R.id.lists_bottom_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewListActivity.class ));
-                        overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.notification_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ViewNotificationsActivity.class));
+                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class ));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                        overridePendingTransition(0,0);
                         return true;
                 }
                 return false;
             }
         });
     }
+
 }
