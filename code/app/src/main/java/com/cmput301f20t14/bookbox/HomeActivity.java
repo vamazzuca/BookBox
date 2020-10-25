@@ -51,8 +51,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  *  - View their Library (Home Menu)
  *  - View a menu where they can choose to view requests
  *      & borrowed books
+<<<<<<< HEAD
  * @author Carter Sabadash
  * @author Alex Mazzuca
+=======
+ * @author Carter Sabadash, Alex Mazzuca
+>>>>>>> origin/master
  * @version 2020.10.24
  */
 public class HomeActivity extends AppCompatActivity {
@@ -86,7 +90,7 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), RequestsActivity.class ));
+                        startActivity(new Intent(getApplicationContext(), ListsActivity.class ));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:

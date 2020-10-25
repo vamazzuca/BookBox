@@ -9,8 +9,14 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class RequestsActivity extends AppCompatActivity {
-
+/**
+ * This activity displays the options to select and view the
+ * different lists. The lists include, outgoing requests,
+ * accepted requests and currently borrowed books.
+ * @author Alex Mazzuca
+ * @version 2020.10.24
+ */
+public class ListsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

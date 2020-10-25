@@ -191,7 +191,7 @@ public class ScanningActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), RequestsActivity.class ));
+                        startActivity(new Intent(getApplicationContext(), ListsActivity.class ));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
