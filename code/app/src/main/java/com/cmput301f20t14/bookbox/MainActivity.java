@@ -34,6 +34,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseFirestore.getInstance();
 
         Button createUserButton = findViewById(R.id.register_button);
-        Button logInButton = findViewById(R.id.login_button);
+        final Button loginButton = findViewById(R.id.login_button);
 
         createUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         // setting listener for login button
-        logInButton.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                loginButton.setText(R.string.login_verify);
                 EditText usernameEditText = findViewById(R.id.username_editText);
                 EditText passwordEditText = findViewById((R.id.password_editText));
 
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 final String password = passwordEditText.getText().toString();
 
                 attemptLogin(view, username, password);
+                loginButton.setText(R.string.log_in_button);
             }
         });
     }
@@ -101,11 +103,13 @@ public class MainActivity extends AppCompatActivity {
      * @param username The entered username
      * @param password The entered password
      */
-    @SuppressLint("SetTextI18n")
     private void attemptLogin(final View view, final String username, final String password){
         if (username.length() == 0 || password.length() == 0){
-            Toast.makeText(getApplicationContext(),
-                    "No User/Password entered", Toast.LENGTH_SHORT).show();
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "No User/Password entered", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,
+                    0, 0);
+            toast.show();
             Log.d(TAG, "No User/Password");
             return;
         }
@@ -127,6 +131,8 @@ public class MainActivity extends AppCompatActivity {
                                 // check that password is correct
                                 if (document.get("password").equals(password)) {
                                     // password is correct, perform login operations
+                                    Button login = findViewById(R.id.login_button);
+                                    login.setText(R.string.login_login);
                                     Intent intent = new Intent(view.getContext(), HomeActivity.class);
                                     intent.putExtra("USERNAME", username);
                                     startActivity(intent);
@@ -134,14 +140,21 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     // password is incorrect, prompt user
                                     Log.d(TAG, "Password Incorrect");
-                                    Toast.makeText(getApplicationContext(),
-                                            "Incorrect Password", Toast.LENGTH_SHORT).show();
+                                    Toast toast = Toast.makeText(getApplicationContext(),
+                                            "Incorrect Password", Toast.LENGTH_SHORT);
+                                    toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,
+                                            0, 0);
+                                    toast.show();
+
                                 }
                             } else {
                                 // user doesn't exist, prompt registration
                                 Log.d(TAG, "User Incorrect");
-                                Toast.makeText(getApplicationContext(),
-                                        "Incorrect Username", Toast.LENGTH_SHORT).show();
+                                Toast toast = Toast.makeText(getApplicationContext(),
+                                        "Incorrect Username", Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,
+                                        0, 0);
+                                toast.show();
                             }
                         }
                     }

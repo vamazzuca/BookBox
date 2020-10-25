@@ -48,6 +48,7 @@ public class Book {
         BORROWED
     } // move to a public file with other enums?
 
+    private String id;
     private String isbn;
     private String title;
     private String author;
@@ -58,35 +59,32 @@ public class Book {
 
     /**
      * Constructs a book without an image
+     * @param id The id to access the book in firebase
      * @param isbn The isbn of the book
      * @param title The title of the book
      * @param author The author of the book
      * @param owner The User who owns the book
+     * @param status The Status of the Book (Book.Status)
+     * @param lentTo Who the book is lent to (null if no-one)
+     * @param photo The image association with the book
      */
-    public Book(String isbn, String title, String author, String owner) {
+    public Book(String id, String isbn, String title, String author, String owner, Status status,
+                String lentTo, Image photo) {
+        this.id = id;
         this.isbn = isbn;
         this.title = title;
         this.author = author;
         this.owner = owner;
-        // when we have default images
-        // this.photo = DEFAULT_BOOK_PHOTO;
+        this.status = status;
+        this.lentTo = lentTo;
+        this.photo = photo;
     }
 
     /**
-     * Constructs a book with an image
-     * @param isbn The isbn of the book
-     * @param title The title of the book
-     * @param author The author of the book
-     * @param owner The User who owns the book
-     * @param photo The image to display with the book
+     * Get the id through which to access the book in firebase
+     * @return The string of the book id
      */
-    public Book(String isbn, String title, String author, String owner, Image photo) {
-        this.isbn = isbn;
-        this.title = title;
-        this.author = author;
-        this.owner = owner;
-        this.photo = photo;
-    }
+    public String getId() { return id; }
 
     /**
      * Get the ISBN of the book
@@ -134,6 +132,7 @@ public class Book {
      * @return A string identifying who the book is lent to
      */
     public String getLentTo() {
+        if (lentTo == null) { return "Not Borrowed"; }
         return lentTo;
     }
 
