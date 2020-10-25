@@ -30,6 +30,7 @@ package com.cmput301f20t14.bookbox;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         // setting listener for login button
         logInButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(final View view) {
                 EditText usernameEditText = findViewById(R.id.username_editText);
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
      * @param username The entered username
      * @param password The entered password
      */
+    @SuppressLint("SetTextI18n")
     private void attemptLogin(final View view, final String username, final String password){
         if (username.length() == 0 || password.length() == 0){
             Toast.makeText(getApplicationContext(),

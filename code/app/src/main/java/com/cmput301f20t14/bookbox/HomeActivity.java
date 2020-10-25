@@ -57,6 +57,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * This shows the Home Menu with a task bar at the bottom
@@ -188,41 +189,66 @@ public class HomeActivity extends AppCompatActivity {
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
                                 @Nullable FirebaseFirestoreException error) {
                 // books.clear() when we've decided how to store the books
-
-                for(QueryDocumentSnapshot doc: queryDocumentSnapshots) {
-                    doc.getDocumentReference("book").get().addOnCompleteListener(
-                            new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            DocumentSnapshot doc = task.getResult();
-                            if (doc.exists()){
-                                final String isbn = doc.get("isbn").toString();
-                                final String title = doc.get("title").toString();
-                                final String author = doc.get("author").toString();
-                                String owned = username;
-                                Book.Status status = (Book.Status) doc.get("status");
-                                // Image photo = doc.get("photo"); get image data correctly
-                                DocumentReference borrowedto = doc.getDocumentReference("borrowedto");
-                                borrowedto.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                try {
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        doc.getDocumentReference("book").get().addOnCompleteListener(
+                                new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        DocumentSnapshot doc = task.getResult();
-                                        //books.addBook(new Book(isbn, title, author, username, b, photo));
-                                        // something like this to create a new book and add it to the list
-                                        if (doc.exists()) {
-                                            String b = task.getResult().getId();
-                                        } else {
-                                            // error handling
-                                        }
+                                        getBookData(task);
                                     }
                                 });
-                            } else {
-                                // error handling
-                            }
-                        }
-                    });
+                    }
+                } catch (Exception e) {
+                    // error handling, generic error
                 }
             }
         });
+    }
+
+    /**
+     * Gets all data from a book and adds to the local list of books
+     * @param task A DocumentReference to the book
+     */
+    private void getBookData(@NonNull Task<DocumentSnapshot> task) {
+        DocumentReference document = database.collection("books")
+                .document(Objects.requireNonNull(task.getResult()).getId());
+        document.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                DocumentSnapshot doc = task.getResult();
+                if (doc.exists()){
+                    final String isbn = doc.get("isbn").toString();
+                    final String title = doc.get("title").toString();
+                    final String author = doc.get("author").toString();
+                    final String owned = username;
+                    final String status = doc.get("status").toString();
+                    // Image photo = doc.get("photo"); get image data correctly
+                    try {
+                        DocumentReference borrowedto = doc.getDocumentReference("borrowedto");
+                        borrowedto.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                DocumentSnapshot doc = task.getResult();
+                                if (doc.exists()) {
+                                    String b = task.getResult().getId();
+                                    // books.addBook(new Book(isbn, title, author, username, b, photo));
+                                    // something like this to create a new book and add it to the list
+                                    // should probably have the id too (top: task.getResult().getID())
+                                } else {
+                                    // error handling
+                                }
+                            }
+                        });
+                    } catch (NullPointerException e) {
+                        // not borrowed
+                        // books.addBook(new Book(isbn, title, author, username, null, photo
+                    }
+                } else {
+                    // error handling
+                }
+            }
+        });
+
     }
 }
