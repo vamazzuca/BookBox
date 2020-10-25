@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        // setting listener for logIn button
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -115,14 +117,12 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d("LOGIN", "Password Incorrect");
                                     Toast.makeText(getApplicationContext(),
                                             "Incorrect Password", Toast.LENGTH_SHORT).show();
-                                    return;
                                 }
                             } else {
                                 // user doesn't exist, prompt registration
                                 Log.d("LOGIN", "User Incorrect");
                                 Toast.makeText(getApplicationContext(),
                                         "Incorrect Username", Toast.LENGTH_SHORT).show();
-                                return;
                             }
                         }
                     }

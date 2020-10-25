@@ -27,11 +27,19 @@
  */
 package com.cmput301f20t14.bookbox;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.common.api.CommonStatusCodes;
 
 /**
  * This shows the Home Menu with a task bar at the bottom
@@ -50,8 +58,18 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_page);
+        setContentView(R.layout.activity_home);
 
         Log.d("Logged in!", "Yay!");
+
+        ImageButton camera = (ImageButton) findViewById(R.id.main_page_scan_button);
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, ScanningActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 }
