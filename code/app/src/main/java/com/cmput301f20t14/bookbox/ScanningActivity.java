@@ -36,9 +36,12 @@ import static com.google.android.gms.vision.barcode.Barcode.UPC_E;
  * This is the scanning activity. It makes use of a surface view and
  * a barcode detector and cameraSource for the scanning functionality
  * of the app. Activity is finished when a valid barcode is scanned.
- * Control is then returned to HomeActivity class.
+ * Control is then returned to HomeActivity class. The scanning
+ * feature makes use of the Google Vision API.
  * @author Olivier Vadiavaloo
  * @version 2020.10.24
+ * @see BarcodeDetector
+ * @see CameraSource
  * */
 public class ScanningActivity extends AppCompatActivity {
 
