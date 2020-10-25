@@ -213,6 +213,7 @@ public class HomeActivity extends AppCompatActivity {
     private void getBookData(@NonNull Task<DocumentSnapshot> task) {
         DocumentReference document = database.collection("books")
                 .document(Objects.requireNonNull(task.getResult()).getId());
+        String bookID = task.getResult().getId();
         document.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -232,9 +233,8 @@ public class HomeActivity extends AppCompatActivity {
                                 DocumentSnapshot doc = task.getResult();
                                 if (doc.exists()) {
                                     String b = task.getResult().getId();
-                                    // books.addBook(new Book(isbn, title, author, username, b, photo));
+                                    // books.addBook(new Book(bookId, isbn, title, author, username, b, photo));
                                     // something like this to create a new book and add it to the list
-                                    // should probably have the id too (top: task.getResult().getID())
                                 } else {
                                     // error handling
                                 }
@@ -242,7 +242,7 @@ public class HomeActivity extends AppCompatActivity {
                         });
                     } catch (NullPointerException e) {
                         // not borrowed
-                        // books.addBook(new Book(isbn, title, author, username, null, photo
+                        // books.addBook(new Book(bookId, isbn, title, author, username, null, photo
                     }
                 } else {
                     // error handling
