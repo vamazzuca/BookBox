@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         // gets all data from firebase (user info, books, etc), then starts HomeActivity
 
         Intent intent = new Intent(view.getContext(), HomeActivity.class);
-        view.getContext().startActivity(intent);
+        startActivity(intent);
+        finish();
     }
 }
