@@ -51,9 +51,9 @@ public class Book {
     private String isbn;
     private String title;
     private String author;
-    private User owner;
+    private String owner;
     private Status status;
-    private User lentTo;
+    private String lentTo;
     private Image photo;
 
     /**
@@ -63,7 +63,7 @@ public class Book {
      * @param author The author of the book
      * @param owner The User who owns the book
      */
-    public Book(String isbn, String title, String author, User owner) {
+    public Book(String isbn, String title, String author, String owner) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
@@ -80,7 +80,7 @@ public class Book {
      * @param owner The User who owns the book
      * @param photo The image to display with the book
      */
-    public Book(String isbn, String title, String author, User owner, Image photo) {
+    public Book(String isbn, String title, String author, String owner, Image photo) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
@@ -114,9 +114,9 @@ public class Book {
 
     /**
      * Gets the owner of the book
-     * @return A User who owns the book
+     * @return A String of who owns the book
      */
-    public User getOwner() {
+    public String getOwner() {
         return owner;
     }
 
@@ -131,9 +131,9 @@ public class Book {
     /**
      * Gets who currently has the book
      * ** Need to define behaviour when the book is AVAILABLE
-     * @return A User who the book is lent to
+     * @return A string identifying who the book is lent to
      */
-    public User getLentTo() {
+    public String getLentTo() {
         return lentTo;
     }
 

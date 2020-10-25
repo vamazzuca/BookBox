@@ -185,34 +185,42 @@ public class HomeActivity extends AppCompatActivity {
         // first, get the references to books associated with the user
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
-                ArrayList<DocumentReference> bookReferences = new ArrayList<>();
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
+                                @Nullable FirebaseFirestoreException error) {
                 // books.clear() when we've decided how to store the books
 
                 for(QueryDocumentSnapshot doc: queryDocumentSnapshots) {
-                    bookReferences.add(doc.getDocumentReference("book"));
-                }
-
-                for(int i = 0; i < bookReferences.size(); ++i){
-                    bookReferences.get(i).get().addOnCompleteListener(
+                    doc.getDocumentReference("book").get().addOnCompleteListener(
                             new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    DocumentSnapshot doc = task.getResult();
-                                    if (doc.exists()){
-                                        String title = doc.get("title").toString();
-                                        String author = doc.get("author").toString();
-                                        String owned = username;
-                                        Book.Status status = (Book.Status) doc.get("status");
-                                        // Image photo = doc.get("photo"); get image data correctly
-                                        DocumentReference borrower = doc.getDocumentReference("borrowedto");
-                                    } else {
-                                        // error handling
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            DocumentSnapshot doc = task.getResult();
+                            if (doc.exists()){
+                                final String isbn = doc.get("isbn").toString();
+                                final String title = doc.get("title").toString();
+                                final String author = doc.get("author").toString();
+                                String owned = username;
+                                Book.Status status = (Book.Status) doc.get("status");
+                                // Image photo = doc.get("photo"); get image data correctly
+                                DocumentReference borrowedto = doc.getDocumentReference("borrowedto");
+                                borrowedto.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        DocumentSnapshot doc = task.getResult();
+                                        //books.addBook(new Book(isbn, title, author, username, b, photo));
+                                        // something like this to create a new book and add it to the list
+                                        if (doc.exists()) {
+                                            String b = task.getResult().getId();
+                                        } else {
+                                            // error handling
+                                        }
                                     }
-
-                                }
+                                });
+                            } else {
+                                // error handling
                             }
-                    )
+                        }
+                    });
                 }
             }
         });
