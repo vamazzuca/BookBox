@@ -50,16 +50,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * for user registration (RegisterUserActivity). Upon success, retrieves
  * user data and opens main menu (HomeActivity)
  * @author Carter Sabadash
- * @version 2020.10.22
- */
-
-/**
- * The Initial Login activity
- * @author Carter Sabadash
- * @version 2020.10.22
+ * @version 2020.10.25
  */
 public class MainActivity extends AppCompatActivity {
     FirebaseFirestore database;
+    final String TAG = "LOGIN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // setting listener for logIn button
+        // setting listener for login button
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -92,21 +87,34 @@ public class MainActivity extends AppCompatActivity {
                 final String username = usernameEditText.getText().toString();
                 final String password = passwordEditText.getText().toString();
 
-                if (username.length() == 0 || password.length() == 0){
-                    Toast.makeText(getApplicationContext(),
-                            "No User/Password entered", Toast.LENGTH_SHORT).show();
-                    Log.d("LOGIN", "No User/Password");
-                    return;
-                }
+                attemptLogin(view, username, password);
+            }
+        });
+    }
 
-                // see if user exists in firebase, get password, and verify
-                // show appropriate message for wrong credentials
-                DocumentReference documentReference
-                        = database.collection("users").document(username);
+    /**
+     * Verifies the user and password, if the user and password is correct, go to HomeActivity
+     * if it is incorrect, show appropriate error and return
+     * @param view The view
+     * @param username The entered username
+     * @param password The entered password
+     */
+    private void attemptLogin(final View view, final String username, final String password){
+        if (username.length() == 0 || password.length() == 0){
+            Toast.makeText(getApplicationContext(),
+                    "No User/Password entered", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "No User/Password");
+            return;
+        }
 
-                // if documentReference doesn't exist, get document -> document.exists() == False
-                documentReference.get().addOnCompleteListener(
-                        new OnCompleteListener<DocumentSnapshot>() {
+        // see if user exists in firebase, get password, and verify
+        // show appropriate message for wrong credentials
+        DocumentReference documentReference
+                = database.collection("users").document(username);
+
+        // if documentReference doesn't exist, get document -> document.exists() == False
+        documentReference.get().addOnCompleteListener(
+                new OnCompleteListener<DocumentSnapshot>() {
 
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -116,31 +124,24 @@ public class MainActivity extends AppCompatActivity {
                                 // check that password is correct
                                 if (document.get("password").equals(password)) {
                                     // password is correct, perform login operations
-                                    login(view);
+                                    Intent intent = new Intent(view.getContext(), HomeActivity.class);
+                                    intent.putExtra("USERNAME", username);
+                                    startActivity(intent);
+                                    finish();
                                 } else {
                                     // password is incorrect, prompt user
-                                    Log.d("LOGIN", "Password Incorrect");
+                                    Log.d(TAG, "Password Incorrect");
                                     Toast.makeText(getApplicationContext(),
                                             "Incorrect Password", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
                                 // user doesn't exist, prompt registration
-                                Log.d("LOGIN", "User Incorrect");
+                                Log.d(TAG, "User Incorrect");
                                 Toast.makeText(getApplicationContext(),
                                         "Incorrect Username", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
                 });
-            }
-        });
-    }
-
-    private void login(View view){
-        // gets all data from firebase (user info, books, etc), then starts HomeActivity
-
-        Intent intent = new Intent(view.getContext(), HomeActivity.class);
-        startActivity(intent);
-        finish();
     }
 }

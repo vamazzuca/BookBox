@@ -32,7 +32,7 @@ import java.util.ArrayList;
 /**
  * A base class to represent a list of books
  * @author Carter Sabadash
- * @version 2020.10.22
+ * @version 2020.10.25
  *
  * So far this assumes we will be using separate lists for owned and borrowed books
  *      in which case subclasses should be made... for now, this serves as a template
@@ -56,5 +56,14 @@ public abstract class BookList {
      */
     public void deleteBook(Book book){
         books.remove(book);
+    }
+
+    /**
+     * Removes all books from the list
+     */
+    public void clear() {
+        if (books.size() > 0) {
+            books.clear();
+        }
     }
 }

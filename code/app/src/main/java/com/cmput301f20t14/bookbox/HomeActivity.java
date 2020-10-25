@@ -27,8 +27,11 @@
  */
 package com.cmput301f20t14.bookbox;
 
+import android.accounts.NetworkErrorException;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
+import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -40,36 +43,56 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 /**
  * This shows the Home Menu with a task bar at the bottom
- * The Home Menu shows the users owned books (?)
+ * The Home Menu shows the users owned books
  * By navigating the task bar, the user can:
  *  - View their profile
  *  - View their notifications
  *  - View their Library (Home Menu)
  *  - View a menu where they can choose to view requests
  *      & borrowed books
-<<<<<<< HEAD
- * @author Carter Sabadash
- * @author Alex Mazzuca
-=======
  * @author Carter Sabadash, Alex Mazzuca
->>>>>>> origin/master
- * @version 2020.10.24
+ * @version 2020.10.25
+ * @see NotificationsActivity
+ * @see ProfileActivity
+ * @see ListsActivity
  */
 public class HomeActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE_SCANNING = 100;
+    private String username;
+    FirebaseFirestore database;
+    BookList books;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        Log.d("Logged in!", "Yay!");
+        FirebaseApp.initializeApp(this);
+        database = FirebaseFirestore.getInstance();
 
+        // get the username from whichever activity we came from
+        // this is necessary to access firebase
+        username = getIntent().getExtras().getString("USERNAME");
+
+        firebaseInitBookListener();
         bottomNavigationView();
         setUpScanningButton();
     }
@@ -78,8 +101,8 @@ public class HomeActivity extends AppCompatActivity {
      * Implementation of the bottom navigation bar for switching to different
      * activity views, such as home, profile, notifications and lists
      * References: https://www.youtube.com/watch?v=JjfSjMs0ImQ&feature=youtu.be
-     * @author Alex Mazzuca
-     * @version 2020.10.24
+     * @author Alex Mazzuca, Carter Sabadash
+     * @version 2020.10.25
      */
     private void bottomNavigationView(){
         //Home Navigation bar implementation
@@ -90,17 +113,20 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ListsActivity.class ));
+                        startActivity(new Intent(getApplicationContext(), ListsActivity.class)
+                                .putExtra("USERNAME", username));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
                         return true;
                     case R.id.notification_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class));
+                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class)
+                                .putExtra("USERNAME", username));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class)
+                                .putExtra("USERNAME", username));
                         overridePendingTransition(0,0);
                         return true;
                 }
@@ -144,5 +170,51 @@ public class HomeActivity extends AppCompatActivity {
             default:
                 Log.d("Wrong return", "Wrong return");
         }
+    }
+
+    /**
+     * This initializes a SnapShotListener to Firebase so the list of books
+     * owned by the user is always correct
+     * @author Carter Sabadash
+     * @version 2020.10.25
+     */
+    private void firebaseInitBookListener(){
+        final CollectionReference collectionReference = database.collection("users")
+                .document(username).collection("OwnedBooks");
+
+        // first, get the references to books associated with the user
+        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                ArrayList<DocumentReference> bookReferences = new ArrayList<>();
+                // books.clear() when we've decided how to store the books
+
+                for(QueryDocumentSnapshot doc: queryDocumentSnapshots) {
+                    bookReferences.add(doc.getDocumentReference("book"));
+                }
+
+                for(int i = 0; i < bookReferences.size(); ++i){
+                    bookReferences.get(i).get().addOnCompleteListener(
+                            new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    DocumentSnapshot doc = task.getResult();
+                                    if (doc.exists()){
+                                        String title = doc.get("title").toString();
+                                        String author = doc.get("author").toString();
+                                        String owned = username;
+                                        Book.Status status = (Book.Status) doc.get("status");
+                                        // Image photo = doc.get("photo"); get image data correctly
+                                        DocumentReference borrower = doc.getDocumentReference("borrowedto");
+                                    } else {
+                                        // error handling
+                                    }
+
+                                }
+                            }
+                    )
+                }
+            }
+        });
     }
 }
