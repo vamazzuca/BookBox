@@ -211,10 +211,8 @@ public class HomeActivity extends AppCompatActivity {
      * @param task A DocumentReference to the book
      */
     private void getBookData(@NonNull Task<DocumentSnapshot> task) {
-        DocumentReference document = database.collection("books")
-                .document(Objects.requireNonNull(task.getResult()).getId());
         String bookID = task.getResult().getId();
-        document.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        task.addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 DocumentSnapshot doc = task.getResult();
@@ -223,16 +221,16 @@ public class HomeActivity extends AppCompatActivity {
                     final String title = doc.get("title").toString();
                     final String author = doc.get("author").toString();
                     final String owned = username;
-                    final String status = doc.get("status").toString();
+                    final Book.Status status = Book.Status.valueOf(doc.get("status").toString());
                     // Image photo = doc.get("photo"); get image data correctly
                     try {
-                        DocumentReference borrowedto = doc.getDocumentReference("borrowedto");
-                        borrowedto.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        DocumentReference borrowedTo = doc.getDocumentReference("borrowedto");
+                        borrowedTo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 DocumentSnapshot doc = task.getResult();
                                 if (doc.exists()) {
-                                    String b = task.getResult().getId();
+                                    String borrower = task.getResult().getId();
                                     // books.addBook(new Book(bookId, isbn, title, author, username, b, photo));
                                     // something like this to create a new book and add it to the list
                                 } else {
