@@ -68,12 +68,8 @@ import java.util.Objects;
  *  - View their Library (Home Menu)
  *  - View a menu where they can choose to view requests
  *      & borrowed books
-<<<<<<< HEAD
  * @author Carter Sabadash
  * @author Alex Mazzuca
-=======
- * @author Carter Sabadash, Alex Mazzuca
->>>>>>> 498723576e58beb2e702c77e1e42df8c8d0eeebe
  * @version 2020.10.25
  * @see NotificationsActivity
  * @see ProfileActivity
@@ -161,6 +157,12 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Implements functionality when a previously launched activity
+     * is finished with a potential set result.
+     * @author Olivier Vadiavaloo
+     * @version 2020.10.25
+     * */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
