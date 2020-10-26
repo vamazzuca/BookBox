@@ -17,6 +17,9 @@
         android:textColor="@color/colorPurpleTitle"
         android:textSize="35sp"
         android:textStyle="bold"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:backgroundTint="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +73,7 @@
 
     <TextView
         android:id="@+id/not_registered_yet"
-        android:layout_width="146dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:layout_marginTop="60dp"
@@ -83,7 +86,7 @@
 
     <Button
         android:id="@+id/register_button"
-        android:layout_width="130dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:layout_marginEnd="48dp"
