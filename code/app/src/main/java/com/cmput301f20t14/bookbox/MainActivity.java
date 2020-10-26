@@ -105,11 +105,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void attemptLogin(final View view, final String username, final String password){
         if (username.length() == 0 || password.length() == 0){
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    "No User/Password entered", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,
-                    0, 0);
-            toast.show();
+            Toast.makeText(getApplicationContext(),
+                    "No User/Password entered", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "No User/Password");
             return;
         }
@@ -140,21 +137,15 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     // password is incorrect, prompt user
                                     Log.d(TAG, "Password Incorrect");
-                                    Toast toast = Toast.makeText(getApplicationContext(),
-                                            "Incorrect Password", Toast.LENGTH_SHORT);
-                                    toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,
-                                            0, 0);
-                                    toast.show();
+                                    Toast.makeText(getApplicationContext(),
+                                            "Incorrect Password", Toast.LENGTH_SHORT).show();
 
                                 }
                             } else {
                                 // user doesn't exist, prompt registration
                                 Log.d(TAG, "User Incorrect");
-                                Toast toast = Toast.makeText(getApplicationContext(),
-                                        "Incorrect Username", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,
-                                        0, 0);
-                                toast.show();
+                                Toast.makeText(getApplicationContext(),
+                                        "Incorrect Username", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
