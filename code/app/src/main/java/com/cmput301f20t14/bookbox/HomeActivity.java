@@ -68,7 +68,12 @@ import java.util.Objects;
  *  - View their Library (Home Menu)
  *  - View a menu where they can choose to view requests
  *      & borrowed books
+<<<<<<< HEAD
+ * @author Carter Sabadash
+ * @author Alex Mazzuca
+=======
  * @author Carter Sabadash, Alex Mazzuca
+>>>>>>> 498723576e58beb2e702c77e1e42df8c8d0eeebe
  * @version 2020.10.25
  * @see NotificationsActivity
  * @see ProfileActivity
@@ -102,7 +107,8 @@ public class HomeActivity extends AppCompatActivity {
      * Implementation of the bottom navigation bar for switching to different
      * activity views, such as home, profile, notifications and lists
      * References: https://www.youtube.com/watch?v=JjfSjMs0ImQ&feature=youtu.be
-     * @author Alex Mazzuca, Carter Sabadash
+     * @author Alex Mazzuca
+     * @author Carter Sabadash
      * @version 2020.10.25
      */
     private void bottomNavigationView(){
@@ -149,6 +155,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HomeActivity.this, ScanningActivity.class);
+                intent.putExtra("USERNAME", username);
                 startActivityForResult(intent, REQUEST_CODE_SCANNING);
             }
         });

@@ -54,20 +54,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * for user registration (RegisterUserActivity). Upon success, retrieves
  * user data and opens main menu (HomeActivity)
  * @author Carter Sabadash
-<<<<<<< HEAD
- * @version 2020.10.25
-=======
  * @author Olivier Vadiavaloo
- * @version 2020.10.22
->>>>>>> origin
+ * @version 2020.10.25
  */
 public class MainActivity extends AppCompatActivity {
+    EditText usernameEditText;
+    EditText passwordEditText;
     FirebaseFirestore database;
-<<<<<<< HEAD
     final String TAG = "LOGIN";
-=======
     public final int REQUEST_CODE_REGISTER = 1;
->>>>>>> origin
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseApp.initializeApp(this);
         database = FirebaseFirestore.getInstance();
+
+        usernameEditText = (EditText) findViewById(R.id.username_editText);
+        passwordEditText = (EditText) findViewById(R.id.password_editText);
 
         Button createUserButton = findViewById(R.id.register_button);
         final Button loginButton = findViewById(R.id.login_button);
@@ -94,14 +92,8 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-<<<<<<< HEAD
                 loginButton.setText(R.string.login_verify);
-                EditText usernameEditText = findViewById(R.id.username_editText);
-                EditText passwordEditText = findViewById((R.id.password_editText));
-=======
-                final EditText usernameEditText = findViewById(R.id.username_editText);
-                final EditText passwordEditText = findViewById((R.id.password_editText));
->>>>>>> origin
+                loginButton.setText(R.string.login_verify);
 
                 final String username = usernameEditText.getText().toString();
                 final String password = passwordEditText.getText().toString();
@@ -110,9 +102,15 @@ public class MainActivity extends AppCompatActivity {
                 loginButton.setText(R.string.log_in_button);
             }
         });
+
+        createUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                register(v);
+            }
+        });
     }
 
-<<<<<<< HEAD
     /**
      * Verifies the user and password, if the user and password is correct, go to HomeActivity
      * if it is incorrect, show appropriate error and return
@@ -120,11 +118,22 @@ public class MainActivity extends AppCompatActivity {
      * @param username The entered username
      * @param password The entered password
      */
-    private void attemptLogin(final View view, final String username, final String password){
-        if (username.length() == 0 || password.length() == 0){
-            Toast.makeText(getApplicationContext(),
-                    "No User/Password entered", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "No User/Password");
+    private void attemptLogin(final View view, final String username, final String password) {
+        boolean isEmptyEditText = false;
+
+        if (username.length() == 0) {
+            usernameEditText.setError("Required");
+            usernameEditText.requestFocus();
+            isEmptyEditText = true;
+        }
+
+        if (password.length() == 0) {
+            passwordEditText.setError("Required");
+            passwordEditText.requestFocus();
+            isEmptyEditText = true;
+        }
+
+        if (isEmptyEditText) {
             return;
         }
 
@@ -136,13 +145,6 @@ public class MainActivity extends AppCompatActivity {
         // if documentReference doesn't exist, get document -> document.exists() == False
         documentReference.get().addOnCompleteListener(
                 new OnCompleteListener<DocumentSnapshot>() {
-=======
-                // if documentReference doesn't exist, get document -> document.exists() == False
-                documentReference
-                        .get()
-                        .addOnCompleteListener(
-                        new OnCompleteListener<DocumentSnapshot>() {
->>>>>>> origin
 
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -163,40 +165,20 @@ public class MainActivity extends AppCompatActivity {
                                     finish();
                                 } else {
                                     // password is incorrect, prompt user
-<<<<<<< HEAD
-                                    Log.d(TAG, "Password Incorrect");
-                                    Toast.makeText(getApplicationContext(),
-                                            "Incorrect Password", Toast.LENGTH_SHORT).show();
-
-=======
                                     passwordEditText.setError("Invalid password");
->>>>>>> origin
+                                    passwordEditText.setText("");
+                                    passwordEditText.requestFocus();
                                 }
 
                             } else {
                                 // user doesn't exist, prompt registration
-<<<<<<< HEAD
-                                Log.d(TAG, "User Incorrect");
-                                Toast.makeText(getApplicationContext(),
-                                        "Incorrect Username", Toast.LENGTH_SHORT).show();
-=======
                                 usernameEditText.setError("Invalid username");
->>>>>>> origin
+                                usernameEditText.setText("");
+                                usernameEditText.requestFocus();
                             }
                         }
                     }
                 });
-<<<<<<< HEAD
-=======
-            }
-        });
-
-        createUserButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                register(v);
-            }
-        });
     }
 
     private void register(View view) {
@@ -215,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
         // finish activity to prevent user from going back to
         // login by pressing the back button on the device
         finish();
->>>>>>> origin
     }
 
     @Override
