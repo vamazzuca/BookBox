@@ -1,103 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+
+<ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:fillViewport="true"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:id="@+id/account_registration_textView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="100dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/account_registration"
-        android:textColor="@color/colorPurpleTitle"
-        android:textSize="35sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/register_username_editText"
-        android:layout_width="335dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="72dp"
-        android:layout_marginEnd="16dp"
-        android:autofillHints="@string/username_hint"
-        android:hint="@string/username_hint"
-        android:inputType="text"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/account_registration_textView" />
+        <ImageButton
+            android:id="@+id/register_back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_gravity="start"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/back"
+            android:src="@drawable/ic_arrow_back" />
 
-    <EditText
-        android:id="@+id/register_password_editText"
-        android:layout_width="335dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:autofillHints="@string/password_hint"
-        android:hint="@string/password_hint"
-        android:inputType="textPassword"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_username_editText" />
 
-    <EditText
-        android:id="@+id/register_email_editText"
-        android:layout_width="335dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:autofillHints="@string/email_hint"
-        android:hint="@string/email_hint"
-        android:inputType="textEmailAddress"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_password_editText" />
+        <TextView
+            android:id="@+id/account_registration_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            android:layout_gravity="center_horizontal"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="@string/account_registration"
+            android:textColor="@color/colorPurpleTitle"
+            android:textSize="35sp"
+            android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/register_phone_editText"
-        android:layout_width="335dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:autofillHints="@string/phone_hint"
-        android:hint="@string/phone_hint"
-        android:inputType="phone"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_email_editText" />
+        <EditText
+            android:id="@+id/register_username_editText"
+            android:layout_width="335dp"
+            android:layout_height="57dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:autofillHints="@string/username_hint"
+            android:hint="@string/username_hint"
+            android:inputType="text"
+            android:textSize="20sp" />
 
-    <Button
-        android:id="@+id/register_activity_button"
-        android:layout_width="335dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/register_button"
-        android:textSize="20sp"
-        android:textColor="@color/colorDarkText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_phone_editText" />
+        <EditText
+            android:id="@+id/register_password_editText"
+            android:layout_width="335dp"
+            android:layout_height="57dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:autofillHints="@string/password_hint"
+            android:hint="@string/password_hint"
+            android:inputType="textPassword"
+            android:textSize="20sp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <EditText
+            android:id="@+id/register_email_editText"
+            android:layout_width="335dp"
+            android:layout_height="57dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:autofillHints="@string/email_hint"
+            android:hint="@string/email_hint"
+            android:inputType="textEmailAddress"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/register_phone_editText"
+            android:layout_width="335dp"
+            android:layout_height="57dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:autofillHints="@string/phone_hint"
+            android:hint="@string/phone_hint"
+            android:inputType="phone"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/register_activity_button"
+            android:layout_width="335dp"
+            android:layout_height="57dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="24dp"
+            android:text="@string/register_button"
+            android:textColor="@color/colorDarkText"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -25,6 +25,12 @@
     <string name="confirm">Confirm</string>
     <string name="scanning">Scanning</string>
     <string name="scan_isbn">Scan the ISBN</string>
+    <string name="back">back</string>
+
+    <string name="username">username</string>
+    <string name="password">password</string>
+    <string name="email">email</string>
+    <string name="phone">phone</string>
 
     <string-array name="filter_statuses">
         <item>Filter by</item>
