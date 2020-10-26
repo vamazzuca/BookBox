@@ -31,9 +31,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,13 +54,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * for user registration (RegisterUserActivity). Upon success, retrieves
  * user data and opens main menu (HomeActivity)
  * @author Carter Sabadash
+<<<<<<< HEAD
+ * @version 2020.10.25
+=======
  * @author Olivier Vadiavaloo
  * @version 2020.10.22
+>>>>>>> origin
  */
-
 public class MainActivity extends AppCompatActivity {
     FirebaseFirestore database;
+<<<<<<< HEAD
+    final String TAG = "LOGIN";
+=======
     public final int REQUEST_CODE_REGISTER = 1;
+>>>>>>> origin
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseFirestore.getInstance();
 
         Button createUserButton = findViewById(R.id.register_button);
-        Button logInButton = findViewById(R.id.login_button);
+        final Button loginButton = findViewById(R.id.login_button);
 
         createUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,33 +90,59 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // setting listener for logIn button
-        logInButton.setOnClickListener(new View.OnClickListener() {
+        // setting listener for login button
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+<<<<<<< HEAD
+                loginButton.setText(R.string.login_verify);
+                EditText usernameEditText = findViewById(R.id.username_editText);
+                EditText passwordEditText = findViewById((R.id.password_editText));
+=======
                 final EditText usernameEditText = findViewById(R.id.username_editText);
                 final EditText passwordEditText = findViewById((R.id.password_editText));
+>>>>>>> origin
 
                 final String username = usernameEditText.getText().toString();
                 final String password = passwordEditText.getText().toString();
 
-                if (username.length() == 0 || password.length() == 0){
-                    Toast.makeText(getApplicationContext(),
-                            "No User/Password entered", Toast.LENGTH_SHORT).show();
-                    Log.d("LOGIN", "No User/Password");
-                    return;
-                }
+                attemptLogin(view, username, password);
+                loginButton.setText(R.string.log_in_button);
+            }
+        });
+    }
 
-                // see if user exists in firebase, get password, and verify
-                // show appropriate message for wrong credentials
-                DocumentReference documentReference
-                        = database.collection("users").document(username);
+<<<<<<< HEAD
+    /**
+     * Verifies the user and password, if the user and password is correct, go to HomeActivity
+     * if it is incorrect, show appropriate error and return
+     * @param view The view
+     * @param username The entered username
+     * @param password The entered password
+     */
+    private void attemptLogin(final View view, final String username, final String password){
+        if (username.length() == 0 || password.length() == 0){
+            Toast.makeText(getApplicationContext(),
+                    "No User/Password entered", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "No User/Password");
+            return;
+        }
 
+        // see if user exists in firebase, get password, and verify
+        // show appropriate message for wrong credentials
+        DocumentReference documentReference
+                = database.collection("users").document(username);
+
+        // if documentReference doesn't exist, get document -> document.exists() == False
+        documentReference.get().addOnCompleteListener(
+                new OnCompleteListener<DocumentSnapshot>() {
+=======
                 // if documentReference doesn't exist, get document -> document.exists() == False
                 documentReference
                         .get()
                         .addOnCompleteListener(
                         new OnCompleteListener<DocumentSnapshot>() {
+>>>>>>> origin
 
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -120,19 +155,39 @@ public class MainActivity extends AppCompatActivity {
                                 if (document.get(getString(R.string.password)) != null &&
                                         document.get(getString(R.string.password)).equals(password)) {
                                     // password is correct, perform login operations
-                                    login(view);
+                                    Button login = findViewById(R.id.login_button);
+                                    login.setText(R.string.login_login);
+                                    Intent intent = new Intent(view.getContext(), HomeActivity.class);
+                                    intent.putExtra("USERNAME", username);
+                                    startActivity(intent);
+                                    finish();
                                 } else {
                                     // password is incorrect, prompt user
+<<<<<<< HEAD
+                                    Log.d(TAG, "Password Incorrect");
+                                    Toast.makeText(getApplicationContext(),
+                                            "Incorrect Password", Toast.LENGTH_SHORT).show();
+
+=======
                                     passwordEditText.setError("Invalid password");
+>>>>>>> origin
                                 }
 
                             } else {
                                 // user doesn't exist, prompt registration
+<<<<<<< HEAD
+                                Log.d(TAG, "User Incorrect");
+                                Toast.makeText(getApplicationContext(),
+                                        "Incorrect Username", Toast.LENGTH_SHORT).show();
+=======
                                 usernameEditText.setError("Invalid username");
+>>>>>>> origin
                             }
                         }
                     }
                 });
+<<<<<<< HEAD
+=======
             }
         });
 
@@ -160,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
         // finish activity to prevent user from going back to
         // login by pressing the back button on the device
         finish();
+>>>>>>> origin
     }
 
     @Override
