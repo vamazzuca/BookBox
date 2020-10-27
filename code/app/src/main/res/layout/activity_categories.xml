@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_nav_bar"
+        android:layout_below="@+id/checkBox5"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="38dp"
+        android:layout_marginBottom="37dp"
+        android:layout_toEndOf="@+id/button4"
+        android:text="@string/Skip"/>
+
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="117dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView1"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="11dp"
+        android:text="@string/Category1" />
+
+    <CheckBox
+        android:id="@+id/checkBox5"
+        android:layout_width="117dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView5"
+        android:layout_alignParentStart="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="157dp"
+        android:layout_marginTop="11dp"
+        android:text="@string/category5" />
+
+    <CheckBox
+        android:id="@+id/checkBox4"
+        android:layout_width="117dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView4"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="11dp"
+        android:text="@string/category4" />
+
+    <CheckBox
+        android:id="@+id/checkBox3"
+        android:layout_width="117dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView3"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="284dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="10dp"
+        android:text="@string/category3" />
+
+    <CheckBox
+        android:id="@+id/checkBox2"
+        android:layout_width="117dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView2"
+        android:layout_alignParentStart="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="157dp"
+        android:layout_marginTop="11dp"
+        android:text="@string/category2" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="117dp"
+        android:layout_height="109dp"
+        android:layout_below="@+id/pickcategory_textView"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="36dp"
+        app:srcCompat="@drawable/ic_custom_image"
+        android:contentDescription="@string/image1" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="117dp"
+        android:layout_height="109dp"
+        android:layout_below="@+id/imageView2"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="70dp"
+        android:layout_toEndOf="@+id/imageView4"
+        app:srcCompat="@drawable/ic_custom_image"
+        android:contentDescription="@string/image5" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="117dp"
+        android:layout_height="109dp"
+        android:layout_below="@+id/imageView1"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="70dp"
+        app:srcCompat="@drawable/ic_custom_image"
+        android:contentDescription="@string/image4" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="117dp"
+        android:layout_height="109dp"
+        android:layout_below="@+id/pickcategory_textView"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="12dp"
+        android:layout_toEndOf="@+id/imageView2"
+        app:srcCompat="@drawable/ic_custom_image"
+        android:contentDescription="@string/image3" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="117dp"
+        android:layout_height="109dp"
+        android:layout_below="@+id/pickcategory_textView"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="36dp"
+        android:layout_toEndOf="@+id/imageView1"
+        app:srcCompat="@drawable/ic_custom_image"
+        android:contentDescription="@string/image2" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        app:itemIconTint="@color/colorDarkBgd"
+        app:itemTextColor="@color/colorDarkText"
+        app:itemIconSize="50sp"
+        android:background="@color/colorWhiteBgd"
+        app:menu="@menu/bottom_nav_bar" />
+
+    <TextView
+        android:id="@+id/categories_textView"
+        android:layout_width="191dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="58dp"
+        android:layout_marginEnd="215dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="@string/bookbox"
+        android:textAlignment="center"
+        android:textColor="@color/colorPurpleTitle"
+        android:textSize="35sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/pickcategory_textView"
+        android:layout_width="247dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/categories_textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="133dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="@string/Categories"
+        android:textAlignment="center"
+        android:textColor="@color/colorDarkText"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="117dp"
+        android:layout_height="109dp"
+        android:layout_below="@+id/imageView3"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginEnd="11dp"
+        android:layout_toEndOf="@+id/imageView5"
+        app:srcCompat="@drawable/ic_custom_image"
+        android:contentDescription="@string/image6" />
+
+    <CheckBox
+        android:id="@+id/checkBox6"
+        android:layout_width="117dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView6"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="284dp"
+        android:layout_marginTop="11dp"
+        android:text="@string/category6" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_nav_bar"
+        android:layout_below="@+id/checkBox5"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="43dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="37dp"
+        android:text="@string/confirm" />
+
+</RelativeLayout>
