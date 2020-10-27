@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
@@ -30,7 +31,7 @@ public class ListsActivity extends AppCompatActivity {
 
         // get the username from whichever activity we came from
         // this is necessary to access firebase
-        username = getIntent().getExtras().getString("USERNAME");
+        username = getIntent().getExtras().getString(User.USERNAME);
 
         bottomNavigationView();
     }
@@ -55,17 +56,17 @@ public class ListsActivity extends AppCompatActivity {
                         return true;
                     case R.id.home_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class)
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.notification_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), NotificationsActivity.class )
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), ProfileActivity.class)
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                 }

@@ -32,6 +32,7 @@ import android.media.Image;
 /**
  * A class that contains all the information necessary to represent a book
  * @author Carter Sabadash
+ * @author Olivier Vadiavaloo
  * @version 2020.10.22
  *
  * All Getters have been implemented, but not setters (will have to also ensure that
@@ -48,7 +49,6 @@ public class Book {
         BORROWED
     } // move to a public file with other enums?
 
-    private String id;
     private String isbn;
     private String title;
     private String author;
@@ -61,11 +61,11 @@ public class Book {
     public static final String TITLE = "TITLE";
     public static final String AUTHOR = "AUTHOR";
     public static final String STATUS = "STATUS";
-    public static final String BORROWED_TO = "BORROWED_TO";
+    public static final String LENT_TO = "LENT_TO";
+    public static final String OWNER = "OWNER";
 
     /**
      * Constructs a book without an image
-     * @param id The id to access the book in firebase
      * @param isbn The isbn of the book
      * @param title The title of the book
      * @param author The author of the book
@@ -74,9 +74,8 @@ public class Book {
      * @param lentTo Who the book is lent to (null if no-one)
      * @param photo The image association with the book
      */
-    public Book(String id, String isbn, String title, String author, String owner, Status status,
+    public Book(String isbn, String title, String author, String owner, Status status,
                 String lentTo, Image photo) {
-        this.id = id;
         this.isbn = isbn;
         this.title = title;
         this.author = author;
@@ -85,12 +84,6 @@ public class Book {
         this.lentTo = lentTo;
         this.photo = photo;
     }
-
-    /**
-     * Get the id through which to access the book in firebase
-     * @return The string of the book id
-     */
-    public String getId() { return id; }
 
     /**
      * Get the ISBN of the book

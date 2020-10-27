@@ -38,6 +38,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -151,13 +152,13 @@ public class MainActivity extends AppCompatActivity {
                             if (document != null && document.exists()) {
 
                                 // check that password is correct
-                                if (document.get(getString(R.string.password)) != null &&
-                                        document.get(getString(R.string.password)).equals(password)) {
+                                if (document.get(User.PASSWORD) != null &&
+                                        document.get(User.PASSWORD).equals(password)) {
                                     // password is correct, perform login operations
                                     Button login = findViewById(R.id.login_button);
                                     login.setText(R.string.login_login);
                                     Intent intent = new Intent(view.getContext(), HomeActivity.class);
-                                    intent.putExtra("USERNAME", username);
+                                    intent.putExtra(User.USERNAME, username);
                                     startActivity(intent);
                                     finish();
                                 } else {
