@@ -25,7 +25,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.cmput301f20t14.bookbox;
+package com.cmput301f20t14.bookbox.entities;
 
 import android.media.Image;
 
@@ -41,7 +41,7 @@ import android.media.Image;
  * Move the Status enum to a public file?
  */
 public class Book {
-    enum Status {
+    public enum Status {
         AVAILABLE,
         REQUESTED,
         ACCEPTED,
@@ -56,6 +56,12 @@ public class Book {
     private Status status;
     private String lentTo;
     private Image photo;
+
+    public static final String ISBN = "ISBN";
+    public static final String TITLE = "TITLE";
+    public static final String AUTHOR = "AUTHOR";
+    public static final String STATUS = "STATUS";
+    public static final String BORROWED_TO = "BORROWED_TO";
 
     /**
      * Constructs a book without an image

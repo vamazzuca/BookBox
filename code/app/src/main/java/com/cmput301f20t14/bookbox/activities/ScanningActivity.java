@@ -1,8 +1,7 @@
-package com.cmput301f20t14.bookbox;
+package com.cmput301f20t14.bookbox.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.cmput301f20t14.bookbox.R;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -30,7 +29,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.io.IOException;
 
 import static com.google.android.gms.vision.barcode.Barcode.UPC_A;
-import static com.google.android.gms.vision.barcode.Barcode.UPC_E;
 
 /**
  * This is the scanning activity. It makes use of a surface view and

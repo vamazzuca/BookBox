@@ -27,6 +27,8 @@
  */
 package com.cmput301f20t14.bookbox;
 
+import com.cmput301f20t14.bookbox.entities.Book;
+
 import java.util.ArrayList;
 
 /**

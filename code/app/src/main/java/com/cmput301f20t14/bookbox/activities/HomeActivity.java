@@ -25,13 +25,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.cmput301f20t14.bookbox;
+package com.cmput301f20t14.bookbox.activities;
 
-import android.accounts.NetworkErrorException;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
-import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -42,6 +39,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cmput301f20t14.bookbox.BookList;
+import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.Book;
+import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -55,9 +56,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * This shows the Home Menu with a task bar at the bottom
@@ -92,7 +90,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // get the username from whichever activity we came from
         // this is necessary to access firebase
-        username = getIntent().getExtras().getString("USERNAME");
+        username = getIntent().getExtras().getString(User.USERNAME);
 
         firebaseInitBookListener();
         bottomNavigationView();
@@ -117,19 +115,19 @@ public class HomeActivity extends AppCompatActivity {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), ListsActivity.class)
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
                         return true;
                     case R.id.notification_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), NotificationsActivity.class)
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), ProfileActivity.class)
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                 }
@@ -151,7 +149,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HomeActivity.this, ScanningActivity.class);
-                intent.putExtra("USERNAME", username);
+                intent.putExtra(User.USERNAME, username);
                 startActivityForResult(intent, REQUEST_CODE_SCANNING);
             }
         });
@@ -204,7 +202,7 @@ public class HomeActivity extends AppCompatActivity {
                                 new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        getBookData(task);
+                                        getBookDataFromDB(task);
                                     }
                                 });
                     }
@@ -219,21 +217,22 @@ public class HomeActivity extends AppCompatActivity {
      * Gets all data from a book and adds to the local list of books
      * @param task A DocumentReference to the book
      */
-    private void getBookData(@NonNull Task<DocumentSnapshot> task) {
+    private void getBookDataFromDB(@NonNull Task<DocumentSnapshot> task) {
         String bookID = task.getResult().getId();
         task.addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 DocumentSnapshot doc = task.getResult();
                 if (doc.exists()){
-                    final String isbn = doc.get("isbn").toString();
-                    final String title = doc.get("title").toString();
-                    final String author = doc.get("author").toString();
-                    final String owned = username;
-                    final Book.Status status = Book.Status.valueOf(doc.get("status").toString());
+                    final String isbn = doc.get(Book.ISBN).toString();
+                    final String title = doc.get(Book.TITLE).toString();
+                    final String author = doc.get(Book.AUTHOR).toString();
+                    final String owner = username;
+                    final Book.Status status = Book.Status.valueOf(doc.get(Book.STATUS).toString());
                     // Image photo = doc.get("photo"); get image data correctly
+
                     try {
-                        DocumentReference borrowedTo = doc.getDocumentReference("borrowedto");
+                        DocumentReference borrowedTo = doc.getDocumentReference(Book.BORROWED_TO);
                         borrowedTo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
