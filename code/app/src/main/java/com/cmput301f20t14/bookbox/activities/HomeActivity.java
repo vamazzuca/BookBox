@@ -189,8 +189,10 @@ public class HomeActivity extends AppCompatActivity {
      * @version 2020.10.25
      */
     private void firebaseInitBookListener(){
-        final CollectionReference collectionReference = database.collection("users")
-                .document(username).collection(User.OWNED_BOOKS);
+        final CollectionReference collectionReference = database
+                .collection("users")
+                .document(username)
+                .collection(User.OWNED_BOOKS);
 
         // first, get the references to books associated with the user
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
