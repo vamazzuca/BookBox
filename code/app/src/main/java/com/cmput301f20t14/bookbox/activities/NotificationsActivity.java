@@ -1,4 +1,4 @@
-package com.cmput301f20t14.bookbox;
+package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.cmput301f20t14.bookbox.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**

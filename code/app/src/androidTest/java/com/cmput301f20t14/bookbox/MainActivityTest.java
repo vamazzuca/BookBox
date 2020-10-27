@@ -1,12 +1,14 @@
 package com.cmput301f20t14.bookbox;
 
-import android.app.Activity;
 import android.widget.EditText;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import com.cmput301f20t14.bookbox.activities.HomeActivity;
+import com.cmput301f20t14.bookbox.activities.MainActivity;
+import com.cmput301f20t14.bookbox.activities.RegisterUserActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
