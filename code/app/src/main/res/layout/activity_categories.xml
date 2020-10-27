@@ -140,9 +140,6 @@
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />
 
-
-
-
     <TextView
         android:id="@+id/categories_textView"
         android:layout_width="191dp"
