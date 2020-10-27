@@ -63,7 +63,6 @@
     <string name="image5">image5</string>
     <string name="image1">image1</string>
 
-
     <string-array name="filter_statuses">
         <item>Filter by</item>
         <item>Accepted</item>

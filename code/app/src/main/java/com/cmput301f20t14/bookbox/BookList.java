@@ -1,5 +1,5 @@
 /*
- * RegisterUserActivity.java
+ * BookList.java
  *
  * Version 1.0
  *
@@ -27,19 +27,45 @@
  */
 package com.cmput301f20t14.bookbox;
 
-import android.os.Bundle;
+import com.cmput301f20t14.bookbox.entities.Book;
+
+import java.util.ArrayList;
 
 /**
- * An Activity that will allow a user to register with a unique username
+ * A base class to represent a list of books
  * @author Carter Sabadash
- * @version 2020.10.22
+ * @version 2020.10.25
+ *
+ * So far this assumes we will be using separate lists for owned and borrowed books
+ *      in which case subclasses should be made... for now, this serves as a template
+ *      that we can use while implementing other things
  */
-import androidx.appcompat.app.AppCompatActivity;
 
-public class RegisterUserActivity extends AppCompatActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
+public abstract class BookList {
+    private ArrayList<Book> books;
+
+    /**
+     * Adds a book to the list
+     * @param book The book to be added
+     */
+    public void addBook(Book book){
+        books.add(book);
+    }
+
+    /**
+     * Removes a book from the list
+     * @param book The book to be removed
+     */
+    public void deleteBook(Book book){
+        books.remove(book);
+    }
+
+    /**
+     * Removes all books from the list
+     */
+    public void clear() {
+        if (books.size() > 0) {
+            books.clear();
+        }
     }
 }
