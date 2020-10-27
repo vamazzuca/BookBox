@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         // see if user exists in firebase, get password, and verify
         // show appropriate message for wrong credentials
         DocumentReference documentReference
-                = database.collection("users").document(username);
+                = database.collection(User.USERS).document(username);
 
         // if documentReference doesn't exist, get document -> document.exists() == False
         documentReference.get().addOnCompleteListener(

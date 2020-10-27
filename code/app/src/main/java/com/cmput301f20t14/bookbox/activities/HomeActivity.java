@@ -190,7 +190,7 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void firebaseInitBookListener(){
         final CollectionReference collectionReference = database
-                .collection("users")
+                .collection(User.USERS)
                 .document(username)
                 .collection(User.OWNED_BOOKS);
 
@@ -217,7 +217,7 @@ public class HomeActivity extends AppCompatActivity {
                         String ref = doc.getId();
 
                         // Search for book in the books collection
-                        final CollectionReference booksCollectionRef = database.collection("books");
+                        final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
                         booksCollectionRef
                                 .document(ref)
                                 .get()

@@ -103,7 +103,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         database = FirebaseFirestore.getInstance();
 
         // Get reference to the users collection
-        final CollectionReference collectionReference = database.collection("users");
+        final CollectionReference collectionReference = database.collection(User.USERS);
 
         // Set the onClickListener for the register button
         registerButton.setOnClickListener(new View.OnClickListener() {
@@ -223,6 +223,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         // launch HomeActivity
 
         Intent intent = new Intent(view.getContext(), HomeActivity.class);
+        intent.putExtra(User.USERNAME, enteredUsername);
         intent.putExtra(User.USERNAME, enteredUsername);
         startActivity(intent);
 

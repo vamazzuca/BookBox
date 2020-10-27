@@ -57,6 +57,7 @@ public class Book {
     private String lentTo;
     private Image photo;
 
+    public static final String BOOKS = "books";
     public static final String ISBN = "ISBN";
     public static final String TITLE = "TITLE";
     public static final String AUTHOR = "AUTHOR";
