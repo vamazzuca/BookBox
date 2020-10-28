@@ -32,6 +32,36 @@
     <string name="password">password</string>
     <string name="email">email</string>
     <string name="phone">phone</string>
+    <string name="add_book_picture">Add_book_picture</string>
+    <string name="Title_hint">Title_hint</string>
+    <string name="Author_hint">Author_hint</string>
+    <string name="ISBN_hint">ISBN_hint</string>
+    <string name="add_an_awesome_book">Add an awesome book!</string>
+    <string name="title">Title</string>
+    <string name="author">Author</string>
+    <string name="isbn">ISBN</string>
+    <string name="add">Add</string>
+    <string name="outgoing_requests">Outgoing Requests</string>
+    <string name="CheckBox">Checkbox</string>
+    <string name="number_of_accepted">You have 2 new accepted request(s)</string>
+    <string name="accepted_requests">Accepted Requests</string>
+    <string name="borrowed">Borrowed Books</string>
+    <string name="number_of_borrowed">You have 18 borrowed books.</string>
+    <string name="Categories">Pick your favourite categories!</string>
+    <string name="Skip">Skip >></string>
+    <string name="Category6">CheckBox</string>
+    <string name="Category1">Category 1</string>
+    <string name="category5">Category 5</string>
+    <string name="category4">Category 4</string>
+    <string name="category3">Category 3</string>
+    <string name="category2">Category 2</string>
+    <string name="category6">Category 6</string>
+    <string name="image6">image6</string>
+    <string name="image2">image2</string>
+    <string name="image3">image3</string>
+    <string name="image4">image4</string>
+    <string name="image5">image5</string>
+    <string name="image1">image1</string>
 
     <string-array name="filter_statuses">
         <item>Filter by</item>
