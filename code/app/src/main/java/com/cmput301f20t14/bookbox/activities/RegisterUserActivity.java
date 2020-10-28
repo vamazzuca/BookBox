@@ -44,6 +44,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -102,7 +103,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         database = FirebaseFirestore.getInstance();
 
         // Get reference to the users collection
-        final CollectionReference collectionReference = database.collection("users");
+        final CollectionReference collectionReference = database.collection(User.USERS);
 
         // Set the onClickListener for the register button
         registerButton.setOnClickListener(new View.OnClickListener() {
@@ -154,10 +155,10 @@ public class RegisterUserActivity extends AppCompatActivity {
 
                                                     // create hash that contains information entered by user
                                                     HashMap<String, String> userInfo = new HashMap<>();
-                                                    userInfo.put(getString(R.string.username), enteredUsername);
-                                                    userInfo.put(getString(R.string.password), enteredPassword);
-                                                    userInfo.put(getString(R.string.email), enteredEmail);
-                                                    userInfo.put(getString(R.string.phone), enteredPhone);
+                                                    userInfo.put(User.USERNAME, enteredUsername);
+                                                    userInfo.put(User.PASSWORD, enteredPassword);
+                                                    userInfo.put(User.EMAIL, enteredEmail);
+                                                    userInfo.put(User.PHONE, enteredPhone);
 
                                                     // documentReference will add the user information
                                                     // to the database at this point since it is confirmed
@@ -222,7 +223,8 @@ public class RegisterUserActivity extends AppCompatActivity {
         // launch HomeActivity
 
         Intent intent = new Intent(view.getContext(), HomeActivity.class);
-        intent.putExtra("USERNAME", enteredUsername);
+        intent.putExtra(User.USERNAME, enteredUsername);
+        intent.putExtra(User.USERNAME, enteredUsername);
         startActivity(intent);
 
         // finish activity to prevent user from

@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -51,7 +52,7 @@ public class ScanningActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scanning);
 
         // get username extra
-        username = getIntent().getExtras().getString("USERNAME");
+        username = getIntent().getExtras().getString(User.USERNAME);
 
         // set up the bottom navigation bar
         bottomNavigationView();
@@ -140,7 +141,7 @@ public class ScanningActivity extends AppCompatActivity {
                                         public void onClick(DialogInterface dialog, int which) {
                                             // finish activity and pass back barcode as extra
                                             Intent intent = new Intent();
-                                            intent.putExtra("BARCODE", barcode);
+                                            intent.putExtra(HomeActivity.BARCODE, barcode);
                                             setResult(CommonStatusCodes.SUCCESS, intent);
                                             finish();
                                         }
@@ -197,7 +198,7 @@ public class ScanningActivity extends AppCompatActivity {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), ListsActivity.class)
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
@@ -205,12 +206,12 @@ public class ScanningActivity extends AppCompatActivity {
                         return true;
                     case R.id.notification_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), NotificationsActivity.class)
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), ProfileActivity.class)
-                                .putExtra("USERNAME", username));
+                                .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
                 }

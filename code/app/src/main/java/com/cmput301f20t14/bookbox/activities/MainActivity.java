@@ -38,6 +38,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseApp.initializeApp(this);
         database = FirebaseFirestore.getInstance();
 
         usernameEditText = (EditText) findViewById(R.id.username_editText);
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         // see if user exists in firebase, get password, and verify
         // show appropriate message for wrong credentials
         DocumentReference documentReference
-                = database.collection("users").document(username);
+                = database.collection(User.USERS).document(username);
 
         // if documentReference doesn't exist, get document -> document.exists() == False
         documentReference.get().addOnCompleteListener(
@@ -151,13 +151,13 @@ public class MainActivity extends AppCompatActivity {
                             if (document != null && document.exists()) {
 
                                 // check that password is correct
-                                if (document.get(getString(R.string.password)) != null &&
-                                        document.get(getString(R.string.password)).equals(password)) {
+                                if (document.get(User.PASSWORD) != null &&
+                                        document.get(User.PASSWORD).equals(password)) {
                                     // password is correct, perform login operations
                                     Button login = findViewById(R.id.login_button);
                                     login.setText(R.string.login_login);
                                     Intent intent = new Intent(view.getContext(), HomeActivity.class);
-                                    intent.putExtra("USERNAME", username);
+                                    intent.putExtra(User.USERNAME, username);
                                     startActivity(intent);
                                     finish();
                                 } else {
