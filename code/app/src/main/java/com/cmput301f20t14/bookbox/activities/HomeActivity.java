@@ -202,7 +202,7 @@ public class HomeActivity extends AppCompatActivity {
                 try {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
 
-                        doc.getDocumentReference("book").get().addOnCompleteListener(
+                        doc.getDocumentReference(Book.BOOKS).get().addOnCompleteListener(
                                 new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -212,15 +212,13 @@ public class HomeActivity extends AppCompatActivity {
 
                                             // Book was successful found in the database
                                             if (documentSnapshot.exists()) {
-                                                String id = documentSnapshot.getId();
                                                 String title = documentSnapshot.getData().get(Book.TITLE).toString();
-                                                String isbn = documentSnapshot.getData().get(Book.ISBN).toString();
+                                                String isbn = documentSnapshot.getId();
                                                 String author = documentSnapshot.getData().get(Book.AUTHOR).toString();
                                                 String status = documentSnapshot.getData().get(Book.STATUS).toString();
                                                 String lent_to = documentSnapshot.getData().get(Book.LENT_TO).toString();
                                                 String owner = documentSnapshot.getData().get(Book.OWNER).toString();
                                                 Book book = new Book(
-                                                        id,
                                                         isbn,
                                                         title,
                                                         author,
