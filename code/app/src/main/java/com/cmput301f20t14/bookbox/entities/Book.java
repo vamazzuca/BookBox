@@ -33,7 +33,7 @@ import android.media.Image;
  * A class that contains all the information necessary to represent a book
  * @author Carter Sabadash
  * @author Olivier Vadiavaloo
- * @version 2020.10.22
+ * @version 2020.10.27
  *
  * All Getters have been implemented, but not setters (will have to also ensure that
  *     data entered is in correct format
@@ -42,18 +42,12 @@ import android.media.Image;
  * Move the Status enum to a public file?
  */
 public class Book {
-    public enum Status {
-        AVAILABLE,
-        REQUESTED,
-        ACCEPTED,
-        BORROWED
-    } // move to a public file with other enums?
 
     private String isbn;
     private String title;
     private String author;
     private String owner;
-    private Status status;
+    private int status;
     private String lentTo;
     private Image photo;
 
@@ -65,6 +59,11 @@ public class Book {
     public static final String LENT_TO = "LENT_TO";
     public static final String OWNER = "OWNER";
 
+    public static final int AVAILABLE = 66;
+    public static final int REQUESTED = 67;
+    public static final int ACCEPTED = 68;
+    public static final int BORROWED = 69;
+
     /**
      * Constructs a book without an image
      * @param isbn The isbn of the book
@@ -75,7 +74,7 @@ public class Book {
      * @param lentTo Who the book is lent to (null if no-one)
      * @param photo The image association with the book
      */
-    public Book(String isbn, String title, String author, String owner, Status status,
+    public Book(String isbn, String title, String author, String owner, int status,
                 String lentTo, Image photo) {
         this.isbn = isbn;
         this.title = title;
@@ -122,7 +121,7 @@ public class Book {
      * Gets the Status of the book
      * @return A Status of the book
      */
-    public Status getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -142,5 +141,61 @@ public class Book {
      */
     public Image getPhoto() {
         return photo;
+    }
+
+    /**
+     * Gets the image associated with the book
+     * @return An image for the book
+     */
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    /**
+     * Gets the image associated with the book
+     * @return An image for the book
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * Sets the author associated with the book
+     * @param author
+     */
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    /**
+     * Sets the image associated with the book
+     * @param owner
+     */
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    /**
+     * Sets the image associated with the book
+     * @param status
+     */
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    /**
+     * Sets the image associated with the book
+     * @param lentTo
+     */
+    public void setLentTo(String lentTo) {
+        this.lentTo = lentTo;
+    }
+
+    /**
+     * Sets the image associated with the book
+     * @param photo
+     */
+    public void setPhoto(Image photo) {
+        this.photo = photo;
     }
 }

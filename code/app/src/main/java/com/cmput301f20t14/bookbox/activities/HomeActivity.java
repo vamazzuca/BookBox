@@ -242,7 +242,7 @@ public class HomeActivity extends AppCompatActivity {
                                                         title,
                                                         author,
                                                         owner,
-                                                        Book.Status.valueOf(status),
+                                                        Integer.parseInt(status),
                                                         lent_to,
                                                         null
                                                 );
