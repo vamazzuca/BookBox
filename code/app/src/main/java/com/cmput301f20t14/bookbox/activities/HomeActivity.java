@@ -186,7 +186,7 @@ public class HomeActivity extends AppCompatActivity {
      * owned by the user is always correct
      * @author Carter Sabadash
      * @author Olivier Vadiavaloo
-     * @version 2020.10.25
+     * @version 2020.10.27
      */
     private void firebaseInitBookListener(){
         final CollectionReference collectionReference = database
@@ -202,26 +202,9 @@ public class HomeActivity extends AppCompatActivity {
                 // books.clear() when we've decided how to store the books
                 try {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        /*
+
                         doc.getDocumentReference("book").get().addOnCompleteListener(
                                 new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        getBookDataFromDB(task);
-                                    }
-                                });
-
-                        */
-
-                        // Get the isbn (reference) of the owned book
-                        String ref = doc.getId();
-
-                        // Search for book in the books collection
-                        final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
-                        booksCollectionRef
-                                .document(ref)
-                                .get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         // On successful search, create a book and add to the list view
@@ -236,7 +219,7 @@ public class HomeActivity extends AppCompatActivity {
                                                 String status = documentSnapshot.getData().get(Book.STATUS).toString();
                                                 String lent_to = documentSnapshot.getData().get(Book.LENT_TO).toString();
                                                 String owner = documentSnapshot.getData().get(Book.OWNER).toString();
-
+                                                Log.d("Book", title);
                                                 Book book = new Book(
                                                         isbn,
                                                         title,
@@ -257,53 +240,4 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
-
-
-    /**
-     * Gets all data from a book and adds to the local list of books
-     * @param task A DocumentReference to the book
-     */
-    /*
-    private void getBookDataFromDB(@NonNull Task<DocumentSnapshot> task) {
-        String bookID = task.getResult().getId();
-        task.addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot doc = task.getResult();
-                if (doc.exists()){
-                    final String isbn = doc.get(Book.ISBN).toString();
-                    final String title = doc.get(Book.TITLE).toString();
-                    final String author = doc.get(Book.AUTHOR).toString();
-                    final String owner = username;
-                    final Book.Status status = Book.Status.valueOf(doc.get(Book.STATUS).toString());
-                    // Image photo = doc.get("photo"); get image data correctly
-
-                    try {
-                        DocumentReference borrowedTo = doc.getDocumentReference(Book.LENT_TO);
-                        borrowedTo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                DocumentSnapshot doc = task.getResult();
-                                if (doc.exists()) {
-                                    String borrower = task.getResult().getId();
-                                    // books.addBook(new Book(bookId, isbn, title, author, username, b, photo));
-                                    // something like this to create a new book and add it to the list
-                                } else {
-                                    // error handling
-                                }
-                            }
-                        });
-                    } catch (NullPointerException e) {
-                        // not borrowed
-                        // books.addBook(new Book(bookId, isbn, title, author, username, null, photo
-                    }
-                } else {
-                    // error handling
-                }
-            }
-        });
-
-
-    }
-     */
 }
