@@ -3,7 +3,7 @@ package com.cmput301f20t14.bookbox.entities;
 import java.util.ArrayList;
 
 public class User {
-    public static final String USERS = "users";
+    public static final String USERS = "USERS";
     public static final String USERNAME = "USERNAME";
     public static final String PASSWORD = "PASSWORD";
     public static final String PHONE = "PHONE";

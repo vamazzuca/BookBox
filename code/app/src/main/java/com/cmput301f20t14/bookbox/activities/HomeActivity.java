@@ -86,7 +86,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        FirebaseApp.initializeApp(this);
         database = FirebaseFirestore.getInstance();
 
         // get the username from whichever activity we came from
@@ -213,14 +212,15 @@ public class HomeActivity extends AppCompatActivity {
 
                                             // Book was successful found in the database
                                             if (documentSnapshot.exists()) {
+                                                String id = documentSnapshot.getId();
                                                 String title = documentSnapshot.getData().get(Book.TITLE).toString();
                                                 String isbn = documentSnapshot.getData().get(Book.ISBN).toString();
                                                 String author = documentSnapshot.getData().get(Book.AUTHOR).toString();
                                                 String status = documentSnapshot.getData().get(Book.STATUS).toString();
                                                 String lent_to = documentSnapshot.getData().get(Book.LENT_TO).toString();
                                                 String owner = documentSnapshot.getData().get(Book.OWNER).toString();
-                                                Log.d("Book", title);
                                                 Book book = new Book(
+                                                        id,
                                                         isbn,
                                                         title,
                                                         author,
