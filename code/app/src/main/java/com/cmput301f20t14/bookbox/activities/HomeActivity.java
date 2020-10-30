@@ -39,7 +39,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.cmput301f20t14.bookbox.BookList;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.User;
@@ -47,9 +46,7 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -68,7 +65,8 @@ import com.google.firebase.firestore.QuerySnapshot;
  *      & borrowed books
  * @author Carter Sabadash
  * @author Alex Mazzuca
- * @version 2020.10.25
+ * @author Olivier Vadiavaloo
+ * @version 2020.10.30
  * @see NotificationsActivity
  * @see ProfileActivity
  * @see ListsActivity
@@ -80,7 +78,6 @@ public class HomeActivity extends AppCompatActivity {
     public static final String BARCODE = "BARCODE";
     private String username;
     FirebaseFirestore database;
-    BookList books;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
