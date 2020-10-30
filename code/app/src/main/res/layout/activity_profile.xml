@@ -6,7 +6,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@id/bottom_nav_bar"
         android:fillViewport="true" >
 
@@ -73,7 +73,6 @@
                 android:layout_margin="8dp"
                 android:layout_gravity="center_horizontal"
                 android:autofillHints="@string/username_hint"
-                android:focusable="false"
                 android:hint="@string/username_hint"
                 android:inputType="text"
                 android:textSize="20sp" />
