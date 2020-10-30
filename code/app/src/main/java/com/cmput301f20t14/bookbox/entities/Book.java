@@ -127,6 +127,27 @@ public class Book {
     }
 
     /**
+     * Gets the Status of the book in string format
+     * @return A string literal representing the status
+     *         the book. It can be one of "Accepted",
+     *         "Borrowed", "Requested" or "Available"
+     */
+    public String getStatusString() {
+        switch (this.status) {
+            case Book.ACCEPTED:
+                return "Accepted";
+            case Book.AVAILABLE:
+                return "Available";
+            case Book.BORROWED:
+                return "Borrowed";
+            case Book.REQUESTED:
+                return "Requested";
+            default:
+                return "";
+        }
+    }
+
+    /**
      * Gets who currently has the book
      * ** Need to define behaviour when the book is AVAILABLE
      * @return A string identifying who the book is lent to

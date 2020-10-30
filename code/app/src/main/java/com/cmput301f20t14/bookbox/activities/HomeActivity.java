@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.view.MenuItem;
 
@@ -40,6 +41,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.adapters.BookList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -53,6 +55,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 /**
  * This shows the Home Menu with a task bar at the bottom
@@ -77,6 +81,9 @@ public class HomeActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_ADD_BOOK = 200;
     public static final String BARCODE = "BARCODE";
     private String username;
+    private BookList bookAdapter;
+    private ArrayList<Book> books;
+    private ListView bookList;
     FirebaseFirestore database;
 
     @Override
@@ -86,14 +93,27 @@ public class HomeActivity extends AppCompatActivity {
 
         database = FirebaseFirestore.getInstance();
 
-        // get the username from whichever activity we came from
+        // Get the username from whichever activity we came from
         // this is necessary to access firebase
         username = getIntent().getExtras().getString(User.USERNAME);
+
+        // Get ListView
+        bookList = (ListView) findViewById(R.id.main_page_books_listView);
+
+        // Initialize book list
+        books = new ArrayList<>();
+
+        // Initialize book adapter
+        bookAdapter = new BookList(HomeActivity.this, books);
+
+        // Set adapter
+        bookList.setAdapter(bookAdapter);
 
         firebaseInitBookListener();
         bottomNavigationView();
         setUpScanningButton();
         setUpAddBookButton();
+
     }
 
     /**
@@ -214,19 +234,25 @@ public class HomeActivity extends AppCompatActivity {
                 .document(username)
                 .collection(User.OWNED_BOOKS);
 
+        final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
+
         // first, get the references to books associated with the user
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
                                 @Nullable FirebaseFirestoreException error) {
-                // books.clear() when we've decided how to store the books
+                books.clear();
+
                 try {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
 
                         // Need book id to retrieve book data from books collection
                         String id = doc.getData().get(Book.ID).toString();
 
-                        doc.getDocumentReference(id).get().addOnCompleteListener(
+                        booksCollectionRef
+                                .document(id)
+                                .get()
+                                .addOnCompleteListener(
                                 new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -251,6 +277,11 @@ public class HomeActivity extends AppCompatActivity {
                                                         lent_to,
                                                         null
                                                 );
+
+                                                // Add book to book list
+                                                books.add(book);
+
+                                                bookAdapter.notifyDataSetChanged();
                                             }
                                         }
                                     }
@@ -258,6 +289,8 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 } catch (Exception e) {
                     // error handling, generic error
+                    Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, "Try again later", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -46,7 +46,14 @@ public class BookList extends ArrayAdapter<Book> {
         author.setText(book.getAuthor());
         title.setText(book.getTitle());
         isbn.setText(book.getIsbn());
-        status.setText(String.valueOf(book.getStatus()));
+
+        CharSequence statusText = book.getStatusString();
+
+        if (book.getStatus() == Book.BORROWED) {
+            statusText = statusText + " (" + book.getLentTo() + ")";
+        }
+
+        status.setText(statusText);
 
         return view;
     }
