@@ -2,9 +2,9 @@ package com.cmput301f20t14.bookbox.entities;
 
 public class Image {
 
-    Integer height;
-    Integer width;
-    String url;
+    private Integer height;
+    private Integer width;
+    private String url;
 
 
     public Image(Integer height, Integer width, String url) {

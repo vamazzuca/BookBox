@@ -1,11 +1,14 @@
 package com.cmput301f20t14.bookbox.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,19 +26,25 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * This activity handles the book addition functionality.
  * It allows the user to add a book with a title, author,
  * isbn and an optional picture.
  * @author Olivier Vadiaval
- * @version 2020.10.28
+ * @author Alex Mazzuca
+ * @version 2020.10.30
  */
 public class AddBookActivity extends AppCompatActivity {
     private String username;
@@ -43,8 +52,11 @@ public class AddBookActivity extends AppCompatActivity {
     private EditText authorEditText;
     private EditText isbnEditText;
     private TextView warningText;
-    private Button addButton;
+    private Button addButton, addImageButton;
     private FirebaseFirestore database;
+    private ImageView bookImage;
+    private Uri imageUri;
+    private StorageReference storageReference;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,6 +69,12 @@ public class AddBookActivity extends AppCompatActivity {
         // get the username from whichever activity we came from
         // this is necessary to access firebase
         username = getIntent().getExtras().getString(User.USERNAME);
+
+        // Retrieve book image view
+        bookImage = findViewById(R.id.book_picture_imageView);
+
+        // Retrieve book add button
+        addImageButton = findViewById(R.id.add_book_picture_button);
 
         // Retrieve the EditText views
         titleEditText = (EditText) findViewById(R.id.Title_editText);
@@ -71,6 +89,9 @@ public class AddBookActivity extends AppCompatActivity {
 
         // Get database instance
         database = FirebaseFirestore.getInstance();
+
+        // Get storage reference
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         // Get the collection reference for OWNED books collections
         final CollectionReference ownedBooksCollectionRef = database.collection(User.USERS)
@@ -139,6 +160,18 @@ public class AddBookActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+        addImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent selectImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(selectImageIntent, 1);
+            }
+
+        });
+
+
     }
 
     private void addBookToDb(final CollectionReference ownedBooksCollectionRef, final Book book) {
@@ -196,6 +229,29 @@ public class AddBookActivity extends AppCompatActivity {
 
     }
 
+    private void addImageToStorage(Uri imageUri){
+        final String randomKey = UUID.randomUUID().toString();
+        final StorageReference imageRef = storageReference.child("users/"+ username + randomKey);
+
+        imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(AddBookActivity.this, "Uploaded", Toast.LENGTH_LONG).show();
+                imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Picasso.get().load(uri).into(bookImage);
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(AddBookActivity.this, "Upload Failed", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     /**
      * Implementation of the bottom navigation bar for switching to different
      * activity views, such as home, profile, notifications and lists
@@ -235,5 +291,16 @@ public class AddBookActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
+            imageUri = data.getData();
+            bookImage.setImageURI(imageUri);
+            addImageToStorage(imageUri);
+        }
     }
 }
