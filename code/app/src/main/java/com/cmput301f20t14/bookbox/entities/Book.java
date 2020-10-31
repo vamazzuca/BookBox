@@ -51,6 +51,7 @@ public class Book {
     private String lentTo;
     private Image photo;
 
+    public static final String ID = "ID";
     public static final String BOOKS = "BOOKS";
     public static final String ISBN = "ISBN";
     public static final String TITLE = "TITLE";
@@ -123,6 +124,27 @@ public class Book {
      */
     public int getStatus() {
         return status;
+    }
+
+    /**
+     * Gets the Status of the book in string format
+     * @return A string literal representing the status
+     *         the book. It can be one of "Accepted",
+     *         "Borrowed", "Requested" or "Available"
+     */
+    public String getStatusString() {
+        switch (this.status) {
+            case Book.ACCEPTED:
+                return "Accepted";
+            case Book.AVAILABLE:
+                return "Available";
+            case Book.BORROWED:
+                return "Borrowed";
+            case Book.REQUESTED:
+                return "Requested";
+            default:
+                return "";
+        }
     }
 
     /**

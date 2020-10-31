@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">BookBox</string>
+    <string name="placeholder">Lorem Ipsum</string>
     <string name="welcome_message">Welcome to BookBox</string>
     <string name="account_registration">Account Registration</string>
     <string name="username_hint">Username</string>
@@ -62,6 +63,7 @@
     <string name="image4">image4</string>
     <string name="image5">image5</string>
     <string name="image1">image1</string>
+    <string name="owner">Owner:</string>
 
     <string-array name="filter_statuses">
         <item>Filter by</item>
