@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
+import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -54,9 +55,10 @@ public class AddBookActivity extends AppCompatActivity {
     private TextView warningText;
     private Button addButton, addImageButton;
     private FirebaseFirestore database;
-    private ImageView bookImage;
+    private ImageView bookImageView;
     private Uri imageUri;
     private StorageReference storageReference;
+    private Image bookImage;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,7 +73,7 @@ public class AddBookActivity extends AppCompatActivity {
         username = getIntent().getExtras().getString(User.USERNAME);
 
         // Retrieve book image view
-        bookImage = findViewById(R.id.book_picture_imageView);
+        bookImageView = findViewById(R.id.book_picture_imageView);
 
         // Retrieve book add button
         addImageButton = findViewById(R.id.add_book_picture_button);
@@ -149,7 +151,7 @@ public class AddBookActivity extends AppCompatActivity {
                                                          username,
                                                          Book.AVAILABLE,
                                                          "",
-                                                         null)
+                                                         bookImage)
                                              );
                                          }
                                     } else {
@@ -237,12 +239,6 @@ public class AddBookActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(AddBookActivity.this, "Uploaded", Toast.LENGTH_LONG).show();
-                imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Picasso.get().load(uri).into(bookImage);
-                    }
-                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -299,7 +295,8 @@ public class AddBookActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
             imageUri = data.getData();
-            bookImage.setImageURI(imageUri);
+            bookImageView.setImageURI(imageUri);
+            bookImage.setUri(imageUri);
             addImageToStorage(imageUri);
         }
     }

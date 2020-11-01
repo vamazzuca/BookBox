@@ -27,8 +27,6 @@
  */
 package com.cmput301f20t14.bookbox.entities;
 
-import android.media.Image;
-
 /**
  * A class that contains all the information necessary to represent a book
  * @author Carter Sabadash
@@ -50,6 +48,7 @@ public class Book {
     private int status;
     private String lentTo;
     private Image photo;
+
 
     public static final String ID = "ID";
     public static final String BOOKS = "BOOKS";
@@ -73,7 +72,6 @@ public class Book {
      * @param owner The User who owns the book
      * @param status The Status of the Book (Book.Status)
      * @param lentTo Who the book is lent to (null if no-one)
-     * @param photo The image association with the book
      */
     public Book(String isbn, String title, String author, String owner, int status,
                 String lentTo, Image photo) {
@@ -85,6 +83,7 @@ public class Book {
         this.lentTo = lentTo;
         this.photo = photo;
     }
+
 
     /**
      * Get the ISBN of the book

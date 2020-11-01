@@ -1,18 +1,21 @@
 package com.cmput301f20t14.bookbox.entities;
 
-public class Image {
+import android.net.Uri;
+
+import java.io.Serializable;
+
+public class Image implements Serializable {
 
     private Integer height;
     private Integer width;
-    private String url;
+    private Uri uri;
 
 
-    public Image(Integer height, Integer width, String url) {
+    public Image(Integer height, Integer width, Uri uri) {
         this.height = height;
         this.width = width;
-        this.url = url;
+        this.uri = uri;
     }
-
 
     public Integer getHeight() {
         return height;
@@ -30,11 +33,11 @@ public class Image {
         this.width = width;
     }
 
-    public String getUrl() {
-        return url;
+    public Uri getUri() {
+        return uri;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 }
