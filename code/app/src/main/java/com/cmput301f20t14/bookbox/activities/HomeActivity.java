@@ -31,7 +31,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.view.MenuItem;
 
@@ -39,23 +41,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.cmput301f20t14.bookbox.BookList;
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.adapters.BookList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 /**
  * This shows the Home Menu with a task bar at the bottom
@@ -68,7 +70,8 @@ import com.google.firebase.firestore.QuerySnapshot;
  *      & borrowed books
  * @author Carter Sabadash
  * @author Alex Mazzuca
- * @version 2020.10.25
+ * @author Olivier Vadiavaloo
+ * @version 2020.10.30
  * @see NotificationsActivity
  * @see ProfileActivity
  * @see ListsActivity
@@ -76,10 +79,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class HomeActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE_SCANNING = 100;
+    public static final int REQUEST_CODE_ADD_BOOK = 200;
+    public static final int REQUEST_CODE_VIEW_BOOK = 300;
     public static final String BARCODE = "BARCODE";
+    public static final String VIEW_BOOK = "VIEW_BOOK";
     private String username;
+    private BookList bookAdapter;
+    private ArrayList<Book> books;
+    private ListView bookList;
     FirebaseFirestore database;
-    BookList books;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,13 +96,27 @@ public class HomeActivity extends AppCompatActivity {
 
         database = FirebaseFirestore.getInstance();
 
-        // get the username from whichever activity we came from
+        // Get the username from whichever activity we came from
         // this is necessary to access firebase
         username = getIntent().getExtras().getString(User.USERNAME);
+
+        // Get ListView
+        bookList = (ListView) findViewById(R.id.main_page_books_listView);
+
+        // Initialize book list
+        books = new ArrayList<>();
+
+        // Initialize book adapter
+        bookAdapter = new BookList(HomeActivity.this, books);
+
+        // Set adapter
+        bookList.setAdapter(bookAdapter);
 
         firebaseInitBookListener();
         bottomNavigationView();
         setUpScanningButton();
+        setUpAddBookButton();
+        setUpItemClickListener();
     }
 
     /**
@@ -137,6 +159,28 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
+     * Setting up the onItemClickListener for the ListView
+     * representing the owned books of the user. On clicking
+     * an item, the EditBookActivity is started.
+     * @author Olivier Vadiavaloo
+     * @version 2020.10.30
+     */
+    private void setUpItemClickListener() {
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Book book = bookAdapter.getItem(position);
+                Intent intent = new Intent(HomeActivity.this, EditBookActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(VIEW_BOOK, book);
+                intent.putExtras(bundle);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_VIEW_BOOK);
+            }
+        });
+    }
+
+    /**
      * Setting up the onClick listener for the scanning button
      * Listener launches the Scanning activity to obtain a book
      * description by scanning the ISBN
@@ -144,13 +188,32 @@ public class HomeActivity extends AppCompatActivity {
      * @version 2020.10.24
      * */
     private void setUpScanningButton() {
-        ImageButton camera = (ImageButton) findViewById(R.id.main_page_scan_button);
+        ImageButton camera = findViewById(R.id.main_page_scan_button);
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HomeActivity.this, ScanningActivity.class);
                 intent.putExtra(User.USERNAME, username);
                 startActivityForResult(intent, REQUEST_CODE_SCANNING);
+            }
+        });
+    }
+
+    /**
+     * Setting up the onClick listener for the scanning button
+     * Listener launches the AddBook activity to allow the user
+     * to add a new book to his or her collection of books
+     * @author Olivier Vadiavaloo
+     * @version 2020.10.28
+     */
+    public void setUpAddBookButton() {
+        ImageButton addButton = findViewById(R.id.add_book_button);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, AddBookActivity.class);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_ADD_BOOK);
             }
         });
     }
@@ -175,6 +238,9 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 break;
 
+            case REQUEST_CODE_ADD_BOOK:
+                break;
+
             default:
                 Log.d("Wrong return", "Wrong return");
         }
@@ -193,16 +259,25 @@ public class HomeActivity extends AppCompatActivity {
                 .document(username)
                 .collection(User.OWNED_BOOKS);
 
+        final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
+
         // first, get the references to books associated with the user
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
                                 @Nullable FirebaseFirestoreException error) {
-                // books.clear() when we've decided how to store the books
+                books.clear();
+
                 try {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
 
-                        doc.getDocumentReference(Book.BOOKS).get().addOnCompleteListener(
+                        // Need book id to retrieve book data from books collection
+                        String id = doc.getData().get(Book.ID).toString();
+
+                        booksCollectionRef
+                                .document(id)
+                                .get()
+                                .addOnCompleteListener(
                                 new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -210,10 +285,10 @@ public class HomeActivity extends AppCompatActivity {
                                         if (task.isSuccessful()) {
                                             DocumentSnapshot documentSnapshot = task.getResult();
 
-                                            // Book was successful found in the database
+                                            // Book was successfully found in the database
                                             if (documentSnapshot.exists()) {
                                                 String title = documentSnapshot.getData().get(Book.TITLE).toString();
-                                                String isbn = documentSnapshot.getId();
+                                                String isbn = documentSnapshot.getData().get(Book.ISBN).toString();
                                                 String author = documentSnapshot.getData().get(Book.AUTHOR).toString();
                                                 String status = documentSnapshot.getData().get(Book.STATUS).toString();
                                                 String lent_to = documentSnapshot.getData().get(Book.LENT_TO).toString();
@@ -227,6 +302,11 @@ public class HomeActivity extends AppCompatActivity {
                                                         lent_to,
                                                         null
                                                 );
+
+                                                // Add book to book list
+                                                books.add(book);
+
+                                                bookAdapter.notifyDataSetChanged();
                                             }
                                         }
                                     }
@@ -234,6 +314,8 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 } catch (Exception e) {
                     // error handling, generic error
+                    Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, "Try again later", Toast.LENGTH_SHORT).show();
                 }
             }
         });

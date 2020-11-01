@@ -9,4 +9,6 @@
     <color name="colorDarkBgd">#000000</color>
     <color name="colorYellowBgd">#FFC107</color>
     <color name="colorGreyBgd">#C3C5C5</color>
+    <color name="colorRedMessage">#DC0000</color>
+    <color name="colorBlueMessage">#006ADC</color>
 </resources>
