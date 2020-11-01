@@ -28,6 +28,9 @@
 package com.cmput301f20t14.bookbox.entities;
 
 import android.media.Image;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 
 /**
  * A class that contains all the information necessary to represent a book
@@ -41,7 +44,7 @@ import android.media.Image;
  *
  * Move the Status enum to a public file?
  */
-public class Book {
+public class Book implements Serializable {
 
     private String isbn;
     private String title;
