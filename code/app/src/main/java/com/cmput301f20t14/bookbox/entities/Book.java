@@ -39,7 +39,7 @@ package com.cmput301f20t14.bookbox.entities;
  *
  * Move the Status enum to a public file?
  */
-public class Book {
+public class Book implements Serializable {
 
     private String isbn;
     private String title;

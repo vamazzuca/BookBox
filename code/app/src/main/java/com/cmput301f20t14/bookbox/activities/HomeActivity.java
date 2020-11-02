@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -79,7 +80,9 @@ public class HomeActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE_SCANNING = 100;
     public static final int REQUEST_CODE_ADD_BOOK = 200;
+    public static final int REQUEST_CODE_VIEW_BOOK = 300;
     public static final String BARCODE = "BARCODE";
+    public static final String VIEW_BOOK = "VIEW_BOOK";
     private String username;
     private BookList bookAdapter;
     private ArrayList<Book> books;
@@ -113,7 +116,7 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView();
         setUpScanningButton();
         setUpAddBookButton();
-
+        setUpItemClickListener();
     }
 
     /**
@@ -151,6 +154,28 @@ public class HomeActivity extends AppCompatActivity {
                         return true;
                 }
                 return false;
+            }
+        });
+    }
+
+    /**
+     * Setting up the onItemClickListener for the ListView
+     * representing the owned books of the user. On clicking
+     * an item, the EditBookActivity is started.
+     * @author Olivier Vadiavaloo
+     * @version 2020.10.30
+     */
+    private void setUpItemClickListener() {
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Book book = bookAdapter.getItem(position);
+                Intent intent = new Intent(HomeActivity.this, EditBookActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(VIEW_BOOK, book);
+                intent.putExtras(bundle);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_VIEW_BOOK);
             }
         });
     }

@@ -20,7 +20,7 @@
     <string name="search">Search</string>
     <string name="add_book">Add Book</string>
     <string name="scan_book">Scan Book</string>
-    <string name="number_of_notifications">You have 4 new notifications!</string>
+    <string name="number_of_notifications">You have 0 new notifications!</string>
     <string name="add_picture">Add picture</string>
     <string name="remove_picture">Remove picture</string>
     <string name="confirm">Confirm</string>
@@ -42,6 +42,9 @@
     <string name="author">Author</string>
     <string name="isbn">ISBN</string>
     <string name="add">Add</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="view_requests">View Requests</string>
     <string name="outgoing_requests">Outgoing Requests</string>
     <string name="CheckBox">Checkbox</string>
     <string name="number_of_accepted">You have 2 new accepted request(s)</string>
@@ -64,6 +67,8 @@
     <string name="image5">image5</string>
     <string name="image1">image1</string>
     <string name="owner">Owner:</string>
+    <string name="bookbox_item">Bookbox Item</string>
+    <string name="request">Request</string>
 
     <string-array name="filter_statuses">
         <item>Filter by</item>
