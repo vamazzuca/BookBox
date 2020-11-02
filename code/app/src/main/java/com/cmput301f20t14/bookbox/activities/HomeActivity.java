@@ -47,6 +47,7 @@ import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.CollectionReference;
@@ -159,6 +160,23 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
+     * This method launches the EditBookActivity to allow
+     * the user to view the description of a book selected
+     * from the list of owned books through clicking or
+     * through scanning the ISBN
+     * @param book The book whose description will be
+     *             viewed
+     */
+    public void launchViewing(Book book) {
+        Intent intent = new Intent(HomeActivity.this, EditBookActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(VIEW_BOOK, book);
+        intent.putExtras(bundle);
+        intent.putExtra(User.USERNAME, username);
+        startActivityForResult(intent, REQUEST_CODE_VIEW_BOOK);
+    }
+
+    /**
      * Setting up the onItemClickListener for the ListView
      * representing the owned books of the user. On clicking
      * an item, the EditBookActivity is started.
@@ -170,12 +188,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Book book = bookAdapter.getItem(position);
-                Intent intent = new Intent(HomeActivity.this, EditBookActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(VIEW_BOOK, book);
-                intent.putExtras(bundle);
-                intent.putExtra(User.USERNAME, username);
-                startActivityForResult(intent, REQUEST_CODE_VIEW_BOOK);
+                launchViewing(book);
             }
         });
     }
@@ -219,6 +232,55 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
+     * This method launches the EditBookActivity after the
+     * ISBN of a book is successfully scanned through the
+     * ScanningActivity
+     * @param barcode A string representing the scanned
+     *                isbn of a book
+     */
+    public void searchBook(final String barcode) {
+        CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
+        booksCollectionRef
+                .whereEqualTo(Book.OWNER, username)
+                .whereEqualTo(Book.ISBN, barcode)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot queryDoc : task.getResult()) {
+                                String isbn = barcode;
+                                String title = queryDoc.getData().get(Book.TITLE).toString();
+                                String author = queryDoc.getData().get(Book.AUTHOR).toString();
+                                String owner = queryDoc.getData().get(Book.OWNER).toString();
+                                String statusString = queryDoc.getData().get(Book.STATUS).toString();
+                                int status = Integer.parseInt(statusString);
+                                String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
+
+                                Book book = new Book(
+                                        isbn,
+                                        title,
+                                        author,
+                                        owner,
+                                        status,
+                                        lentTo,
+                                        null
+                                );
+
+                                launchViewing(book);
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /**
      * Implements functionality when a previously launched activity
      * is finished with a potential set result.
      * @author Olivier Vadiavaloo
@@ -235,6 +297,7 @@ public class HomeActivity extends AppCompatActivity {
                     // must launch viewing activity for user to be able to view book description
                     Toast.makeText(this, "Launch viewing", Toast.LENGTH_SHORT).show();
                     Toast.makeText(this, data.getStringExtra(BARCODE), Toast.LENGTH_SHORT).show();
+                    searchBook(data.getStringExtra(BARCODE));
                 }
                 break;
 
