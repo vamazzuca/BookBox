@@ -62,7 +62,6 @@ public class ScanningActivity extends AppCompatActivity {
 
         // initialise barcodeDectector
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
-                .setBarcodeFormats(UPC_A)
                 .build();
 
         // Build CameraSource object
@@ -133,6 +132,7 @@ public class ScanningActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             Intent intent = new Intent(ScanningActivity.this, ScanningActivity.class);
+                                            intent.putExtra(User.USERNAME, username);
                                             startActivityForResult(intent, HomeActivity.REQUEST_CODE_SCANNING);
                                         }
                                     })
