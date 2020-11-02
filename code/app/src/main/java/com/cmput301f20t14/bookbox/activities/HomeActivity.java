@@ -304,6 +304,11 @@ public class HomeActivity extends AppCompatActivity {
             case REQUEST_CODE_ADD_BOOK:
                 break;
 
+            case REQUEST_CODE_VIEW_BOOK:
+                if (resultCode == EditBookActivity.RESULT_CODE_DELETE) {
+                    Toast.makeText(this, "Book successfully deleted", Toast.LENGTH_SHORT).show();
+                }
+
             default:
                 Log.d("Wrong return", "Wrong return");
         }
