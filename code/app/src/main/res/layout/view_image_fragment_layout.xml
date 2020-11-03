@@ -8,5 +8,6 @@
     <ImageView
         android:id="@+id/imageViewFrag"
         android:layout_width="match_parent"
-        android:layout_height="596dp" />
+        android:layout_height="596dp"
+        android:src="@drawable/ic_custom_image"/>
 </LinearLayout>

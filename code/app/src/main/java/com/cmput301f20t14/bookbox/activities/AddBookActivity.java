@@ -69,7 +69,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         bottomNavigationView();
 
         // Create book Image object for book Image
-        setBookImage(bookImage);
+        bookImage = new Image(null, null, null);
 
         // get the username from whichever activity we came from
         // this is necessary to access firebase
@@ -187,7 +187,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         removeImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                new ImageFragment().show(getSupportFragmentManager(), "Delete Image");
             }
         });
 
@@ -313,11 +313,11 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
             imageUri = data.getData();
+            addImageToStorage(imageUri);
             bookImageView.setImageURI(imageUri);
+            bookImage.setUri(imageUri);
             removeImageButton.setEnabled(true);
             addImageButton.setText("Change Picture");
-            bookImage.setUri(imageUri);
-            addImageToStorage(imageUri);
         }
     }
 
@@ -334,10 +334,6 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         addImageButton.setText("Add Picture");
         bookImage.setUri(null);
 
-    }
-
-    public void setBookImage(Image bookImage) {
-        this.bookImage = bookImage;
     }
 
 }
