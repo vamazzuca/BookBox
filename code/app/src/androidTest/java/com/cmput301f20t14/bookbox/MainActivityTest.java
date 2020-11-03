@@ -1,5 +1,6 @@
 package com.cmput301f20t14.bookbox;
 
+import android.app.Activity;
 import android.widget.EditText;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -17,7 +18,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(AndroidJUnit4.class)
+/**
+ * Test class for MainActivity. All UI tests related
+ * to MainActivity are written. Robotium test frameword
+ * is used
+ */
 public class MainActivityTest {
     private Solo solo;
 
@@ -28,30 +33,35 @@ public class MainActivityTest {
     /**
      * Runs before all tests; creates solo instance
      */
-
     @Before
     public void setUp() throws Exception{
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
     }
 
     /**
-     * Gets the activity
-     * **This test needs to be finished when RegisterUserActivity is added**
+     * Gets the Activity
      * @throws Exception
      */
     @Test
-    public void checkRegister(){
-        // asserts that the current activity is main activity
-        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
-
-        solo.clickOnButton("Log in");
-
-        // checks that we successfully navigated to RegisterUserActivity
-        solo.assertCurrentActivity("Wrong Activity", RegisterUserActivity.class);
+    public void start() throws Exception {
+        Activity activity = rule.getActivity();
     }
 
     @Test
-    public void loginUserFail(){
+    public void registerMockUser(){
+        // asserts that the current activity is main activity
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+
+        solo.clickOnButton(R.string.register_button);
+
+        // checks that we successfully navigated to RegisterUserActivity
+        solo.assertCurrentActivity("Wrong Activity", RegisterUserActivity.class);
+
+        solo.enterText((EditText) solo.getView(R.id.register_username_editText), "Example");
+    }
+
+    @Test
+    public void checkLoginUserFail(){
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
 
         // test for just username
@@ -63,7 +73,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void loginPasswordFail(){
+    public void checkLoginPasswordFail(){
         // test for just password
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
 
@@ -75,12 +85,12 @@ public class MainActivityTest {
     }
 
     @Test
-    public void loginWrongPassword(){
+    public void checkLoginWrongPassword(){
         // test for wrong password
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
 
-        solo.enterText((EditText) solo.getView(R.id.username_editText), "Example User");
-        solo.enterText((EditText) solo.getView(R.id.password_editText), "password");
+        solo.enterText((EditText) solo.getView(R.id.username_editText), "IncorrectUsername");
+        solo.enterText((EditText) solo.getView(R.id.password_editText), "IncorrectPassword");
 
         solo.clickOnButton("Log in");
 
@@ -88,12 +98,12 @@ public class MainActivityTest {
     }
 
     @Test
-    public void loginSuccess(){
+    public void checkLoginSuccess(){
         // test that login works correctly
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
 
-        solo.enterText((EditText) solo.getView(R.id.username_editText), "Example User");
-        solo.enterText((EditText) solo.getView(R.id.password_editText), "p");
+        solo.enterText((EditText) solo.getView(R.id.username_editText), "correctUsername");
+        solo.enterText((EditText) solo.getView(R.id.password_editText), "correctPassword");
 
         solo.clickOnButton("Log in");
 
