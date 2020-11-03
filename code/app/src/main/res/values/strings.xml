@@ -67,6 +67,7 @@
     <string name="image5">image5</string>
     <string name="image1">image1</string>
     <string name="owner">Owner:</string>
+    <string name="borrower">Borrower:</string>
     <string name="bookbox_item">Bookbox Item</string>
     <string name="request">Request</string>
 
