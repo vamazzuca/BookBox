@@ -32,8 +32,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.view.MenuItem;
 
@@ -50,6 +52,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.collection.LLRBEmptyNode;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -88,6 +91,7 @@ public class HomeActivity extends AppCompatActivity {
     private BookList bookAdapter;
     private ArrayList<Book> books;
     private ListView bookList;
+    private Spinner filterSpinner;
     FirebaseFirestore database;
 
     @Override
@@ -104,6 +108,9 @@ public class HomeActivity extends AppCompatActivity {
         // Get ListView
         bookList = (ListView) findViewById(R.id.main_page_books_listView);
 
+        // Get Spinner
+        filterSpinner = (Spinner) findViewById(R.id.status_filter_spinner);
+
         // Initialize book list
         books = new ArrayList<>();
 
@@ -113,11 +120,13 @@ public class HomeActivity extends AppCompatActivity {
         // Set adapter
         bookList.setAdapter(bookAdapter);
 
-        firebaseInitBookListener();
         bottomNavigationView();
+        firebaseInitBookListener();
+        setUpItemClickListener();
+        setUpFilter();
         setUpScanningButton();
         setUpAddBookButton();
-        setUpItemClickListener();
+
     }
 
     /**
@@ -160,6 +169,79 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
+     * This method gets the owned books from the database and adds it to the
+     * ListView
+     * @param booksCollectionRef Reference to the books collection
+     */
+    public void getOwnedBooks(CollectionReference booksCollectionRef) {
+        booksCollectionRef
+                .whereEqualTo(Book.OWNER, username)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot queryDoc : task.getResult()) {
+                                String isbn = queryDoc.getData().get(Book.ISBN).toString();
+                                String title = queryDoc.getData().get(Book.TITLE).toString();
+                                String author = queryDoc.getData().get(Book.AUTHOR).toString();
+                                String owner = queryDoc.getData().get(Book.OWNER).toString();
+                                String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
+                                String statusString = queryDoc.getData().get(Book.STATUS).toString();
+                                int status = Integer.parseInt(statusString);
+
+                                Book book = new Book(
+                                        isbn,
+                                        title,
+                                        author,
+                                        owner,
+                                        status,
+                                        lentTo,
+                                        null
+                                );
+
+                                bookAdapter.add(book);
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /**
+     * Initializes a Book object from the data in a
+     * QueryDocumentSnapshot object
+     * @param queryDoc QueryDocumentSnapshot object
+     *                 obtained after database query
+     * @return Book object initialized from data in
+     *         queryDoc
+     */
+    public Book getBookFromDbData(QueryDocumentSnapshot queryDoc) {
+        String isbn = queryDoc.getData().get(Book.ISBN).toString();
+        String title = queryDoc.getData().get(Book.TITLE).toString();
+        String author = queryDoc.getData().get(Book.AUTHOR).toString();
+        String owner = queryDoc.getData().get(Book.OWNER).toString();
+        String statusString = queryDoc.getData().get(Book.STATUS).toString();
+        int status = Integer.parseInt(statusString);
+        String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
+
+        return new Book(
+                isbn,
+                title,
+                author,
+                owner,
+                status,
+                lentTo,
+                null
+        );
+    }
+
+    /**
      * This method launches the EditBookActivity to allow
      * the user to view the description of a book selected
      * from the list of owned books through clicking or
@@ -174,6 +256,88 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtras(bundle);
         intent.putExtra(User.USERNAME, username);
         startActivityForResult(intent, REQUEST_CODE_VIEW_BOOK);
+    }
+
+    /**
+     * This method sets up the OnItemSelected listener and
+     * modifies the list of owned books displayed depending
+     * on the status selected by the user
+     */
+    public void setUpFilter() {
+        // Create the spinner adapter
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.filter_statuses,
+                android.R.layout.simple_spinner_item
+        );
+
+        // Set which layout to use when list of statuses appears
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        filterSpinner.setAdapter(spinnerAdapter);
+
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Integer status = null;
+                CharSequence itemSelected = (CharSequence) parent.getItemAtPosition(position);
+                String itemString = itemSelected.toString();
+
+                // Find what the selected status is
+                if (itemString.matches(Book.getStatusString(Book.ACCEPTED))) {
+                    status = Book.ACCEPTED;
+                } else if (itemString.matches(Book.getStatusString(Book.AVAILABLE))) {
+                    status = Book.AVAILABLE;
+                } else if (itemString.matches(Book.getStatusString(Book.BORROWED))) {
+                    status = Book.BORROWED;
+                } else if (itemString.matches(Book.getStatusString(Book.REQUESTED))) {
+                    status = Book.REQUESTED;
+                }
+
+                // if a status was selected, get the owned books with that status
+                if (status != null) {
+                    database
+                            .collection(Book.BOOKS)
+                            .whereEqualTo(Book.OWNER, username)
+                            .whereEqualTo(Book.STATUS, status.toString())
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful() && task.getResult() != null) {
+                                        if (task.getResult().size() > 0) {
+                                            bookAdapter.clear();
+
+                                            // Add the book with selected status to the list to be displayed
+                                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                                Book book = getBookFromDbData(doc);
+                                                bookAdapter.add(book);
+                                            }
+                                        } else {
+                                            bookAdapter.clear();
+                                        }
+
+                                        bookAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                } else if (position == 1) {
+                    // if "All" was selected, re-populate the list with all the owned books
+                    bookAdapter.clear();
+                    getOwnedBooks(database.collection(Book.BOOKS));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     /**
@@ -238,7 +402,7 @@ public class HomeActivity extends AppCompatActivity {
      * @param barcode A string representing the scanned
      *                isbn of a book
      */
-    public void searchBook(final String barcode) {
+    public void searchBookInDb(final String barcode) {
         CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
         booksCollectionRef
                 .whereEqualTo(Book.OWNER, username)
@@ -247,27 +411,9 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot queryDoc : task.getResult()) {
-                                String isbn = barcode;
-                                String title = queryDoc.getData().get(Book.TITLE).toString();
-                                String author = queryDoc.getData().get(Book.AUTHOR).toString();
-                                String owner = queryDoc.getData().get(Book.OWNER).toString();
-                                String statusString = queryDoc.getData().get(Book.STATUS).toString();
-                                int status = Integer.parseInt(statusString);
-                                String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
-
-                                Book book = new Book(
-                                        isbn,
-                                        title,
-                                        author,
-                                        owner,
-                                        status,
-                                        lentTo,
-                                        null
-                                );
-
-                                launchViewing(book);
+                                launchViewing(getBookFromDbData(queryDoc));
                             }
                         }
                     }
@@ -297,7 +443,7 @@ public class HomeActivity extends AppCompatActivity {
                     // must launch viewing activity for user to be able to view book description
                     Toast.makeText(this, "Launch viewing", Toast.LENGTH_SHORT).show();
                     Toast.makeText(this, data.getStringExtra(BARCODE), Toast.LENGTH_SHORT).show();
-                    searchBook(data.getStringExtra(BARCODE));
+                    searchBookInDb(data.getStringExtra(BARCODE));
                 }
                 break;
 
@@ -335,56 +481,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
                                 @Nullable FirebaseFirestoreException error) {
                 books.clear();
-
-                try {
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-
-                        // Need book id to retrieve book data from books collection
-                        String id = doc.getData().get(Book.ID).toString();
-
-                        booksCollectionRef
-                                .document(id)
-                                .get()
-                                .addOnCompleteListener(
-                                new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        // On successful search, create a book and add to the list view
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot documentSnapshot = task.getResult();
-
-                                            // Book was successfully found in the database
-                                            if (documentSnapshot.exists()) {
-                                                String title = documentSnapshot.getData().get(Book.TITLE).toString();
-                                                String isbn = documentSnapshot.getData().get(Book.ISBN).toString();
-                                                String author = documentSnapshot.getData().get(Book.AUTHOR).toString();
-                                                String status = documentSnapshot.getData().get(Book.STATUS).toString();
-                                                String lent_to = documentSnapshot.getData().get(Book.LENT_TO).toString();
-                                                String owner = documentSnapshot.getData().get(Book.OWNER).toString();
-                                                Book book = new Book(
-                                                        isbn,
-                                                        title,
-                                                        author,
-                                                        owner,
-                                                        Integer.parseInt(status),
-                                                        lent_to,
-                                                        null
-                                                );
-
-                                                // Add book to book list
-                                                books.add(book);
-
-                                                bookAdapter.notifyDataSetChanged();
-                                            }
-                                        }
-                                    }
-                                });
-                    }
-                } catch (Exception e) {
-                    // error handling, generic error
-                    Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-                    Toast.makeText(HomeActivity.this, "Try again later", Toast.LENGTH_SHORT).show();
-                }
+                getOwnedBooks(booksCollectionRef);
             }
         });
     }

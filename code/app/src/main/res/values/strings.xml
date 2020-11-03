@@ -73,6 +73,7 @@
 
     <string-array name="filter_statuses">
         <item>Filter by</item>
+        <item>All</item>
         <item>Accepted</item>
         <item>Available</item>
         <item>Borrowed</item>
