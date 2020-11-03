@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.ImageFragment;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
@@ -22,7 +23,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -30,7 +30,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,18 +46,19 @@ import java.util.UUID;
  * @author Alex Mazzuca
  * @version 2020.10.30
  */
-public class AddBookActivity extends AppCompatActivity {
+public class AddBookActivity extends AppCompatActivity implements ImageFragment.OnFragmentInteractionListener {
     private String username;
     private EditText titleEditText;
     private EditText authorEditText;
     private EditText isbnEditText;
     private TextView warningText;
-    private Button addButton, addImageButton;
+    private Button addButton, addImageButton, removeImageButton;
     private FirebaseFirestore database;
     private ImageView bookImageView;
     private Uri imageUri;
     private StorageReference storageReference;
     private Image bookImage;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,6 +68,9 @@ public class AddBookActivity extends AppCompatActivity {
         // Set up bottom nav bar
         bottomNavigationView();
 
+        // Create book Image object for book Image
+        setBookImage(bookImage);
+
         // get the username from whichever activity we came from
         // this is necessary to access firebase
         username = getIntent().getExtras().getString(User.USERNAME);
@@ -75,8 +78,9 @@ public class AddBookActivity extends AppCompatActivity {
         // Retrieve book image view
         bookImageView = findViewById(R.id.book_picture_imageView);
 
-        // Retrieve book add button
+        // Retrieve book add button and remove button
         addImageButton = findViewById(R.id.add_book_picture_button);
+        removeImageButton = findViewById(R.id.remove_book_picture_button);
 
         // Retrieve the EditText views
         titleEditText = (EditText) findViewById(R.id.Title_editText);
@@ -171,6 +175,20 @@ public class AddBookActivity extends AppCompatActivity {
                 startActivityForResult(selectImageIntent, 1);
             }
 
+        });
+
+        bookImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ImageFragment().newInstance(bookImage).show(getSupportFragmentManager(), "View Image");
+            }
+        });
+
+        removeImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
         });
 
 
@@ -296,8 +314,30 @@ public class AddBookActivity extends AppCompatActivity {
         if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
             imageUri = data.getData();
             bookImageView.setImageURI(imageUri);
+            removeImageButton.setEnabled(true);
+            addImageButton.setText("Change Picture");
             bookImage.setUri(imageUri);
             addImageToStorage(imageUri);
         }
     }
+
+    @Override
+    public void onUpdateImage(){
+        Intent selectImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(selectImageIntent, 1);
+    }
+
+    @Override
+    public void onDeleteImage(){
+        bookImageView.setImageURI(null);
+        removeImageButton.setEnabled(false);
+        addImageButton.setText("Add Picture");
+        bookImage.setUri(null);
+
+    }
+
+    public void setBookImage(Image bookImage) {
+        this.bookImage = bookImage;
+    }
+
 }
