@@ -27,6 +27,8 @@
  */
 package com.cmput301f20t14.bookbox.entities;
 
+import java.io.Serializable;
+
 /**
  * A class that contains all the information necessary to represent a book
  * @author Carter Sabadash
