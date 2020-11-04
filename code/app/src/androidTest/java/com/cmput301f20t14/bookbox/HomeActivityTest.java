@@ -56,6 +56,65 @@ public class HomeActivityTest {
     }
 
     @Test
+    public void checkBookHasStatus() {
+        checkActivitySwitch();
+        try {
+            deleteFromList();
+        } catch (Exception e) {
+            // Do nothing
+        }
+
+        solo.clickOnImageButton(1);
+        solo.assertCurrentActivity("Wrong activity", AddBookActivity.class);
+
+        solo.enterText((EditText) solo.getView(R.id.Title_editText), "testTitle");
+        solo.enterText((EditText) solo.getView(R.id.Author_editText), "testAuthor");
+        solo.enterText((EditText) solo.getView(R.id.ISBN_editText), "testISBN");
+        solo.clickOnButton(2);
+
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        assertTrue(solo.searchText("Available"));
+
+        try {
+            deleteFromList();
+        } catch (Exception e) {
+            // Do nothing
+        }
+    }
+
+    @Test
+    public void checkFilterStatus() {
+        checkActivitySwitch();
+        try {
+            deleteFromList();
+        } catch (Exception e) {
+            // Do nothing
+        }
+
+        solo.clickOnImageButton(1);
+        solo.assertCurrentActivity("Wrong activity", AddBookActivity.class);
+
+        solo.enterText((EditText) solo.getView(R.id.Title_editText), "testTitle");
+        solo.enterText((EditText) solo.getView(R.id.Author_editText), "testAuthor");
+        solo.enterText((EditText) solo.getView(R.id.ISBN_editText), "testISBN");
+        solo.clickOnButton(2);
+
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        assertTrue(solo.searchText("testISBN"));
+        solo.clickOnView(solo.getView(R.id.status_filter_spinner));
+        solo.clickOnText("Accepted");
+        assertFalse(solo.searchText("testISBN"));
+
+        try {
+            deleteFromList();
+        } catch (Exception e) {
+            // Do nothing
+        }
+    }
+
+    @Test
     public void checkHomeActivityList() throws InterruptedException {
         checkActivitySwitch();
         try {
