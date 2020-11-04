@@ -452,6 +452,8 @@ public class HomeActivity extends AppCompatActivity {
 
             case REQUEST_CODE_VIEW_BOOK:
                 if (resultCode == EditBookActivity.RESULT_CODE_DELETE) {
+                    books.clear();
+                    getOwnedBooks(database.collection(Book.BOOKS));
                     Toast.makeText(this, "Book successfully deleted", Toast.LENGTH_SHORT).show();
                 }
 
@@ -482,6 +484,7 @@ public class HomeActivity extends AppCompatActivity {
                                 @Nullable FirebaseFirestoreException error) {
                 books.clear();
                 getOwnedBooks(booksCollectionRef);
+                bookAdapter.notifyDataSetChanged();
             }
         });
     }
