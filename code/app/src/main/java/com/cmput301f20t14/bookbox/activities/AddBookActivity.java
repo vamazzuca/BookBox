@@ -69,7 +69,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         bottomNavigationView();
 
         // Create book Image object for book Image
-        bookImage = new Image(null, null, null);
+        bookImage = new Image(null, null, null, null);
 
         // get the username from whichever activity we came from
         // this is necessary to access firebase
@@ -180,7 +180,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         bookImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new ImageFragment().newInstance(bookImage).show(getSupportFragmentManager(), "View Image");
+                    new ImageFragment().newInstance(bookImage).show(getSupportFragmentManager(), "View Image");
             }
         });
 
@@ -203,6 +203,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         data.put(Book.STATUS, String.valueOf(book.getStatus()));
         data.put(Book.OWNER, book.getOwner());
         data.put(Book.LENT_TO, book.getLentTo());
+        data.put(Book.IMAGE_URL, book.getPhoto().getUrl());
 
         booksCollectionRef
                 .add(data)
@@ -251,7 +252,9 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
 
     private void addImageToStorage(Uri imageUri){
         final String randomKey = UUID.randomUUID().toString();
-        final StorageReference imageRef = storageReference.child("users/"+ username + randomKey);
+        String imageUrl = "users/"+ username + randomKey;
+        bookImage.setUrl(imageUrl);
+        final StorageReference imageRef = storageReference.child(imageUrl);
 
         imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -329,7 +332,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
 
     @Override
     public void onDeleteImage(){
-        bookImageView.setImageURI(null);
+        bookImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_custom_image));
         removeImageButton.setEnabled(false);
         addImageButton.setText("Add Picture");
         bookImage.setUri(null);

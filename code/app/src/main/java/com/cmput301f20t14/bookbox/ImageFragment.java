@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.cmput301f20t14.bookbox.entities.Image;
+import com.squareup.picasso.Picasso;
 
 public class ImageFragment extends DialogFragment {
     private ImageView bookImageView;
@@ -59,7 +60,8 @@ public class ImageFragment extends DialogFragment {
             bookImageView = view.findViewById(R.id.imageViewFrag);
             final Image image = (Image) getArguments().getSerializable("image");
             imageUri = image.getUri();
-            bookImageView.setImageURI(imageUri);
+            //bookImageView.setImageURI(imageUri);
+            Picasso.get().load(imageUri).into(bookImageView);
 
             return builder
                     .setView(view)

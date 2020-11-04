@@ -60,6 +60,7 @@ public class Book implements Serializable {
     public static final String STATUS = "STATUS";
     public static final String LENT_TO = "LENT_TO";
     public static final String OWNER = "OWNER";
+    public static final String IMAGE_URL = "IMAGE_URL";
 
     public static final int AVAILABLE = 66;
     public static final int REQUESTED = 67;
@@ -74,6 +75,7 @@ public class Book implements Serializable {
      * @param owner The User who owns the book
      * @param status The Status of the Book (Book.Status)
      * @param lentTo Who the book is lent to (null if no-one)
+     * @param photo The image association with the book
      */
     public Book(String isbn, String title, String author, String owner, int status,
                 String lentTo, Image photo) {

@@ -9,12 +9,14 @@ public class Image implements Serializable {
     private Integer height;
     private Integer width;
     private Uri uri;
+    private String url;
 
 
-    public Image(Integer height, Integer width, Uri uri) {
+    public Image(Integer height, Integer width, Uri uri, String url) {
         this.height = height;
         this.width = width;
         this.uri = uri;
+        this.url = url;
     }
 
     public Integer getHeight() {
@@ -39,5 +41,13 @@ public class Image implements Serializable {
 
     public void setUri(Uri uri) {
         this.uri = uri;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
