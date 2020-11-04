@@ -456,6 +456,7 @@ public class HomeActivity extends AppCompatActivity {
                     getOwnedBooks(database.collection(Book.BOOKS));
                     Toast.makeText(this, "Book successfully deleted", Toast.LENGTH_SHORT).show();
                 }
+                break;
 
             default:
                 Log.d("Wrong return", "Wrong return");

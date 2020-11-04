@@ -84,8 +84,27 @@ public class EditBookActivity extends AppCompatActivity {
         final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
         final CollectionReference usersCollectionRef = database.collection(User.USERS);
 
-        // Get book information
-        getBookInfo(booksCollectionRef);
+        // set info in TextViews and EditText views
+        titleEditText.setText(book.getTitle());
+        authorEditText.setText(book.getAuthor());
+        isbnEditText.setText(book.getIsbn());
+
+        CharSequence statusText = "Status: " + book.getStatusString();
+        status.setText(statusText);
+
+        CharSequence borrowerText = "Borrower: ";
+        if (book.getLentTo().isEmpty()) {
+            borrowerText = borrowerText + "None";
+        } else {
+            borrowerText = borrowerText + book.getLentTo();
+        }
+        borrower.setText(borrowerText);
+
+        CharSequence ownerText = "Owner: " + book.getOwner();
+        owner.setText(ownerText);
+
+        // Get book id
+        getBookId(usersCollectionRef);
 
         // Setting up the bottom nav bar
         bottomNavigationView();
@@ -160,10 +179,6 @@ public class EditBookActivity extends AppCompatActivity {
                     newData.put(Book.TITLE, title);
                     newData.put(Book.AUTHOR, author);
                     newData.put(Book.ISBN, isbn);
-                    book.setTitle(title);
-                    book.setAuthor(author);
-                    book.setIsbn(isbn);
-
                     editBookInfo(id, newData, booksCollectionRef);
 
                 }
@@ -211,63 +226,22 @@ public class EditBookActivity extends AppCompatActivity {
     }
 
     /**
-     * Gets the owned book information from the database
-     * @param booksCollectionRef A reference to the books collection
+     * Gets the owned book id from the database
+     * @param usersCollectionRef A reference to the books collection
      */
-    public void getBookInfo(CollectionReference booksCollectionRef) {
-        // Get book information to construct a User object
-        // It is important to note that this query should return
-        // only one snapshot because we are searching for a book
-        // using the username of the owner and the isbn of the book
-        // which can be seen a key for the books data if the storage
-        // was relational in nature
-        booksCollectionRef
-                .whereEqualTo(Book.OWNER, username)
-                .whereEqualTo(Book.ISBN, book.getIsbn())
+    public void getBookId(CollectionReference usersCollectionRef) {
+        usersCollectionRef
+                .document(username)
+                .collection(User.OWNED_BOOKS)
+                .document(book.getIsbn())
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult().size() == 1) {
-                            for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
-                                // Get the id of the document from the query
-                                id = queryDocumentSnapshot.getId();
-
-                                // Get the data and put into the EditText views
-                                titleEditText.setText(
-                                        queryDocumentSnapshot.getData().get(Book.TITLE).toString()
-                                );
-                                authorEditText.setText(
-                                        queryDocumentSnapshot.getData().get(Book.AUTHOR).toString()
-                                );
-                                isbnEditText.setText(
-                                        queryDocumentSnapshot.getData().get(Book.ISBN).toString()
-                                );
-
-                                int statusInt = Integer.parseInt(
-                                        queryDocumentSnapshot.getData().get(Book.STATUS).toString()
-                                );
-
-                                CharSequence statusText = "Status: " + Book.getStatusString(statusInt);
-                                status.setText(statusText);
-
-                                CharSequence ownerText = "Owner: " + queryDocumentSnapshot.getData().get(Book.OWNER).toString();
-                                owner.setText(ownerText);
-
-                                String borrowerString = queryDocumentSnapshot.getData().get(Book.LENT_TO).toString();
-                                CharSequence borrowerText = "Borrower: ";
-
-                                // if there's no borrower, the displayed text should be
-                                // "Borrower: None", but if there is a borrower, the
-                                // displayed text should be "Borrower: [Username of borrower]"
-                                if (!borrowerString.isEmpty()) {
-                                    borrowerText = borrowerText + borrowerString;
-                                } else {
-                                    borrowerText = borrowerText + "None";
-                                }
-
-                                borrower.setText(borrowerText);
-                                break;
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            DocumentSnapshot doc = task.getResult();
+                            if (doc != null) {
+                                id = doc.getData().get(Book.ID).toString();
                             }
                         }
                     }
@@ -284,16 +258,54 @@ public class EditBookActivity extends AppCompatActivity {
      * Edit the information about the selected book
      * using the firestore method and listeners
      */
-    private void editBookInfo(String id, HashMap<String, String> data, final CollectionReference booksCollectionRef) {
+    private void editBookInfo(final String id, final HashMap<String, String> data, final CollectionReference booksCollectionRef) {
         // Set the new data for the book and use the merge option
         // because some fields might not have changed
+
+        final CollectionReference ownedBooks =  database
+                .collection(User.USERS)
+                .document(username)
+                .collection(User.OWNED_BOOKS);
+
         booksCollectionRef
                 .document(id)
                 .set(data, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(EditBookActivity.this, "Book updated", Toast.LENGTH_SHORT).show();
+                        ownedBooks
+                                .document(book.getIsbn())
+                                .delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        HashMap<String, String> idMap = new HashMap<>();
+                                        idMap.put(Book.ID, id);
+
+                                        ownedBooks
+                                                .document(data.get(Book.ISBN))
+                                                .set(idMap)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Toast.makeText(EditBookActivity.this, "Book updated", Toast.LENGTH_SHORT).show();
+                                                        finish();
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -302,6 +314,7 @@ public class EditBookActivity extends AppCompatActivity {
                         Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
+
     }
 
     /**
