@@ -70,15 +70,6 @@ public class EditBookActivityTest {
     }
 
     /**
-     * Gets the Activity
-     * @throws Exception
-     */
-    @Test
-    public void start() throws Exception {
-        Activity activity = rule.getActivity();
-    }
-
-    /**
      * Deletes added book from the list of owned books in home page and database
      * @throws InterruptedException
      */
@@ -102,13 +93,9 @@ public class EditBookActivityTest {
         solo.clickOnView(solo.getView(R.id.home_bottom_nav));
         solo.clickInList(1);
 
-        EditText title = solo.getEditText(0);
-        EditText author = solo.getEditText(1);
-        EditText isbn = solo.getEditText(2);
-
-        assertEquals("testTitle", title.getText().toString());
-        assertEquals("testAuthor", author.getText().toString());
-        assertEquals("testISBN", isbn.getText().toString());
+        assertTrue(solo.searchText("testTitle"));
+        assertTrue(solo.searchText("testAuthor"));
+        assertTrue(solo.searchText("testISBN"));
 
         solo.clickOnButton("Delete");
         solo.clickOnButton("Yes");
@@ -133,13 +120,9 @@ public class EditBookActivityTest {
         solo.clickOnView(solo.getView(R.id.home_bottom_nav));
         solo.clickInList(1);
 
-        EditText title = solo.getEditText(0);
-        EditText author = solo.getEditText(1);
-        EditText isbn = solo.getEditText(2);
-
-        assertEquals("testTitleEdit", title.getText().toString());
-        assertEquals("testAuthorEdit", author.getText().toString());
-        assertEquals("testISBNEdit", isbn.getText().toString());
+        assertTrue(solo.searchText("testTitleEdit"));
+        assertTrue(solo.searchText("testAuthorEdit"));
+        assertTrue(solo.searchText("testISBNEdit"));
 
         solo.clickOnButton("Delete");
         solo.clickOnButton("Yes");

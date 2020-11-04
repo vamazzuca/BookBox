@@ -17,6 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ProfileActivityTest {
     private Solo solo;
@@ -64,11 +65,8 @@ public class ProfileActivityTest {
         solo.clickOnView(solo.getView(R.id.home_bottom_nav));
         solo.clickOnView(solo.getView(R.id.profile_bottom_nav));
 
-        EditText password = (EditText) solo.getView(R.id.profile_password_editText);
-        EditText phone = (EditText) solo.getView(R.id.profile_phone_editText);
-
-        assertEquals("correctPassword", password.getText().toString());
-        assertEquals("780 999 1111", phone.getText().toString());
+        assertTrue(solo.searchText("correctUsername"));
+        assertTrue(solo.searchText("correctPassword"));
     }
 
     @Test
@@ -86,13 +84,9 @@ public class ProfileActivityTest {
         solo.clickOnView(solo.getView(R.id.home_bottom_nav));
         solo.clickOnView(solo.getView(R.id.profile_bottom_nav));
 
-        EditText password = (EditText) solo.getView(R.id.profile_password_editText);
-        EditText phone = (EditText) solo.getView(R.id.profile_phone_editText);
-        EditText email = (EditText) solo.getView(R.id.profile_email_editText);
-
-        assertEquals("correctPassword2", password.getText().toString());
-        assertEquals("000 000 0001", phone.getText().toString());
-        assertEquals("correctEmail@bookbox.com", email.getText().toString());
+        assertTrue(solo.searchText("correctPassword2"));
+        assertTrue(solo.searchText("000 000 0001"));
+        assertTrue(solo.searchText("correctEmail@bookbox.com"));
 
         solo.enterText((EditText) solo.getView(R.id.profile_password_editText), "");
         solo.enterText((EditText) solo.getView(R.id.profile_phone_editText), "");

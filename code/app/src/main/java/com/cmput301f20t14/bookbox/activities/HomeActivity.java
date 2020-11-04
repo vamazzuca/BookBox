@@ -182,23 +182,25 @@ public class HomeActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot queryDoc : task.getResult()) {
-                                String isbn = queryDoc.getData().get(Book.ISBN).toString();
-                                String title = queryDoc.getData().get(Book.TITLE).toString();
-                                String author = queryDoc.getData().get(Book.AUTHOR).toString();
-                                String owner = queryDoc.getData().get(Book.OWNER).toString();
-                                String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
-                                String statusString = queryDoc.getData().get(Book.STATUS).toString();
-                                int status = Integer.parseInt(statusString);
+//                                String isbn = queryDoc.getData().get(Book.ISBN).toString();
+//                                String title = queryDoc.getData().get(Book.TITLE).toString();
+//                                String author = queryDoc.getData().get(Book.AUTHOR).toString();
+//                                String owner = queryDoc.getData().get(Book.OWNER).toString();
+//                                String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
+//                                String statusString = queryDoc.getData().get(Book.STATUS).toString();
+//                                int status = Integer.parseInt(statusString);
+//
+//                                Book book = new Book(
+//                                        isbn,
+//                                        title,
+//                                        author,
+//                                        owner,
+//                                        status,
+//                                        lentTo,
+//                                        null
+//                                );
 
-                                Book book = new Book(
-                                        isbn,
-                                        title,
-                                        author,
-                                        owner,
-                                        status,
-                                        lentTo,
-                                        null
-                                );
+                                Book book = getBookFromDbData(queryDoc);
 
                                 bookAdapter.add(book);
                             }
@@ -250,7 +252,7 @@ public class HomeActivity extends AppCompatActivity {
      *             viewed
      */
     public void launchViewing(Book book) {
-        Intent intent = new Intent(HomeActivity.this, EditBookActivity.class);
+        Intent intent = new Intent(this, EditBookActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(VIEW_BOOK, book);
         intent.putExtras(bundle);
