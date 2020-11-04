@@ -113,11 +113,10 @@ public class EditBookActivityTest {
         solo.clickOnButton("Delete");
         solo.clickOnButton("Yes");
         solo.assertCurrentActivity("Wrong activity", HomeActivity.class);
-        assertFalse(solo.searchText("testISBN"));
     }
 
     @Test
-    public void checkEditBookSuccess() {
+    public void checkEditBookSuccess() throws InterruptedException {
         solo.enterText((EditText) solo.getView(R.id.edit_title_editText), "");
         solo.enterText((EditText) solo.getView(R.id.edit_author_editText), "");
         solo.enterText((EditText) solo.getView(R.id.edit_isbn_editText), "");
@@ -144,8 +143,6 @@ public class EditBookActivityTest {
 
         solo.clickOnButton("Delete");
         solo.clickOnButton("Yes");
-        solo.assertCurrentActivity("Wrong activity", HomeActivity.class);
-        assertFalse(solo.searchText("testISBN"));
     }
 
     /**
