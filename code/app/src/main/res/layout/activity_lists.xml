@@ -54,7 +54,7 @@
     </LinearLayout>
 
     <ListView
-        android:id="@+id/main_page_books_listView"
+        android:id="@+id/lists_listView"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_marginTop="80dp"
