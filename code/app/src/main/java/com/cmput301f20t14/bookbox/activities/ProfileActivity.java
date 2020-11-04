@@ -185,16 +185,19 @@ public class ProfileActivity extends AppCompatActivity {
                     case R.id.lists_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), ListsActivity.class)
                                 .putExtra(User.USERNAME, username));
+                        finish();
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class)
                                 .putExtra(User.USERNAME, username));
+                        finish();
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.notification_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), NotificationsActivity.class)
                                 .putExtra(User.USERNAME, username));
+                        finish();
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
