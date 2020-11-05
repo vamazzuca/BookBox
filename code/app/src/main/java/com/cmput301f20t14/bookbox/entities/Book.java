@@ -33,7 +33,8 @@ import java.io.Serializable;
  * A class that contains all the information necessary to represent a book
  * @author Carter Sabadash
  * @author Olivier Vadiavaloo
- * @version 2020.10.27
+ * @author Alex Mazzuca
+ * @version 2020.11.04
  *
  * All Getters have been implemented, but not setters (will have to also ensure that
  *     data entered is in correct format
