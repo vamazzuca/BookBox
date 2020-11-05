@@ -128,6 +128,8 @@ public class EditBookActivityTest {
         solo.clickOnButton("Yes");
     }
 
+
+
     /**
      * Close activity after each test
      * @throws Exception

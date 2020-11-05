@@ -214,6 +214,7 @@ public class HomeActivity extends AppCompatActivity {
         String statusString = queryDoc.getData().get(Book.STATUS).toString();
         int status = Integer.parseInt(statusString);
         String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
+        String imageUrl = queryDoc.getData().get(Book.IMAGE_URL).toString();
 
         return new Book(
                 isbn,
@@ -222,7 +223,7 @@ public class HomeActivity extends AppCompatActivity {
                 owner,
                 status,
                 lentTo,
-                null
+                imageUrl
         );
     }
 

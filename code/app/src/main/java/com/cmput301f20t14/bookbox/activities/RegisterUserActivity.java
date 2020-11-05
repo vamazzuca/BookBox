@@ -69,7 +69,7 @@ import java.util.HashMap;
  * User account information is stored in the Firestore
  * database.
  * @author Olivier Vadiavaloo
- * @version 2020.10.25
+ * @version 2020.11.05
  * @see com.google.firebase.firestore.FirebaseFirestore
  */
 
@@ -81,6 +81,7 @@ public class RegisterUserActivity extends AppCompatActivity {
     private Button registerButton;
     private ImageButton backButton;
     private FirebaseFirestore database;
+    private String imageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +96,9 @@ public class RegisterUserActivity extends AppCompatActivity {
 
         // Retrieve the register Button view
         registerButton = (Button) findViewById(R.id.register_activity_button);
+
+        //Initialize imageUrl
+        imageUrl = "";
 
         // Retrieve the back ImageButton view
         backButton = (ImageButton) findViewById(R.id.register_back_button);
@@ -159,6 +163,7 @@ public class RegisterUserActivity extends AppCompatActivity {
                                                     userInfo.put(User.PASSWORD, enteredPassword);
                                                     userInfo.put(User.EMAIL, enteredEmail);
                                                     userInfo.put(User.PHONE, enteredPhone);
+                                                    userInfo.put(User.IMAGE_URL, imageUrl);
 
                                                     // documentReference will add the user information
                                                     // to the database at this point since it is confirmed
