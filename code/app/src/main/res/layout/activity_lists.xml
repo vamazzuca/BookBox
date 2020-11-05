@@ -71,6 +71,4 @@
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />
 
-
-
 </RelativeLayout>

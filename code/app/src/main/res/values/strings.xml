@@ -70,6 +70,8 @@
     <string name="borrower">Borrower:</string>
     <string name="bookbox_item">Bookbox Item</string>
     <string name="request">Request</string>
+    <string name="enter_text">Search bookbox</string>
+    <string name="results">Results</string>
 
     <string-array name="filter_statuses">
         <item>Filter by</item>
