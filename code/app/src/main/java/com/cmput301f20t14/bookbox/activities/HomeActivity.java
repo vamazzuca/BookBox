@@ -182,26 +182,7 @@ public class HomeActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot queryDoc : task.getResult()) {
-//                                String isbn = queryDoc.getData().get(Book.ISBN).toString();
-//                                String title = queryDoc.getData().get(Book.TITLE).toString();
-//                                String author = queryDoc.getData().get(Book.AUTHOR).toString();
-//                                String owner = queryDoc.getData().get(Book.OWNER).toString();
-//                                String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
-//                                String statusString = queryDoc.getData().get(Book.STATUS).toString();
-//                                int status = Integer.parseInt(statusString);
-//
-//                                Book book = new Book(
-//                                        isbn,
-//                                        title,
-//                                        author,
-//                                        owner,
-//                                        status,
-//                                        lentTo,
-//                                        null
-//                                );
-
                                 Book book = getBookFromDbData(queryDoc);
-
                                 bookAdapter.add(book);
                             }
                         }
