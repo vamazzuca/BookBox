@@ -182,9 +182,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         bookImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (bookImage.getUri() != null) {
-                    new ImageFragment().newInstance(bookImage).show(getSupportFragmentManager(), "View Image");
-                }
+                new ImageFragment().newInstance(bookImage).show(getSupportFragmentManager(), "View Image");
             }
         });
 

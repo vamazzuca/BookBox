@@ -44,7 +44,7 @@ import java.util.UUID;
  * isbn and an optional picture.
  * @author Olivier Vadiaval
  * @author Alex Mazzuca
- * @version 2020.10.30
+ * @version 2020.11.04
  */
 public class AddBookActivity extends AppCompatActivity implements ImageFragment.OnFragmentInteractionListener {
     private String username;
@@ -338,6 +338,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         removeImageButton.setEnabled(false);
         addImageButton.setText("Add Picture");
         bookImage.setUri(null);
+        imageUrl = "";
 
     }
 
