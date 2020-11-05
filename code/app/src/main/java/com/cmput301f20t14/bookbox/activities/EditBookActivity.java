@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cmput301f20t14.bookbox.ImageFragment;
+import com.cmput301f20t14.bookbox.fragments.ImageFragment;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
@@ -31,15 +31,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -149,6 +146,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         //Get Image URL
         bookImage.setUrl(book.getPhotoUrl());
 
+        //Download Image from Firebase and set it to ImageView
         if (bookImage.getUrl() != "") {
             StorageReference imageRef = storageReference.child(bookImage.getUrl());
 
@@ -169,7 +167,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         }
 
 
-
+        //Add picture button listener
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,6 +177,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
         });
 
+        //View picture button listener
         bookImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,6 +185,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             }
         });
 
+        //Delete picture button listener
         removeImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -438,6 +438,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         });
     }
 
+    /**
+     * This method will add the selected image from the android gallery and upload it to the
+     * Firebase storage.
+     * @author Alex Mazzuca
+     * @version 2020.11.04
+     * @param imageUri An imageuri to point to image location
+     */
     private void addImageToStorage(Uri imageUri){
         final String randomKey = UUID.randomUUID().toString();
         imageUrl = "users/"+ username + randomKey;
@@ -457,6 +464,12 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         });
     }
 
+    /**
+     * When and image is added or changed to a select book from the android gallery, this will
+     * set the image to the image view can call addImageToStorage to store the image
+     * @author Alex Mazzuca
+     * @version 2020.11.04
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -471,12 +484,24 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         }
     }
 
+    /**
+     * Part of the ImageFragment interface where when an image is changed in the fragment it will
+     * get the image from the android gallery and pass it onto onActivityResult
+     * @author Alex Mazzuca
+     * @version 2020.11.04
+     */
     @Override
     public void onUpdateImage(){
         Intent selectImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(selectImageIntent, 1);
     }
 
+    /**
+     * Part of the ImageFragment interface where when an image is deleted it will changed
+     * the image view to a defualt logo and remove the image
+     * @author Alex Mazzuca
+     * @version 2020.11.04
+     */
     @Override
     public void onDeleteImage(){
         bookImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_custom_image));

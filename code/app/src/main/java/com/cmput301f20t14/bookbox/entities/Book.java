@@ -68,7 +68,7 @@ public class Book implements Serializable {
     public static final int BORROWED = 69;
 
     /**
-     * Constructs a book without an image
+     * Constructs a book
      * @param isbn The isbn of the book
      * @param title The title of the book
      * @param author The author of the book

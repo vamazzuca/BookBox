@@ -13,7 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cmput301f20t14.bookbox.R;
-import com.cmput301f20t14.bookbox.ImageFragment;
+import com.cmput301f20t14.bookbox.fragments.ImageFragment;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
@@ -169,7 +169,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
             }
         });
 
-
+        //Add picture button listener
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,6 +179,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
 
         });
 
+        //View picture button listener
         bookImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,6 +187,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
             }
         });
 
+        //Delete picture button listener
         removeImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -252,6 +254,13 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
 
     }
 
+    /**
+     * This method will add the selected image from the android gallery and upload it to the
+     * Firebase storage.
+     * @author Alex Mazzuca
+     * @version 2020.11.04
+     * @param imageUri An imageuri to point to image location
+     */
     private void addImageToStorage(Uri imageUri){
         final String randomKey = UUID.randomUUID().toString();
         imageUrl = "users/"+ username + randomKey;
@@ -313,6 +322,12 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
     }
 
 
+    /**
+     * When and image is added or changed to a select book from the android gallery, this will
+     * set the image to the image view can call addImageToStorage to store the image
+     * @author Alex Mazzuca
+     * @version 2020.11.04
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -326,12 +341,24 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         }
     }
 
+    /**
+     * Part of the ImageFragment interface where when an image is changed in the fragment it will
+     * get the image from the android gallery and pass it onto onActivityResult
+     * @author Alex Mazzuca
+     * @version 2020.11.04
+     */
     @Override
     public void onUpdateImage(){
         Intent selectImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(selectImageIntent, 1);
     }
 
+    /**
+     * Part of the ImageFragment interface where when an image is deleted it will changed
+     * the image view to a defualt logo and remove the image
+     * @author Alex Mazzuca
+     * @version 2020.11.04
+     */
     @Override
     public void onDeleteImage(){
         bookImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_custom_image));
