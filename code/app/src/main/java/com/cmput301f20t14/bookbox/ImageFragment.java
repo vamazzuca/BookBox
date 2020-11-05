@@ -52,7 +52,6 @@ public class ImageFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         LayoutInflater LayoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         if (getArguments() != null) {

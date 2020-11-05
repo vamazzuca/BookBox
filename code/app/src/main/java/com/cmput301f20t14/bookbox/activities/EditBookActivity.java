@@ -63,6 +63,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     private Uri imageUri;
     private StorageReference storageReference;
     private Image bookImage;
+    private String imageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +82,8 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         bookImageView = findViewById(R.id.book_picture_imageView);
 
         // Create book Image object for book Image
-        bookImage = new Image(null, null, null, null);
+        bookImage = new Image(null, null, null, "");
+        imageUrl = "";
 
         // Retrieve book add button and remove button
         addImageButton = findViewById(R.id.add_book_picture_button);
@@ -143,6 +145,28 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
         // Set up the "Delete" button
         setDeleteBtn(booksCollectionRef, usersCollectionRef);
+
+        //Get Image URL
+        bookImage.setUrl(book.getPhotoUrl());
+
+        if (bookImage.getUrl() != "") {
+            StorageReference imageRef = storageReference.child(bookImage.getUrl());
+
+            imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.get().load(uri).into(bookImageView);
+                    removeImageButton.setEnabled(true);
+                    addImageButton.setText("Change Picture");
+                    bookImage.setUri(uri);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    //Handle any errors
+                }
+            });
+        }
 
 
 
@@ -236,6 +260,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                     newData.put(Book.TITLE, title);
                     newData.put(Book.AUTHOR, author);
                     newData.put(Book.ISBN, isbn);
+                    newData.put(Book.IMAGE_URL, imageUrl);
                     editBookInfo(id, newData, booksCollectionRef);
 
                 }
@@ -417,6 +442,8 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
     private void addImageToStorage(Uri imageUri){
         final String randomKey = UUID.randomUUID().toString();
+        imageUrl = "users/"+ username + randomKey;
+        bookImage.setUrl(imageUrl);
         final StorageReference imageRef = storageReference.child("users/"+ username + randomKey);
 
         imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -440,6 +467,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             addImageToStorage(imageUri);
             bookImageView.setImageURI(imageUri);
             bookImage.setUri(imageUri);
+            book.setPhotoUrl(imageUrl);
             removeImageButton.setEnabled(true);
             addImageButton.setText("Change Picture");
         }
@@ -457,6 +485,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         removeImageButton.setEnabled(false);
         addImageButton.setText("Add Picture");
         bookImage.setUri(null);
+        imageUrl = "";
 
     }
 

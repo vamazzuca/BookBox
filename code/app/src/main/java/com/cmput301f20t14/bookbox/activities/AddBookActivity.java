@@ -58,6 +58,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
     private Uri imageUri;
     private StorageReference storageReference;
     private Image bookImage;
+    private String imageUrl;
 
 
     @Override
@@ -69,7 +70,8 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         bottomNavigationView();
 
         // Create book Image object for book Image
-        bookImage = new Image(null, null, null, null);
+        bookImage = new Image(null, null, null, "");
+        imageUrl = "";
 
         // get the username from whichever activity we came from
         // this is necessary to access firebase
@@ -155,7 +157,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
                                                          username,
                                                          Book.AVAILABLE,
                                                          "",
-                                                         bookImage)
+                                                         imageUrl)
                                              );
                                          }
                                     } else {
@@ -203,7 +205,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         data.put(Book.STATUS, String.valueOf(book.getStatus()));
         data.put(Book.OWNER, book.getOwner());
         data.put(Book.LENT_TO, book.getLentTo());
-        data.put(Book.IMAGE_URL, book.getPhoto().getUrl());
+        data.put(Book.IMAGE_URL, book.getPhotoUrl());
 
         booksCollectionRef
                 .add(data)
@@ -252,7 +254,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
 
     private void addImageToStorage(Uri imageUri){
         final String randomKey = UUID.randomUUID().toString();
-        String imageUrl = "users/"+ username + randomKey;
+        imageUrl = "users/"+ username + randomKey;
         bookImage.setUrl(imageUrl);
         final StorageReference imageRef = storageReference.child(imageUrl);
 

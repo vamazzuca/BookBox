@@ -49,7 +49,7 @@ public class Book implements Serializable {
     private String owner;
     private int status;
     private String lentTo;
-    private Image photo;
+    private String photoUrl;
 
 
     public static final String ID = "ID";
@@ -75,17 +75,17 @@ public class Book implements Serializable {
      * @param owner The User who owns the book
      * @param status The Status of the Book (Book.Status)
      * @param lentTo Who the book is lent to (null if no-one)
-     * @param photo The image association with the book
+     * @param photoUrl The image association with the book
      */
     public Book(String isbn, String title, String author, String owner, int status,
-                String lentTo, Image photo) {
+                String lentTo, String photoUrl) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
         this.owner = owner;
         this.status = status;
         this.lentTo = lentTo;
-        this.photo = photo;
+        this.photoUrl = photoUrl;
     }
 
 
@@ -187,8 +187,8 @@ public class Book implements Serializable {
      * Gets the image associated with the book
      * @return An image for the book
      */
-    public Image getPhoto() {
-        return photo;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
     /**
@@ -241,9 +241,9 @@ public class Book implements Serializable {
 
     /**
      * Sets the image associated with the book
-     * @param photo
+     * @param photoUrl
      */
-    public void setPhoto(Image photo) {
-        this.photo = photo;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }
