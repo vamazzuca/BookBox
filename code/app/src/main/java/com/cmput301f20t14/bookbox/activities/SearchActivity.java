@@ -33,8 +33,6 @@ public class SearchActivity extends AppCompatActivity {
 
     FirebaseFirestore database;
     private ListView searchList;
-   // private EditText searchText;
-    private Button searchButton;
     private ArrayList<Book> searchResults;
     private String keyString;
     private SearchList searchAdapter;
@@ -59,20 +57,23 @@ public class SearchActivity extends AppCompatActivity {
 
         searchList.setAdapter(searchAdapter);
 
-       // searchText = (EditText) findViewById(R.id.search_EditText);
-       // searchButton = (Button) findViewById(R.id.search_word_button);
-
     }
 
     public void executeSearch(View view){
         EditText editText = (EditText) findViewById(R.id.search_EditText);
         keyString = editText.getText().toString();
-        searchResults = new ArrayList<>();
-        searchAdapter = new SearchList(this,searchResults);
-        searchList.setAdapter(searchAdapter);
+        searchResults.clear();
         search();
 
     }
+
+    /**
+     * Implements search function to update list with all books
+     * that contain a string, entered in the EditText box, in thier description
+     * (case sensitive) sorted so available books appear above request books
+     * @author Nicholas DeMarco
+     * @version 2020.11.05
+     */
 
     public void search(){
         CollectionReference collectionRef = database.collection(Book.BOOKS);
@@ -84,29 +85,12 @@ public class SearchActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot queryDoc : task.getResult()) {
-//                                String isbn = queryDoc.getData().get(Book.ISBN).toString();
-//                                String title = queryDoc.getData().get(Book.TITLE).toString();
-//                                String author = queryDoc.getData().get(Book.AUTHOR).toString();
-//                                String owner = queryDoc.getData().get(Book.OWNER).toString();
-//                                String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
-//                                String statusString = queryDoc.getData().get(Book.STATUS).toString();
-//                                int status = Integer.parseInt(statusString);
-//
-//                                Book book = new Book(
-//                                        isbn,
-//                                        title,
-//                                        author,
-//                                        owner,
-//                                        status,
-//                                        lentTo,
-//                                        null
-//                                );
 
                                 Book book = getBookFromDb(queryDoc);
-                                String titleDB = queryDoc.getData().get(Book.TITLE).toString();
-                                String authorDB = queryDoc.getData().get(Book.AUTHOR).toString();
-                                String isbnDB = queryDoc.getData().get(Book.ISBN).toString();
-                                if (keyString.equals(titleDB) || keyString.equals(authorDB) || keyString.equals(isbnDB)) {
+                                String titleDB = book.getTitle();
+                                String authorDB = book.getAuthor();
+                                String isbnDB = book.getIsbn();
+                                if (titleDB.contains(keyString) || authorDB.contains(keyString) || isbnDB.contains(keyString)) {
 
                                     searchAdapter.add(book);
                                 }
@@ -126,29 +110,12 @@ public class SearchActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot queryDoc : task.getResult()) {
-//                                String isbn = queryDoc.getData().get(Book.ISBN).toString();
-//                                String title = queryDoc.getData().get(Book.TITLE).toString();
-//                                String author = queryDoc.getData().get(Book.AUTHOR).toString();
-//                                String owner = queryDoc.getData().get(Book.OWNER).toString();
-//                                String lentTo = queryDoc.getData().get(Book.LENT_TO).toString();
-//                                String statusString = queryDoc.getData().get(Book.STATUS).toString();
-//                                int status = Integer.parseInt(statusString);
-//
-//                                Book book = new Book(
-//                                        isbn,
-//                                        title,
-//                                        author,
-//                                        owner,
-//                                        status,
-//                                        lentTo,
-//                                        null
-//                                );
 
                                 Book book = getBookFromDb(queryDoc);
-                                String titleDB = queryDoc.getData().get(Book.TITLE).toString();
-                                String authorDB = queryDoc.getData().get(Book.AUTHOR).toString();
-                                String isbnDB = queryDoc.getData().get(Book.ISBN).toString();
-                                if (keyString.equals(titleDB) || keyString.equals(authorDB) || keyString.equals(isbnDB)) {
+                                String titleDB = book.getTitle();
+                                String authorDB = book.getAuthor();
+                                String isbnDB = book.getIsbn();
+                                if (titleDB.contains(keyString) || authorDB.contains(keyString) || isbnDB.contains(keyString)) {
 
                                     searchAdapter.add(book);
                                 }
@@ -157,6 +124,7 @@ public class SearchActivity extends AppCompatActivity {
                         }
                     }
                 });
+
 
     }
 
