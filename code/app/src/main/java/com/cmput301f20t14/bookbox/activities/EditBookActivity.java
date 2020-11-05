@@ -146,6 +146,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         //Get Image URL
         bookImage.setUrl(book.getPhotoUrl());
 
+        imageUrl = book.getPhotoUrl();
         //Download Image from Firebase and set it to ImageView
         if (bookImage.getUrl() != "") {
             StorageReference imageRef = storageReference.child(bookImage.getUrl());

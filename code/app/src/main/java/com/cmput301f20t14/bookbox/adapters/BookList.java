@@ -26,6 +26,7 @@ public class BookList extends ArrayAdapter<Book> {
     private ArrayList<Book> books;
     private Context context;
     private StorageReference storageReference;
+    private String imageUrlList;
 
     public BookList(Context context, ArrayList<Book> books) {
         super(context, 0, books);
@@ -38,6 +39,7 @@ public class BookList extends ArrayAdapter<Book> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
         storageReference = FirebaseStorage.getInstance().getReference();
+        imageUrlList = "";
 
         if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.owned_book_content, parent, false);
@@ -57,8 +59,10 @@ public class BookList extends ArrayAdapter<Book> {
         title.setText(book.getTitle());
         isbn.setText(book.getIsbn());
 
-        if (book.getPhotoUrl() != "") {
-            StorageReference imageRef = storageReference.child(book.getPhotoUrl());
+        imageUrlList = book.getPhotoUrl();
+
+        if (imageUrlList != "") {
+            StorageReference imageRef = storageReference.child(imageUrlList);
 
             imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
