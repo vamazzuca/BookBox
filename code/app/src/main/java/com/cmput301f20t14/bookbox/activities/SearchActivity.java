@@ -77,7 +77,7 @@ public class SearchActivity extends AppCompatActivity {
     public void search(){
         CollectionReference collectionRef = database.collection(Book.BOOKS);
         collectionRef
-                .whereEqualTo(Book.STATUS, "66")
+                .whereEqualTo(Book.STATUS, String.valueOf(AVAILABLE))
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
