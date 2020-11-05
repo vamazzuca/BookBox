@@ -85,6 +85,7 @@ public class HomeActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_SCANNING = 100;
     public static final int REQUEST_CODE_ADD_BOOK = 200;
     public static final int REQUEST_CODE_VIEW_BOOK = 300;
+    public static final int REQUEST_CODE_SEARCHING = 400;
     public static final String BARCODE = "BARCODE";
     public static final String VIEW_BOOK = "VIEW_BOOK";
     private String username;
@@ -124,6 +125,7 @@ public class HomeActivity extends AppCompatActivity {
         firebaseInitBookListener();
         setUpItemClickListener();
         setUpFilter();
+        setUpSearchingButton();
         setUpScanningButton();
         setUpAddBookButton();
 
@@ -341,6 +343,25 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
+     * Setting up the onClick listener for the search button
+     * Listener launches the search activity to find available books
+     * based on if a keyword is in the book description
+     * @author Nicholas DeMarco
+     * @version 2020.11.04
+     */
+    private void setUpSearchingButton() {
+        ImageButton search = findViewById(R.id.search_button);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, SearchActivity.class);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_SEARCHING);
+            }
+        });
+    }
+
+    /**
      * Setting up the onClick listener for the scanning button
      * Listener launches the Scanning activity to obtain a book
      * description by scanning the ISBN
@@ -431,6 +452,9 @@ public class HomeActivity extends AppCompatActivity {
                 break;
 
             case REQUEST_CODE_ADD_BOOK:
+                break;
+
+            case REQUEST_CODE_SEARCHING:
                 break;
 
             case REQUEST_CODE_VIEW_BOOK:
