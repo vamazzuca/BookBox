@@ -25,6 +25,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Bookbox
+        working-directory: code
          
       - name: Set up JDK
         uses: actions/setup-java@v1
@@ -33,9 +34,12 @@ jobs:
         
       - name: Go to code
         run: cd code
+        working-directory: code
         
       - name: Run tests
         run: ./gradlew test
+        working-directory: code
 
       - name: Build project
         run: ./gradlew assemble
+        working-directory: code
