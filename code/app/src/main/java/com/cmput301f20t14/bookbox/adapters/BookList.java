@@ -13,7 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -36,7 +39,15 @@ public class BookList extends ArrayAdapter<Book> {
     private ArrayList<Book> books;
     private Context context;
     private StorageReference storageReference;
-    private String imageUrlList;
+
+    private static class ViewHolder {
+        TextView owner;
+        TextView author;
+        TextView title;
+        TextView isbn;
+        TextView status;
+        ImageView bookImageView;
+    }
 
     public BookList(Context context, ArrayList<Book> books) {
         super(context, 0, books);
@@ -49,45 +60,29 @@ public class BookList extends ArrayAdapter<Book> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
         storageReference = FirebaseStorage.getInstance().getReference();
-        imageUrlList = "";
 
+        ViewHolder holder;
         if (view == null) {
+            holder = new ViewHolder();
             view = LayoutInflater.from(context).inflate(R.layout.owned_book_content, parent, false);
+            holder.owner = (TextView) view.findViewById(R.id.list_content_owner);
+            holder.author = (TextView) view.findViewById(R.id.list_content_author);
+            holder.title = (TextView) view.findViewById(R.id.list_content_title);
+            holder.isbn = (TextView) view.findViewById(R.id.list_content_isbn);
+            holder.status = (TextView) view.findViewById(R.id.list_content_status);
+            holder.bookImageView = (ImageView) view.findViewById(R.id.list_content_image);
+
+            view.setTag(holder);
+        } else {
+            holder = (ViewHolder) view.getTag();
         }
 
         Book book = books.get(position);
 
-        TextView owner = (TextView) view.findViewById(R.id.list_content_owner);
-        TextView author = (TextView) view.findViewById(R.id.list_content_author);
-        TextView title = (TextView) view.findViewById(R.id.list_content_title);
-        TextView isbn = (TextView) view.findViewById(R.id.list_content_isbn);
-        TextView status = (TextView) view.findViewById(R.id.list_content_status);
-        final ImageView bookImageView = view.findViewById(R.id.list_content_image);
-
-        owner.setText(book.getOwner());
-        author.setText(book.getAuthor());
-        title.setText(book.getTitle());
-        isbn.setText(book.getIsbn());
-
-        imageUrlList = book.getPhotoUrl();
-
-        if (!imageUrlList.isEmpty()) {
-            StorageReference imageRef = storageReference.child(imageUrlList);
-
-            imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Picasso.get().load(uri).into(bookImageView);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    //Handle any errors
-                }
-            });
-        } else {
-            bookImageView.setImageDrawable(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_custom_image, null));
-        }
+        holder.owner.setText(book.getOwner());
+        holder.author.setText(book.getAuthor());
+        holder.title.setText(book.getTitle());
+        holder.isbn.setText(book.getIsbn());
 
         CharSequence statusText = book.getStatusString();
 
@@ -95,8 +90,38 @@ public class BookList extends ArrayAdapter<Book> {
             statusText = statusText + " (" + book.getLentTo() + ")";
         }
 
-        status.setText(statusText);
+        holder.status.setText(statusText);
 
+        downloadImage(holder.bookImageView, book);
         return view;
+    }
+
+
+    public void downloadImage(final ImageView imageView, Book book) {
+        String imageUrlList = book.getPhotoUrl();
+
+
+        if (!imageUrlList.isEmpty()) {
+            StorageReference imageRef = storageReference.child(imageUrlList);
+
+            imageRef.getDownloadUrl()
+                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                                Glide.with(imageView.getContext())
+                                        .load(uri)
+                                        .into(imageView);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            //Handle any errors
+                        }
+                    });
+        } else {
+            imageView.setImageResource(R.drawable.ic_custom_image);
+        }
+
     }
 }
