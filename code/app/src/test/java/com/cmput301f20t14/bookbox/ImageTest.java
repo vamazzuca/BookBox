@@ -36,11 +36,7 @@ public class ImageTest {
 
         mockImage.setWidth(width);
         assertEquals(mockImage.getWidth(), width);
-
-        Uri imageUri = Uri.parse("gs://bookbox-d77e5.appspot.com/users/Alex00b22bc0-cb7a-407c-ae6e-3bb96dfbda1a");
-        mockImage.setUri(imageUri);
-        assertEquals(mockImage.getUri(), imageUri);
-
+        
         String imageUrl = "doc/picture/image.jpg";
         mockImage.setUrl(imageUrl);
         assertEquals(mockImage.getUrl(), imageUrl);
