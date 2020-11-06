@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
@@ -21,6 +23,14 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+/**
+ * This is the adapter used to represent a book in
+ * a listview with each row having the layout described in
+ * owned_book_content.xml
+ * @author Olivier Vadiavaloo
+ * @version 2020.11.04
+ */
 
 public class BookList extends ArrayAdapter<Book> {
     private ArrayList<Book> books;
@@ -61,7 +71,7 @@ public class BookList extends ArrayAdapter<Book> {
 
         imageUrlList = book.getPhotoUrl();
 
-        if (imageUrlList != "") {
+        if (!imageUrlList.isEmpty()) {
             StorageReference imageRef = storageReference.child(imageUrlList);
 
             imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -75,8 +85,8 @@ public class BookList extends ArrayAdapter<Book> {
                     //Handle any errors
                 }
             });
-        } else{
-            bookImageView.setImageDrawable(bookImageView.getResources().getDrawable(R.drawable.ic_custom_image));
+        } else {
+            bookImageView.setImageDrawable(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_custom_image, null));
         }
 
         CharSequence statusText = book.getStatusString();

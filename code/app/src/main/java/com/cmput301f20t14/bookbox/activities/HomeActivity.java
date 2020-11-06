@@ -248,6 +248,8 @@ public class HomeActivity extends AppCompatActivity {
      * This method sets up the OnItemSelected listener and
      * modifies the list of owned books displayed depending
      * on the status selected by the user
+     * @author Olivier Vadiavaloo
+     * @version 2020.11.02
      */
     public void setUpFilter() {
         // Create the spinner adapter

@@ -26,9 +26,12 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Test class for RegisterUserActivity. All UI tests related
- * to MainActivity are written. Robotium test framework
+ * to RegisterUserActivity are written. Robotium test framework
  * is used.
+ * @author Olivier Vadiavaloo
+ * @version 2020.10.29
  */
+
 public class RegisterUserActivityTest {
     private Solo solo;
     private String username;

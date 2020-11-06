@@ -16,33 +16,33 @@ import static org.junit.Assert.assertEquals;
  * @author ALex Mazzuca
  * @version 20.11.04
  */
+
 public class ImageTest {
 
-    Image imageTestObject = new Image(null, null, null, null);
+    private Image mockImage() {
+        Image mockImage = new Image(null, null, null, null);
+        return mockImage;
+    }
 
     @Test
-    public void ImageTest(){
+    public void testImageSetters(){
         Integer height = 20;
         Integer width = 30;
 
-        imageTestObject.setHeight(height);
+        Image mockImage = mockImage();
 
-        assertEquals(imageTestObject.getHeight(), height);
+        mockImage.setHeight(height);
+        assertEquals(mockImage.getHeight(), height);
 
-        imageTestObject.setWidth(width);
-
-        assertEquals(imageTestObject.getWidth(), width);
+        mockImage.setWidth(width);
+        assertEquals(mockImage.getWidth(), width);
 
         Uri imageUri = Uri.parse("gs://bookbox-d77e5.appspot.com/users/Alex00b22bc0-cb7a-407c-ae6e-3bb96dfbda1a");
-
-        imageTestObject.setUri(imageUri);
-
-        assertEquals(imageTestObject.getUri(), imageUri);
+        mockImage.setUri(imageUri);
+        assertEquals(mockImage.getUri(), imageUri);
 
         String imageUrl = "doc/picture/image.jpg";
-
-        imageTestObject.setUrl(imageUrl);
-
-        assertEquals(imageTestObject.getUrl(), imageUrl);
+        mockImage.setUrl(imageUrl);
+        assertEquals(mockImage.getUrl(), imageUrl);
     }
 }

@@ -20,6 +20,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Test class for HomeActivity. All UI tests related
+ * to HomeActivity are written. Robotium test framework
+ * is used.
+ * @author Olivier Vadiavaloo
+ * @version 2020.10.29
+ */
+
 public class HomeActivityTest {
     private Solo solo;
 

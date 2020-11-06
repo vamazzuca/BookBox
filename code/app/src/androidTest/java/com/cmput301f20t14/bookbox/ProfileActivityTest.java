@@ -19,6 +19,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Test class for ProfileActivity. All UI tests related
+ * to ProfileActivity are written. Robotium test framework
+ * is used.
+ * @author Olivier Vadiavaloo
+ * @version 2020.10.29
+ */
+
 public class ProfileActivityTest {
     private Solo solo;
 

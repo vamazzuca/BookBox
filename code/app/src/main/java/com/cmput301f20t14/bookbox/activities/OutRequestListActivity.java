@@ -30,6 +30,16 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This activity shows a list of books that the user has
+ * requested, but are not accepted yet. As the user clicks
+ * on one of the books from the list, he can see the details
+ * of that book
+ * Potential feature could be to remove a request
+ * @author  Olivier Vadiavaloo
+ * @version 2020.11.03
+ */
+
 public class OutRequestListActivity extends AppCompatActivity {
     private BookList listAdapter;
     private ArrayList<Book> books;
@@ -96,8 +106,9 @@ public class OutRequestListActivity extends AppCompatActivity {
                                 String statusString = doc.getData().get(Book.STATUS).toString();
                                 int status = Integer.parseInt(statusString);
                                 String lentTo = doc.getData().get(Book.LENT_TO).toString();
+                                String imageUrl = doc.getData().get(Book.IMAGE_URL).toString();
 
-                                Book book = new Book(isbn, title, author, owner, status, lentTo, null);
+                                Book book = new Book(isbn, title, author, owner, status, lentTo, imageUrl);
                                 listAdapter.add(book);
                             }
                         }

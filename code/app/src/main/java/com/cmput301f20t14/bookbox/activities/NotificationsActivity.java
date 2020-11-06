@@ -16,7 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * notifications that they receive. In this activity, the notifications
  * show that another user would like to borrow your book, and is notified
  * if their own request can been accepted or declined
- * @author Alex Mazzuca, Carter Sabadash
+ * @author Alex Mazzuca
+ * @author Carter Sabadash
  * @version 2020.10.25
  * @see HomeActivity
  * @see ListsActivity
