@@ -25,14 +25,17 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Bookbox
-        
+         
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
         
+      - name: Go to code
+        run: cd code
+        
       - name: Run tests
-        run: ./code/gradlew test
+        run: ./gradlew test
 
       - name: Build project
-        run: ./code/gradlew assemble
+        run: ./gradlew assemble
