@@ -185,17 +185,6 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_CODE_REGISTER);
     }
 
-    private void login(View view){
-        // gets all data from firebase (user info, books, etc), then starts HomeActivity
-
-        Intent intent = new Intent(view.getContext(), HomeActivity.class);
-        startActivity(intent);
-
-        // finish activity to prevent user from going back to
-        // login by pressing the back button on the device
-        finish();
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

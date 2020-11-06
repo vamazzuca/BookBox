@@ -5,7 +5,8 @@ import java.util.ArrayList;
 /**
  * An entity class that encapsulates the user of the app.
  * @author Olivier
- * @version 2020.10.27
+ * @author Alex Mazzuca
+ * @version 2020.11.04
  */
 
 public class User {
@@ -15,7 +16,9 @@ public class User {
     public static final String PHONE = "PHONE";
     public static final String EMAIL = "EMAIL";
     public static final String OWNED_BOOKS = "OWNED_BOOKS";
+    public static final String REQUESTED_BOOKS = "REQUESTED_BOOKS";
     public static final String BORROWED_BOOKS = "BORROWED_BOOKS";
+    public static final String IMAGE_URL = "IMAGE_URL";
 
     private String username;
     private String password;
@@ -23,8 +26,8 @@ public class User {
     private String email;
     private ArrayList<Book> ownedBooks;
     private ArrayList<Book> borrowedBooks;
+    private String photoUrl;
     //TO ADD LATER:
-    // private Image photo;
     // private ArrayList<Request> requests;
 
     /**
@@ -37,13 +40,14 @@ public class User {
      * @param borrowedBooks ArrayList of books borrowed by user
      */
     public User(String username, String password, String phone, String email,
-                ArrayList<Book> ownedBooks, ArrayList<Book> borrowedBooks) {
+                ArrayList<Book> ownedBooks, ArrayList<Book> borrowedBooks, String photoUrl) {
         this.username = username;
         this.password = password;
         this.phone = phone;
         this.email = email;
         this.ownedBooks = ownedBooks;
         this.borrowedBooks = borrowedBooks;
+        this.photoUrl = photoUrl;
     }
 
     /**
@@ -187,5 +191,21 @@ public class User {
      */
     public void setBorrowedBooks(ArrayList<Book> borrowedBooks) {
         this.borrowedBooks = borrowedBooks;
+    }
+
+    /**
+     * Sets the image associated with the user
+     * @param photoUrl
+     */
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    /**
+     * Gets the image associated with the book
+     * @return An image for the book
+     */
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 }

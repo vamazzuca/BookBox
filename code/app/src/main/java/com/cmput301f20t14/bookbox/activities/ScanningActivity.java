@@ -29,6 +29,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 
+import static com.google.android.gms.vision.barcode.Barcode.EAN_13;
+import static com.google.android.gms.vision.barcode.Barcode.ISBN;
 import static com.google.android.gms.vision.barcode.Barcode.UPC_A;
 
 /**
@@ -62,7 +64,7 @@ public class ScanningActivity extends AppCompatActivity {
 
         // initialise barcodeDectector
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
-                .setBarcodeFormats(UPC_A)
+                .setBarcodeFormats(EAN_13)
                 .build();
 
         // Build CameraSource object
@@ -133,6 +135,7 @@ public class ScanningActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             Intent intent = new Intent(ScanningActivity.this, ScanningActivity.class);
+                                            intent.putExtra(User.USERNAME, username);
                                             startActivityForResult(intent, HomeActivity.REQUEST_CODE_SCANNING);
                                         }
                                     })

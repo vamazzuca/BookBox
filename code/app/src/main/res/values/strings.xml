@@ -67,14 +67,20 @@
     <string name="image5">image5</string>
     <string name="image1">image1</string>
     <string name="owner">Owner:</string>
+    <string name="borrower">Borrower:</string>
     <string name="bookbox_item">Bookbox Item</string>
     <string name="request">Request</string>
+    <string name="enter_text">Search bookbox</string>
+    <string name="results">Results</string>
 
     <string-array name="filter_statuses">
         <item>Filter by</item>
+        <item>All</item>
         <item>Accepted</item>
         <item>Available</item>
         <item>Borrowed</item>
         <item>Requested</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
