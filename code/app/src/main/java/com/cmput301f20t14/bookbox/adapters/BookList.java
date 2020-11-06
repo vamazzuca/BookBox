@@ -58,8 +58,7 @@ public class BookList extends ArrayAdapter<Book> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        //convertView hase to be null for now becasue it bugs out the images in listview
-        View view = null;
+        View view = convertView;
         storageReference = FirebaseStorage.getInstance().getReference();
 
         ViewHolder holder;
@@ -99,11 +98,11 @@ public class BookList extends ArrayAdapter<Book> {
 
 
     public void downloadImage(final ImageView imageView, Book book) {
-        String imageUrl = book.getPhotoUrl();
+        String imageUrlList = book.getPhotoUrl();
 
 
-        if (imageUrl != "") {
-            StorageReference imageRef = storageReference.child(imageUrl);
+        if (!imageUrlList.isEmpty()) {
+            StorageReference imageRef = storageReference.child(imageUrlList);
 
             imageRef.getDownloadUrl()
                     .addOnSuccessListener(new OnSuccessListener<Uri>() {
