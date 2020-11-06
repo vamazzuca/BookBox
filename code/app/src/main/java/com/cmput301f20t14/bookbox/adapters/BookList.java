@@ -58,7 +58,7 @@ public class BookList extends ArrayAdapter<Book> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        // view much be null for now because it bugs out the images in list view if set to convertView
+        // view must be null for now because it bugs out the images in list view if set to convertView
         View view = null;
         storageReference = FirebaseStorage.getInstance().getReference();
 
