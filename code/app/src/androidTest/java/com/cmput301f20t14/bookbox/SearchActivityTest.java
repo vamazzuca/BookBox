@@ -65,7 +65,7 @@ public class SearchActivityTest {
         assertTrue(solo.searchText("Man's Search for Meaning"));
         assertTrue(solo.searchText("Available"));
     }
-    
+
     @Test
     public void checkSearchNoResults() {
         checkActivitySwitch();
