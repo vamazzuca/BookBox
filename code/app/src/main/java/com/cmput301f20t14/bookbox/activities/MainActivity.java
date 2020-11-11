@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Button loginButton = findViewById(R.id.login_button);
                             loginButton.setText(R.string.login_login);
-                            login(username);
+                            login(mAuth.getCurrentUser().getDisplayName());
                         } else {
                             // email or password is incorrect; we cant determine which from the task
                             passwordEditText.setError("Email or Password is Incorrect!");

@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,7 +44,7 @@ import java.util.UUID;
  * their username, email address, phone number and
  * profile photo
  * @author Alex Mazzuca, Carter Sabadash
- * @version 2020.11.04
+ * @version 2020.11.10
  * @see HomeActivity
  * @see ListsActivity
  * @see NotificationsActivity
@@ -127,11 +128,18 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
 
                 if (!isErrorSet) {
                     HashMap<String, String> updatedData = new HashMap<>();
-                    updatedData.put(User.PASSWORD, enteredPassword);
                     updatedData.put(User.EMAIL, enteredEmail);
                     updatedData.put(User.PHONE, enteredPhone);
                     updatedData.put(Book.IMAGE_URL, imageUrl);
 
+                    // update email & password as user credentials
+                    // must modify the following to ensure that the update can complete
+                    FirebaseAuth.getInstance().getCurrentUser()
+                            .updateEmail(enteredEmail);
+                    FirebaseAuth.getInstance().getCurrentUser()
+                            .updatePassword(enteredPassword);
+
+                    // and update everything in the database
                     userCollectionRef
                             .document(username)
                             .set(updatedData, SetOptions.merge())
@@ -208,7 +216,6 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
 
                             if (doc.exists()) {
                                 String email = doc.getData().get(User.EMAIL).toString();
-                                String password = doc.getData().get(User.PASSWORD).toString();
                                 String phone = doc.getData().get(User.PHONE).toString();
                                 imageUrl = doc.getData().get(User.IMAGE_URL).toString();
 
@@ -237,7 +244,6 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
 
 
                                 emailEditText.setText(email);
-                                passwordEditText.setText(password);
                                 phoneEditText.setText(phone);
                             }
                         }
