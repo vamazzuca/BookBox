@@ -36,7 +36,7 @@ public class ImageTest {
 
         mockImage.setWidth(width);
         assertEquals(mockImage.getWidth(), width);
-        
+
         String imageUrl = "doc/picture/image.jpg";
         mockImage.setUrl(imageUrl);
         assertEquals(mockImage.getUrl(), imageUrl);
