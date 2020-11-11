@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             // start main activity
-            login();
+            login(currentUser.getDisplayName());
         }
 
         usernameEditText = (EditText) findViewById(R.id.username_editText);
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Button loginButton = findViewById(R.id.login_button);
                             loginButton.setText(R.string.login_login);
-                            login();
+                            login(username);
                         } else {
                             // email or password is incorrect; we cant determine which from the task
                             passwordEditText.setError("Email or Password is Incorrect!");
@@ -167,10 +167,15 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void login(){
+    /**
+     * Starts HomeActivity
+     * @param username The Users username
+     */
+    private void login(String username){
         Button login = findViewById(R.id.login_button);
         login.setText(R.string.login_login);
         Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra(User.USERNAME, username);
         startActivity(intent);
         finish();
     }

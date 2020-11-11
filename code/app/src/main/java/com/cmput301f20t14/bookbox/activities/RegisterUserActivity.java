@@ -267,6 +267,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         // User registered successful
         // launch HomeActivity
         Intent intent = new Intent(view.getContext(), HomeActivity.class);
+        intent.putExtra(User.USERNAME, enteredUsername);
         startActivity(intent);
 
         // finish activity to prevent user from
