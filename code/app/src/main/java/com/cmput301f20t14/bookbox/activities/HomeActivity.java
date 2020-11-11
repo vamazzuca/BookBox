@@ -52,6 +52,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.collection.LLRBEmptyNode;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -88,12 +90,14 @@ public class HomeActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_SEARCHING = 400;
     public static final String BARCODE = "BARCODE";
     public static final String VIEW_BOOK = "VIEW_BOOK";
-    private String username;
     private BookList bookAdapter;
     private ArrayList<Book> books;
     private ListView bookList;
     private Spinner filterSpinner;
-    FirebaseFirestore database;
+    private String username;
+    private FirebaseFirestore database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -101,10 +105,16 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         database = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
 
-        // Get the username from whichever activity we came from
-        // this is necessary to access firebase
-        username = getIntent().getExtras().getString(User.USERNAME);
+        if (mUser == null) {
+            Toast.makeText(this, "An Error Occurred, please Login!",
+                    Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        username = mUser.getDisplayName();
 
         // Get ListView
         bookList = (ListView) findViewById(R.id.main_page_books_listView);
@@ -148,20 +158,17 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ListsActivity.class)
-                                .putExtra(User.USERNAME, username));
+                        startActivity(new Intent(getApplicationContext(), ListsActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.home_bottom_nav:
                         return true;
                     case R.id.notification_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class)
-                                .putExtra(User.USERNAME, username));
+                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class)
-                                .putExtra(User.USERNAME, username));
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         overridePendingTransition(0,0);
                         return true;
                 }

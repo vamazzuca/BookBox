@@ -50,6 +50,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -130,6 +134,11 @@ public class RegisterUserActivity extends AppCompatActivity {
                     password.setError("Required");
                 }
 
+                if (enteredEmail.isEmpty()) {
+                    isErrorSet = true;
+                    email.setError("Required");
+                }
+
                 if (enteredPhone.isEmpty()) {
                     isErrorSet = true;
                     phone.setError("Required");
@@ -158,38 +167,69 @@ public class RegisterUserActivity extends AppCompatActivity {
                                                 if (documentSnapshot != null && !documentSnapshot.exists()) {
 
                                                     // create hash that contains information entered by user
-                                                    HashMap<String, String> userInfo = new HashMap<>();
+                                                    final HashMap<String, String> userInfo = new HashMap<>();
                                                     userInfo.put(User.USERNAME, enteredUsername);
-                                                    userInfo.put(User.PASSWORD, enteredPassword);
                                                     userInfo.put(User.EMAIL, enteredEmail);
                                                     userInfo.put(User.PHONE, enteredPhone);
                                                     userInfo.put(User.IMAGE_URL, imageUrl);
 
-                                                    // documentReference will add the user information
-                                                    // to the database at this point since it is confirmed
-                                                    // that the entered username is unique. If the addition failed,
-                                                    // the onFailureListener will show a toast on the screen
-                                                    // notifying that an error occurred
-                                                    documentReference
-                                                            .set(userInfo)
-                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    register(v, enteredUsername);
-                                                                }
-                                                            })
-                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    Toast
-                                                                        .makeText(RegisterUserActivity.this,
-                                                                               "An error occurred",
-                                                                                Toast.LENGTH_SHORT
-                                                                        )
-                                                                        .show();
-                                                                }
-                                                            });
+                                                    // create a firebase user before adding data to database
+                                                    final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                                                    mAuth.createUserWithEmailAndPassword(enteredEmail, enteredPassword)
+                                                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                                            if (task.isSuccessful()) {
+                                                                // update displayName to reflect username
+                                                                // this way there are minimal changes in the rest of the project
+                                                                //https://stackoverflow.com/questions/38114358/firebase-setdisplayname-of-user-while-creating-user-android
 
+                                                                FirebaseUser mUser = mAuth.getCurrentUser();
+
+                                                                UserProfileChangeRequest profile_change = new UserProfileChangeRequest.Builder()
+                                                                        .setDisplayName(enteredUsername).build();
+
+                                                                mUser.updateProfile(profile_change).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            // put the rest of the user info in the database and start homeactivity
+                                                                            // documentReference will add the user information
+                                                                            // to the database at this point since it is confirmed
+                                                                            // that the entered username is unique. If the addition failed,
+                                                                            // the onFailureListener will show a toast on the screen
+                                                                            // notifying that an error occurred
+                                                                            documentReference
+                                                                                    .set(userInfo)
+                                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onSuccess(Void aVoid) {
+                                                                                            register(v, enteredUsername);
+                                                                                        }
+                                                                                    })
+                                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                                        @Override
+                                                                                        public void onFailure(@NonNull Exception e) {
+                                                                                            Toast.makeText(RegisterUserActivity.this,
+                                                                                                            "An error occurred",
+                                                                                                            Toast.LENGTH_SHORT).show();
+                                                                                        }
+                                                                                    });
+
+                                                                        } else {
+                                                                            Toast.makeText(RegisterUserActivity.this,
+                                                                                            "An error occurred",
+                                                                                            Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                // the email is already taken
+                                                                email.setError("Email already in use!");
+                                                                email.requestFocus();
+                                                            }
+                                                        }
+                                                    });
                                                 } else {
                                                     //  if the username is already taken, an error
                                                     // is set for the username EditText view
@@ -226,10 +266,7 @@ public class RegisterUserActivity extends AppCompatActivity {
     private void register(View view, String enteredUsername) {
         // User registered successful
         // launch HomeActivity
-
         Intent intent = new Intent(view.getContext(), HomeActivity.class);
-        intent.putExtra(User.USERNAME, enteredUsername);
-        intent.putExtra(User.USERNAME, enteredUsername);
         startActivity(intent);
 
         // finish activity to prevent user from

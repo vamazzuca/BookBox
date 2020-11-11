@@ -3,8 +3,8 @@
     <string name="placeholder">Lorem Ipsum</string>
     <string name="welcome_message">Welcome to BookBox</string>
     <string name="account_registration">Account Registration</string>
-    <string name="username_hint">Username</string>
-    <string name="email_hint">Email (optional)</string>
+    <string name="username_hint">User</string>
+    <string name="email_hint">Email</string>
     <string name="phone_hint">Phone</string>
     <string name="password_hint">Password</string>
     <string name="log_in_button">Log in</string>
