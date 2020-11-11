@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -41,7 +42,7 @@ import java.util.ArrayList;
  */
 
 public class SearchActivity extends AppCompatActivity {
-
+    public static final String VIEW_BOOK = "VIEW_BOOK";
     private FirebaseFirestore database;
     private ListView searchList;
     private EditText searchField;
@@ -68,7 +69,6 @@ public class SearchActivity extends AppCompatActivity {
         searchField = (EditText) findViewById(R.id.search_EditText);
         resultsHeader = (TextView) findViewById(R.id.search_results_textview);
 
-
         searchResults = new ArrayList<>();
 
         searchAdapter = new BookList(this, searchResults);
@@ -85,6 +85,19 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        // Set the OnItemClick listener of the results ListView
+        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Book book = searchAdapter.getItem(position);
+                Intent intent = new Intent(SearchActivity.this, EditBookActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(VIEW_BOOK, book);
+                intent.putExtras(bundle);
+                intent.putExtra(User.USERNAME, username);
+                startActivity(intent);
+            }
+        });
     }
 
     /**

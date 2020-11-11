@@ -83,7 +83,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
         // Get original book object passed through bundle
         final Bundle bundle = getIntent().getExtras();
-        book = (Book) bundle.get(HomeActivity.VIEW_BOOK);
+        book = (Book) bundle.get("VIEW_BOOK");
 
         // Retrieve book image view
         bookImageView = findViewById(R.id.book_picture_imageView);
@@ -111,6 +111,14 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         viewRequests = (Button) findViewById(R.id.edit_book_requests_button);
         delete = (Button) findViewById(R.id.edit_book_delete_button);
         requestBook = (Button) findViewById(R.id.edit_book_request_book);
+
+        if (!book.getOwner().equals(username)) {
+            updateBtn.setEnabled(false);
+            viewRequests.setEnabled(false);
+            delete.setEnabled(false);
+        } else {
+            requestBook.setEnabled(false);
+        }
 
         // Set up firestore database
         database = FirebaseFirestore.getInstance();
@@ -146,6 +154,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
         // Setting up the bottom nav bar
         bottomNavigationView();
+
+        // Set up the "View Request" button
+        setViewRequestBtn();
 
         // Set up the "Update" button
         setUpdateBtn(booksCollectionRef);
@@ -204,6 +215,12 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             }
         });
 
+    }
+
+    /**
+     * This method sets up the listener for the "View Request" button of the activity.
+     */
+    private void setViewRequestBtn() {
     }
 
     /**
