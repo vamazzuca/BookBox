@@ -24,8 +24,8 @@ import java.util.List;
  * different lists. The lists include, outgoing requests,
  * accepted requests and currently borrowed books.
  * @author Alex Mazzuca
- *         Carter Sabadash
- *         Olivier Vadiavaloo
+ * @author Carter Sabadash
+ * @author Olivier Vadiavaloo
  * @version 2020.10.25
  * @see HomeActivity
  * @see NotificationsActivity
@@ -64,6 +64,15 @@ public class ListsActivity extends AppCompatActivity {
         bottomNavigationView();
     }
 
+    /**
+     * Sets up the OnItemClickListener of the listView
+     * whose rows are:
+     * Outgoing requests,
+     * Accepted requests and
+     * Borrowed books
+     * @author  Olivier Vadiavaloo
+     * @version 2020.11.04
+     */
     public void setListViewListener() {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

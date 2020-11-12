@@ -180,6 +180,10 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * This method starts the RegisterUserActivity
+     * @param view The view used in MainActivity
+     */
     private void register(View view) {
         // launches the RegisterUserActivity
 

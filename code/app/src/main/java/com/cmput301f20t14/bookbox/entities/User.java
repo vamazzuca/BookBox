@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * An entity class that encapsulates the user of the app.
- * @author Olivier
+ * @author Olivier Vadiavaloo
  * @author Alex Mazzuca
  * @version 2020.11.04
  */

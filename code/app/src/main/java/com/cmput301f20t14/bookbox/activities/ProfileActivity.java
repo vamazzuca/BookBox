@@ -43,8 +43,10 @@ import java.util.UUID;
  * Through this activity the user can view and edit
  * their username, email address, phone number and
  * profile photo
- * @author Alex Mazzuca, Carter Sabadash
  * @version 2020.11.10
+ * @author Alex Mazzuca
+ * @author Carter Sabadash
+ * @author Olivier Vadiavaloo
  * @see HomeActivity
  * @see ListsActivity
  * @see NotificationsActivity
@@ -340,7 +342,7 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
             userImageView.setImageURI(imageUri);
             userImage.setUri(imageUri);
             removeImageButton.setEnabled(true);
-            addImageButton.setText("Change Picture");
+            addImageButton.setText(R.string.change_picture);
         }
     }
 
@@ -366,7 +368,7 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
     public void onDeleteImage(){
         userImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_custom_image));
         removeImageButton.setEnabled(false);
-        addImageButton.setText("Add Picture");
+        addImageButton.setText(R.string.add_picture);
         userImage.setUri(null);
         imageUrl = "";
 

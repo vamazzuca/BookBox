@@ -22,7 +22,10 @@ import org.junit.runner.RunWith;
  * Test class for MainActivity. All UI tests related
  * to MainActivity are written. Robotium test framework
  * is used.
+ * @author Olivier Vadiavaloo
+ * @version 2020.10.29
  */
+
 public class MainActivityTest {
     private Solo solo;
 

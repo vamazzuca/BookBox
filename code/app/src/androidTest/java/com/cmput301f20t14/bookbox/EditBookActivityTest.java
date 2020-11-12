@@ -21,6 +21,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Test class for EditBookActivity. All UI tests related
+ * to EditBookActivity are written. Robotium test framework
+ * is used.
+ * @author Olivier Vadiavaloo
+ * @version 2020.10.29
+ */
+
 public class EditBookActivityTest {
     private Solo solo;
 

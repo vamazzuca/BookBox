@@ -40,6 +40,16 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * This activity handles the edit book feature of BookBox
+ * It allows the user to add a picture to the book, edit the
+ * title, author and the isbn and also allows the user to
+ * delete the book. This activity is mainly launched from
+ * HomeActivity
+ * @author Olivier Vadiavaloo
+ * @version 2020.11.03
+ */
+
 public class EditBookActivity extends AppCompatActivity implements ImageFragment.OnFragmentInteractionListener{
     public static final int RESULT_CODE_DELETE = 10;
     private String username;
@@ -156,7 +166,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 public void onSuccess(Uri uri) {
                     Picasso.get().load(uri).into(bookImageView);
                     removeImageButton.setEnabled(true);
-                    addImageButton.setText("Change Picture");
+                    addImageButton.setText(R.string.change_picture);
                     bookImage.setUri(uri);
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -338,6 +348,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     /**
      * Edit the information about the selected book
      * using the firestore method and listeners
+     * It first updates the data
      */
     private void editBookInfo(final String id, final HashMap<String, String> data, final CollectionReference booksCollectionRef) {
         // Set the new data for the book and use the merge option
@@ -481,7 +492,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             bookImage.setUri(imageUri);
             book.setPhotoUrl(imageUrl);
             removeImageButton.setEnabled(true);
-            addImageButton.setText("Change Picture");
+            addImageButton.setText(R.string.change_picture);
         }
     }
 
