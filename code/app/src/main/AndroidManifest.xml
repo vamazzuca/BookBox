@@ -28,6 +28,20 @@
         <activity android:name=".activities.HomeActivity" />
         <activity android:name=".activities.RegisterUserActivity" />
         <activity android:name=".activities.ScanningActivity" />
+
+        <service
+            android:name=".FirebaseMessageService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <!-- Set a default notification icon; currently just the letter B
+        https://stackoverflow.com/questions/5350624/set-icon-for-android-application -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_test_icon" />
+
     </application>
 
 </manifest>
