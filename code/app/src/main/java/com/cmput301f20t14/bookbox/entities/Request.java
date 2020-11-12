@@ -9,6 +9,9 @@ package com.cmput301f20t14.bookbox.entities;
  */
 
 public class Request {
+    public static final String REQUESTS = "REQUESTS";
+    public static final String BORROWER = "BORROWER";
+    public static final String  OWNER = "OWNER";
     private String borrower;
     private String owner;
     private Book book;
