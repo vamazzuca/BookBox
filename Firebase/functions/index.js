@@ -41,9 +41,6 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
     const bookTitle = (await admin.firestore().collection('BOOKS').doc(bookID).get()).data().TITLE;
     const token = (await admin.firestore().collection('USERS').doc(bookOwnerUid).get()).data().NOTIFICATION_TOKEN;
 
-    console.log("There is a new request from", requesterUid, "for", bookOwnerUid, "on", bookTitle, "(ID:", bookID, ")");
-    console.log("The Owner token is:", token);
-
     // Notification details.
     const payload = {
       notification: {
@@ -66,7 +63,14 @@ exports.sendAcceptedRequestNotification = functions.firestore.document('/REQUEST
       const bookTitle = (await admin.firestore().collection('BOOKS').doc(bookID).get()).data().TITLE;
 
     // Send notifications to all tokens.
-    //await admin.messaging().sendToDevice(token, payload);  
 
+    const payload = {
+      notitification: {
+        title: 'Request Accepted!',
+        body: `${bookOwnerUid} has accepted your request on ${bookTitle}!`
+      }
+    };
+
+    admin.messaging().sendToDevice(token, payload);  
     });
     */
