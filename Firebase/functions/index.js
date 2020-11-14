@@ -49,28 +49,31 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
       }
     };
 
-    // Send notifications to tokens.
+    // Send notifications to token.
     admin.messaging().sendToDevice(token, payload);
   });
 
-  /*
-exports.sendAcceptedRequestNotification = functions.firestore.document('/REQUESTS/{RequestID}')
-    .onUpdate(async (snap, context) => {
-      const data = snap.after.data();
+exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{BookID}')
+  .onUpdate(async (snap, context) => {
+    const data = snap.after.data();
+    const before_status = snap.before.data().STATUS;
+    const after_status = data.STATUS;
+    if (before_status !== '68' && after_status === '68') {
       const bookOwnerUid = data.OWNER;
-      const requesterUid = data.BORROWER;
-      const bookID = data.ID;
-      const bookTitle = (await admin.firestore().collection('BOOKS').doc(bookID).get()).data().TITLE;
+      const requesterUid = data.LENT_TO;
+      const bookTitle = data.TITLE;
 
-    // Send notifications to all tokens.
+      const token = (await admin.firestore().collection('USERS').doc(requesterUid).get()).data().NOTIFICATION_TOKEN;
+
+    // Send notifications to token.
 
     const payload = {
-      notitification: {
+      notification: {
         title: 'Request Accepted!',
         body: `${bookOwnerUid} has accepted your request on ${bookTitle}!`
       }
     };
 
     admin.messaging().sendToDevice(token, payload);  
-    });
-    */
+    }
+  });
