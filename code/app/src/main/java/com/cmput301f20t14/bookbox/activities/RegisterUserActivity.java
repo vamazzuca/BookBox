@@ -259,16 +259,13 @@ public class RegisterUserActivity extends AppCompatActivity {
      * Launches the Home activity because user information
      * has been successfully save on the database
      * @author Olivier Vadiavaloo
-     * @version 2020.10.25
+     * @version 2020.11.13
      * @param view
      * @param enteredUsername
      */
     private void register(View view, String enteredUsername) {
         // User registered successful
-        // launch HomeActivity
-        Intent intent = new Intent(view.getContext(), HomeActivity.class);
-        intent.putExtra(User.USERNAME, enteredUsername);
-        startActivity(intent);
+        // go back to login activity so they can login
 
         // finish activity to prevent user from
         // going back to the registering activity

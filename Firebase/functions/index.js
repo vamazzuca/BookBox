@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
 // https://firebase.google.com/docs/functions/get-started?authuser=0
 // https://github.com/firebase/functions-samples/blob/master/fcm-notifications/functions/index.js
@@ -35,15 +34,14 @@ admin.initializeApp();
 exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{RequestID}')
   .onCreate(async (snap, context) => {
     const data = snap.data();
+
     const bookOwnerUid = data.OWNER;
     const requesterUid = data.BORROWER;
     const bookID = data.ID;
     const bookTitle = (await admin.firestore().collection('BOOKS').doc(bookID).get()).data().TITLE;
-
-    console.log("There is a new request from", requesterUid, "for", bookOwnerUid, "on", bookTitle, "(ID:", bookID, ")");
-
     const token = (await admin.firestore().collection('USERS').doc(bookOwnerUid).get()).data().NOTIFICATION_TOKEN;
 
+    console.log("There is a new request from", requesterUid, "for", bookOwnerUid, "on", bookTitle, "(ID:", bookID, ")");
     console.log("The Owner token is:", token);
 
     // Notification details.
@@ -54,12 +52,21 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
       }
     };
 
-    // Send notifications to all tokens.
-    await admin.messaging().sendToDevice(token, payload);
+    // Send notifications to tokens.
+    admin.messaging().sendToDevice(token, payload);
   });
 
+  /*
 exports.sendAcceptedRequestNotification = functions.firestore.document('/REQUESTS/{RequestID}')
     .onUpdate(async (snap, context) => {
       const data = snap.after.data();
+      const bookOwnerUid = data.OWNER;
+      const requesterUid = data.BORROWER;
+      const bookID = data.ID;
+      const bookTitle = (await admin.firestore().collection('BOOKS').doc(bookID).get()).data().TITLE;
+
+    // Send notifications to all tokens.
+    //await admin.messaging().sendToDevice(token, payload);  
 
     });
+    */

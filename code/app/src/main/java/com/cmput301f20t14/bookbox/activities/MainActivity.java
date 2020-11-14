@@ -33,9 +33,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.User;
@@ -49,6 +51,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
  * This is the initial activity that shows a login screen and allows
@@ -75,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseAuth.getInstance().signOut(); // figure out how to do this properly
+        //FirebaseAuth.getInstance().signOut(); // figure out how to do this properly
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             // start main activity
@@ -168,12 +171,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Starts HomeActivity
+     * Starts HomeActivity and updates the device token in the database so that it's always up to date
      * @param username The Users username
      */
-    private void login(String username){
+    private void login(final String username){
         Button login = findViewById(R.id.login_button);
         login.setText(R.string.login_login);
+
+        // get the token
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // update in the database
+                        FirebaseFirestore.getInstance().collection(User.USERS).document(username)
+                                .update("NOTIFICATION_TOKEN", token).addOnCompleteListener(
+                                new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.d(TAG, "Updated Token Successfully");
+                                            return;
+                                        } else {
+                                            // try again
+                                            Log.d(TAG, "Failed to set new Token");
+                                        }
+                                    }
+                                }
+                        );
+                    }
+                });
+
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(User.USERNAME, username);
         startActivity(intent);
