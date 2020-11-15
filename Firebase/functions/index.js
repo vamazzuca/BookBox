@@ -22,6 +22,7 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
+const { firestore } = require('firebase-admin');
 admin.initializeApp();
 
 /**
@@ -44,15 +45,26 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
     // Notification details.
     const payload = {
       notification: {
-        title: 'Book Request!',
+        title: 'Book Requested',
         body: `${requesterUid} has requested ${bookTitle}!`
       }
     };
 
     // Send notifications to token.
     admin.messaging().sendToDevice(token, payload);
+
+    // we also want to create a NOTIFICATION entry for the book owner
+    admin.firestore().collection('USERS').doc(bookOwnerUid).collection('NOTIFICATIONS')
+      .add( {TYPE: "BOOK REQUEST", BOOK: bookID, USER: requesterUid});
   });
 
+
+  /**
+   * Triggers when a book is updated
+   * 
+   * We are specifically paying attention to the STATUS field
+   * When it changes to ACCEPTED (68) then we send a notificatino to the borrower
+   */
 exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{BookID}')
   .onUpdate(async (snap, context) => {
     const data = snap.after.data();
@@ -69,11 +81,16 @@ exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{
 
     const payload = {
       notification: {
-        title: 'Request Accepted!',
+        title: 'Request Accepted',
         body: `${bookOwnerUid} has accepted your request on ${bookTitle}!`
       }
     };
 
     admin.messaging().sendToDevice(token, payload);  
+
+    // we also want to create a NOTIFICATION entry for the requester
+    admin.firestore().collection('USERS').doc(requesterUid).collection('NOTIFICATIONS')
+      .add( {TYPE: "ACCEPT REQUEST", BOOK: context.params.BookID, USER: bookOwnerUid});
+
     }
   });
