@@ -53,6 +53,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.Objects;
+
 /**
  * This is the initial activity that shows a login screen and allows
  * for user registration (RegisterUserActivity). Upon success, retrieves
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     final String TAG = "LOGIN";
     public final int REQUEST_CODE_REGISTER = 1;
     private FirebaseAuth mAuth;
+    private boolean rememberMe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if user is signed in (non-null) and update UI accordingly.
         //FirebaseAuth.getInstance().signOut(); // figure out how to do this properly
+        rememberMe = true;
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             // start main activity
@@ -178,7 +182,10 @@ public class MainActivity extends AppCompatActivity {
         Button login = findViewById(R.id.login_button);
         login.setText(R.string.login_login);
 
-        // get the token
+        // get the token; it is necessary to get the token here (for switching users the token for
+        // the device has already been generated so it will not be updated otherwise)
+        // We assume that each use only has one associated device from which to send
+        // notifications (the one they last logged into)
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override
@@ -213,6 +220,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(User.USERNAME, username);
         startActivity(intent);
+
+        if (!rememberMe) { FirebaseAuth.getInstance().signOut(); }
         finish();
     }
 
@@ -231,9 +240,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // If the register activity was successful, then finish this
+        // If the register activity was successful, then login and finish this
         // activity to prevent user from going back to the login activity
         if (requestCode == REQUEST_CODE_REGISTER && resultCode == CommonStatusCodes.SUCCESS) {
+            login(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
             finish();
         }
     }
