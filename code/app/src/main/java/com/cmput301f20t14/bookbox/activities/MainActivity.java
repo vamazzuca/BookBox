@@ -53,6 +53,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -182,40 +183,7 @@ public class MainActivity extends AppCompatActivity {
         Button login = findViewById(R.id.login_button);
         login.setText(R.string.login_login);
 
-        // get the token; it is necessary to get the token here (for switching users the token for
-        // the device has already been generated so it will not be updated otherwise)
-        // We assume that each use only has one associated device from which to send
-        // notifications (the one they last logged into)
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-
-                        // update in the database
-                        FirebaseFirestore.getInstance().collection(User.USERS).document(username)
-                                .update("NOTIFICATION_TOKEN", token).addOnCompleteListener(
-                                new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Log.d(TAG, "Updated Token Successfully");
-                                            return;
-                                        } else {
-                                            // try again
-                                            Log.d(TAG, "Failed to set new Token");
-                                        }
-                                    }
-                                }
-                        );
-                    }
-                });
+        addToken(username);
 
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(User.USERNAME, username);
@@ -223,6 +191,37 @@ public class MainActivity extends AppCompatActivity {
 
         if (!rememberMe) { FirebaseAuth.getInstance().signOut(); }
         finish();
+    }
+
+    /**
+     * This adds the device token to the list of tokens for the user if it has not already been
+     * added. This is necessary to receive notifications
+     * @param username The username (displayName) of the user
+     */
+    void addToken(final String username){
+        // get the token; it is necessary to get the token here if the user is switching devices
+        // logging for the first time (we don't know -> always update it)
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            // we'll try again on the next login
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        final String token = task.getResult();
+
+                        // update in the database, we can overwrite any existing documents
+                        // they have the same content
+                        HashMap<String, String> tokenInfo = new HashMap<>();
+                        tokenInfo.put("VALUE", token);
+                        database.collection(User.USERS).document(username)
+                                .collection("TOKENS").document(token).set(tokenInfo);
+                    }
+                });
     }
 
     /**
