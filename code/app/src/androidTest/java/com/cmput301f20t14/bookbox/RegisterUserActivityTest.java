@@ -31,6 +31,8 @@ import static org.junit.Assert.assertTrue;
  * to RegisterUserActivity are written. Robotium test framework
  * is used.
  * ** Make sure that no user is logged in before starting the tests
+ *      Users are signed out after each test (@Before is not early enough)
+ *      so try running the test twice
  * @author Olivier Vadiavaloo, Carter Sabadash
  * @version 2020.11.15
  */
@@ -179,8 +181,10 @@ public class RegisterUserActivityTest {
     @After
     public void tearDown() throws  Exception {
         // the only time it won't be cancelled is when it succeeds ->
-        // we return to MainActivity either way
+        // natural flow will proceed to HomeActivity as expected, and
+        // then the code is irrevelant
         solo.getCurrentActivity().setResult(CommonStatusCodes.CANCELED);
         solo.finishOpenedActivities();
+        FirebaseAuth.getInstance().signOut();
     }
 }

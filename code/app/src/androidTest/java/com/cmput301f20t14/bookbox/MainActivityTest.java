@@ -26,7 +26,8 @@ import org.junit.runner.RunWith;
  * Before running this test, it is necessary to create a test user
  *  -> RegisterUserActivityTest will create the proper user (if not already created)
  *  -> Also make sure that you are logged out before testing
- *      (It must occur before setUp (before the activity starts))
+ *      Users are signed out after each test (@Before is not early enough)
+ *      so try running the test twice
  * @author Olivier Vadiavaloo, Carter Sabadash
  * @version 2020.10.29
  */
@@ -123,5 +124,6 @@ public class MainActivityTest {
     @After
     public void tearDown() throws  Exception{
         solo.finishOpenedActivities();
+        FirebaseAuth.getInstance().signOut();
     }
 }
