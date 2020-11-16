@@ -193,7 +193,8 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomeActivity.this, "An error occurred 3", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
                     }
                 });
     }
@@ -312,7 +313,7 @@ public class HomeActivity extends AppCompatActivity {
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(HomeActivity.this, "An error occurred 2", Toast.LENGTH_SHORT).show();
                                 }
                             });
                 } else if (position == 1) {
@@ -428,7 +429,7 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomeActivity.this, "An error occurred 1", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

@@ -41,8 +41,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -120,22 +124,23 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         requestBook = (Button) findViewById(R.id.edit_book_request_book);
 
         if (book.getOwner().equals(username)) {
-            requestBook.setEnabled(false);      // user cannot request own book
+            requestBook.setVisibility(View.GONE);      // user cannot request own book
 
-            // Set enabled to false if a request on
-            // the book has already been accepted
+            // Hide the following buttons if a request
+            // on the book has been accepted or if the
+            // book is borrowed by some other user
             if (book.getStatus() == Book.ACCEPTED ||
                 book.getStatus() == Book.BORROWED) {
-                updateBtn.setEnabled(false);
-                viewRequests.setEnabled(false);
-                delete.setEnabled(false);
+                updateBtn.setVisibility(View.GONE);
+                viewRequests.setVisibility(View.GONE);
+                delete.setVisibility(View.GONE);
             }
         } else {
             // else, book is not owned by the user
             // So, no changes can be made to the book
-            updateBtn.setEnabled(false);
-            viewRequests.setEnabled(false);
-            delete.setEnabled(false);
+            updateBtn.setVisibility(View.GONE);
+            viewRequests.setVisibility(View.GONE);
+            delete.setVisibility(View.GONE);
             addImageButton.setEnabled(false);
             removeImageButton.setEnabled(false);
             bookImageView.setEnabled(false);
@@ -251,7 +256,6 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
      * @param requestsCollectionRef A reference to requests collection
      */
     public void setViewRequestBtn(final CollectionReference requestsCollectionRef) {
-
         viewRequests.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -265,8 +269,10 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                                     for (QueryDocumentSnapshot queryDoc : task.getResult()) {
                                         String owner = queryDoc.getData().get(Request.OWNER).toString();
                                         String borrower = queryDoc.getData().get(Request.BORROWER).toString();
-                                        Request request = new Request(owner, borrower, book);
-                                        // Start view book requests activity
+                                        String date = queryDoc.getData().get(Request.DATE).toString();
+                                        Request request = new Request(owner, borrower, book, date);
+
+
                                     }
                                 }
                             }
@@ -277,6 +283,14 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                                 Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                             }
                         });
+
+                // Start view book requests activity
+                Intent intent = new Intent(EditBookActivity.this, ViewBookRequests.class);
+                intent.putExtra(User.USERNAME, username);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("VIEW_BOOK", book);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
     }
@@ -295,6 +309,11 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 requestData.put(Request.OWNER, book.getOwner());
                 requestData.put(Request.BORROWER, username);
                 requestData.put(Book.ID, id);
+
+                Date today = Calendar.getInstance().getTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String date = dateFormat.format(today);
+                requestData.put(Request.DATE, date);
 
                 requestsCollectionRef
                         .add(requestData)

@@ -86,4 +86,7 @@
     <string name="no_results">No results found</string>
     <string name="change_picture">Change picture</string>
     <string name="delete_pic_dialog_text">Are you sure you want to remove this picture?</string>
+    <string name="requests">Requests</string>
+    <string name="requested_by">Requested by:</string>
+    <string name="data">Date:</string>
 </resources>

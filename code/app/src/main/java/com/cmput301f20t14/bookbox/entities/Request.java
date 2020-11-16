@@ -12,9 +12,11 @@ public class Request {
     public static final String REQUESTS = "REQUESTS";
     public static final String BORROWER = "BORROWER";
     public static final String  OWNER = "OWNER";
+    public static final String DATE = "DATE";
     private String borrower;
     private String owner;
     private Book book;
+    private String date;
 
     /**
      * Constructor of the Request object
@@ -22,10 +24,11 @@ public class Request {
      * @param owner    username of the one owning the requested book
      * @param book     the requested book
      */
-    public Request(String borrower, String owner, Book book) {
+    public Request(String borrower, String owner, Book book, String date) {
         this.borrower = borrower;
         this.owner = owner;
         this.book = book;
+        this.date = date;
     }
 
     /**
@@ -45,6 +48,19 @@ public class Request {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Gets the date the request was made
+     * @return date on which the request was made
+     */
+    public String getDate() { return date;}
+
+    /**
+     * Sets the date the request was made
+     */
+    public void setDate(String date) {
+        this.date = date;
     }
 
     /**
