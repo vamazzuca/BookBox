@@ -66,7 +66,7 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
         // Cleanup the tokens who are not registered anymore.
         if (error.code === 'messaging/invalid-registration-token' ||
             error.code === 'messaging/registration-token-not-registered') {
-            tokenDoc.remove();
+            tokenDoc.delete();
         }
       }
       return null;
@@ -79,7 +79,7 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
    * Triggers when a book is updated
    * 
    * We are specifically paying attention to the STATUS field
-   * When it changes to ACCEPTED (68) then we send a notificatino to the borrower
+   * When it changes to ACCEPTED (68) then we send a notification to the borrower
    */
 exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{BookID}')
   .onUpdate(async (snap, context) => {
@@ -117,7 +117,7 @@ exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{
           // Cleanup the tokens who are not registered anymore.
           if (error.code === 'messaging/invalid-registration-token' ||
               error.code === 'messaging/registration-token-not-registered') {
-              tokenDoc.remove();
+              tokenDoc.delete();
           }
         }
         return null;

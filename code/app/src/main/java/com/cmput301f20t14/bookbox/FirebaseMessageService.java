@@ -22,6 +22,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -30,7 +31,7 @@ import java.util.Objects;
  * Much of the code is taken from the samples at:
  *      https://firebase.google.com/docs/cloud-messaging/android/client
  * @author Carter Sabadash
- * @version 2020.11.12
+ * @version 2020.11.15
  */
 public class FirebaseMessageService extends FirebaseMessagingService {
     private final String TAG = "FCM Service";
@@ -104,21 +105,9 @@ public class FirebaseMessageService extends FirebaseMessagingService {
         // get the user from displayname
         String user = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
         assert user != null;
+        HashMap<String, String> tokenInfo = new HashMap<>();
+        tokenInfo.put("VALUE", token);
         FirebaseFirestore.getInstance().collection(User.USERS).document(user)
-                .update("NOTIFICATION_TOKEN", token).addOnCompleteListener(
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Updated Token Successfully");
-                            return;
-                        } else {
-                            // try again
-                            Log.d(TAG, "Failed to set new Token");
-                            onNewToken(token);
-                        }
-                    }
-                }
-        );
+                .collection("TOKENS").document(token).set(tokenInfo);
     }
 }

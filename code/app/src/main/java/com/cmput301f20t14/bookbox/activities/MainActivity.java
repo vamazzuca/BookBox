@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
     final String TAG = "LOGIN";
     public final int REQUEST_CODE_REGISTER = 1;
     private FirebaseAuth mAuth;
-    private boolean rememberMe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +81,9 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // Check if user is signed in (non-null) and update UI accordingly.
-        //FirebaseAuth.getInstance().signOut(); // figure out how to do this properly
-        rememberMe = true;
+        // FirebaseAuth.getInstance().signOut(); // figure out how to do this properly
         FirebaseUser currentUser = mAuth.getCurrentUser();
+
         if (currentUser != null) {
             // start main activity
             login(currentUser.getDisplayName());
@@ -188,8 +187,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(User.USERNAME, username);
         startActivity(intent);
-
-        if (!rememberMe) { FirebaseAuth.getInstance().signOut(); }
         finish();
     }
 
@@ -243,7 +240,6 @@ public class MainActivity extends AppCompatActivity {
         // activity to prevent user from going back to the login activity
         if (requestCode == REQUEST_CODE_REGISTER && resultCode == CommonStatusCodes.SUCCESS) {
             login(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
-            finish();
         }
     }
 }

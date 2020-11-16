@@ -73,7 +73,7 @@ import java.util.HashMap;
  * User account information is stored in the Firestore
  * database.
  * @author Olivier Vadiavaloo
- * @version 2020.11.05
+ * @version 2020.11.15
  * @see com.google.firebase.firestore.FirebaseFirestore
  */
 
@@ -176,7 +176,7 @@ public class RegisterUserActivity extends AppCompatActivity {
                                                     // create a firebase user before adding data to database
                                                     final FirebaseAuth mAuth = FirebaseAuth.getInstance();
                                                     mAuth.createUserWithEmailAndPassword(enteredEmail, enteredPassword)
-                                                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                                         @Override
                                                         public void onComplete(@NonNull Task<AuthResult> task) {
                                                             if (task.isSuccessful()) {

@@ -13,6 +13,8 @@ import com.cmput301f20t14.bookbox.activities.EditBookActivity;
 import com.cmput301f20t14.bookbox.activities.HomeActivity;
 import com.cmput301f20t14.bookbox.activities.MainActivity;
 import com.cmput301f20t14.bookbox.activities.RegisterUserActivity;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.firebase.auth.FirebaseAuth;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -28,8 +30,9 @@ import static org.junit.Assert.assertTrue;
  * Test class for RegisterUserActivity. All UI tests related
  * to RegisterUserActivity are written. Robotium test framework
  * is used.
- * @author Olivier Vadiavaloo
- * @version 2020.10.29
+ * ** Make sure that no user is logged in before starting the tests
+ * @author Olivier Vadiavaloo, Carter Sabadash
+ * @version 2020.11.15
  */
 
 public class RegisterUserActivityTest {
@@ -102,11 +105,23 @@ public class RegisterUserActivityTest {
     }
 
     @Test
+    public void checkRegisterEmptyEmail() {
+        checkActivitySwitch();
+        solo.enterText((EditText) solo.getView(R.id.register_username_editText), "testUsername");
+        solo.enterText((EditText) solo.getView(R.id.register_password_editText), "password");
+        solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
+        solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "000 000 0000");
+
+        solo.clickOnButton("Register");
+        solo.assertCurrentActivity("Wrong activity", RegisterUserActivity.class);
+    }
+
+    @Test
     public void checkRegisterEmptyPhone() {
         checkActivitySwitch();
         solo.enterText((EditText) solo.getView(R.id.register_username_editText), "testUsername");
         solo.enterText((EditText) solo.getView(R.id.register_password_editText), "testPassword");
-        solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
+        solo.enterText((EditText) solo.getView(R.id.register_email_editText), "testEmail@bookbox.com");
         solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "");
 
         solo.clickOnButton("Register");
@@ -131,18 +146,19 @@ public class RegisterUserActivityTest {
         boolean isSuccess = false;
         checkActivitySwitch();
 
-
-        solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
         solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "000 000 0000");
 
         while (!isSuccess) {
-            String username = "testUsername" + Integer.toString(count);
-            String password = "testPassword" + Integer.toString(count);
+            String username = "bookboxtest" + Integer.toString(count);
+            String password = "bookboxtest" + Integer.toString(count);
+            String email = "bookboxtest" + Integer.toString(count) + "@bookbox.com";
             solo.enterText((EditText) solo.getView(R.id.register_username_editText), username);
             solo.enterText((EditText) solo.getView(R.id.register_password_editText), password);
+            solo.enterText((EditText) solo.getView(R.id.register_email_editText), email);
             solo.clickOnButton("Register");
 
             try {
+                solo.sleep(5000);
                 solo.assertCurrentActivity("Still in RegisterUserActivity", HomeActivity.class);
                 isSuccess = true;
             } catch (junit.framework.ComparisonFailure e) {
@@ -151,6 +167,7 @@ public class RegisterUserActivityTest {
                 count = count + 1;
                 solo.enterText((EditText) solo.getView(R.id.register_username_editText), "");
                 solo.enterText((EditText) solo.getView(R.id.register_password_editText), "");
+                solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
             }
         }
     }
@@ -160,7 +177,10 @@ public class RegisterUserActivityTest {
      * @throws Exception
      */
     @After
-    public void tearDown() throws  Exception{
+    public void tearDown() throws  Exception {
+        // the only time it won't be cancelled is when it succeeds ->
+        // we return to MainActivity either way
+        solo.getCurrentActivity().setResult(CommonStatusCodes.CANCELED);
         solo.finishOpenedActivities();
     }
 }
