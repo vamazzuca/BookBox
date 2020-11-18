@@ -55,22 +55,32 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
     .add( {TYPE: "BOOK REQUEST", BOOK: bookID, USER: requesterUid});
 
   // The snapshot to the user's tokens.
-  let tokenCollection = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
+  const tokenReference = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
 
-  // try to send the message to each token
-  return tokenCollection.get().then(documentRefs => {
-    return documentRefs.forEach((tokenDoc) => {
-      const response = admin.messaging().sendToDevice(tokenDoc.data().VALUE, payload);
-      if (response) {
-        console.error('Failure sending notification to', tokenDoc.data().VALUE, error);
-        // Cleanup the tokens who are not registered anymore.
-        if (error.code === 'messaging/invalid-registration-token' ||
-            error.code === 'messaging/registration-token-not-registered') {
-            tokenDoc.delete();
-        }
-      }
+  // try and send a notification for each token
+  tokenReference.get()
+  .then(snapshot => {
+      snapshot.forEach(doc => {
+        let token = doc.data().VALUE;
+        admin.messaging().sendToDevice(token, payload)
+          .then((response) => {
+            // Response is a message ID string.
+            console.log('Successfully sent message:', response);
+            return null;
+          })
+          .catch((error) => {
+            console.log('Error sending message:', error);
+            // Cleanup the tokens who are not registered anymore.
+            if (error.code === 'messaging/invalid-registration-token' ||
+                error.code === 'messaging/registration-token-not-registered') {
+                tokenDoc.delete();
+            }
+          });
+      });
       return null;
-    });
+  })
+  .catch(err => {
+      console.log('Error getting documents', err);
   });
 });
 
@@ -106,22 +116,32 @@ exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{
       .add( {TYPE: "ACCEPT REQUEST", BOOK: context.params.BookID, USER: bookOwnerUid});
 
     // The snapshot to the user's tokens.
-    let tokenCollection = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
+    const tokenReference = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
 
-    // try to send the message to each token
-    return tokenCollection.get().then(documentRefs => {
-      return documentRefs.forEach((tokenDoc) => {
-        const response = admin.messaging().sendToDevice(tokenDoc.data().VALUE, payload);
-        if (response) {
-          console.error('Failure sending notification to', tokenDoc.data().VALUE, error);
-          // Cleanup the tokens who are not registered anymore.
-          if (error.code === 'messaging/invalid-registration-token' ||
-              error.code === 'messaging/registration-token-not-registered') {
-              tokenDoc.delete();
-          }
-        }
+    // try and send a notification for each token
+    tokenReference.get()
+    .then(snapshot => {
+        snapshot.forEach(doc => {
+          let token = doc.data().VALUE;
+          admin.messaging().sendToDevice(token, payload)
+            .then((response) => {
+              // Response is a message ID string.
+              console.log('Successfully sent message:', response);
+              return null;
+            })
+            .catch((error) => {
+              console.log('Error sending message:', error);
+              // Cleanup the tokens who are not registered anymore.
+              if (error.code === 'messaging/invalid-registration-token' ||
+                  error.code === 'messaging/registration-token-not-registered') {
+                  tokenDoc.delete();
+              }
+            });
+        });
         return null;
-      });
+    })
+    .catch(err => {
+        console.log('Error getting documents', err);
     });
   }
 });

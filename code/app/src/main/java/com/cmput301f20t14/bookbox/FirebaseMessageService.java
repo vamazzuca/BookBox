@@ -103,8 +103,9 @@ public class FirebaseMessageService extends FirebaseMessagingService {
 
         // we need to update token in the database
         // get the user from displayname
-        String user = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
-        assert user != null;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() == null) { return; }
+        String user = Objects.requireNonNull(mAuth.getCurrentUser().getDisplayName());
         HashMap<String, String> tokenInfo = new HashMap<>();
         tokenInfo.put("VALUE", token);
         FirebaseFirestore.getInstance().collection(User.USERS).document(user)
