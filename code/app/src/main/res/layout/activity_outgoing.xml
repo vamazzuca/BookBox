@@ -4,30 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/outgoing_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="@string/outgoing_requests"
+        android:textColor="@color/colorPurpleTitle"
+        android:textSize="35sp"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/outgoing_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-
-        <TextView
-            android:id="@+id/outgoing_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="24dp"
-            android:text="@string/outgoing_requests"
-            android:textColor="@color/colorPurpleTitle"
-            android:textSize="35sp"
-            android:textStyle="bold" />
-
-        <ListView
-            android:id="@+id/outgoing_listview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="38dp"/>
-
-    </LinearLayout>
+        android:layout_below="@+id/outgoing_textView"
+        android:layout_above="@id/bottom_nav_bar"
+        android:layout_marginTop="16dp"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav_bar"

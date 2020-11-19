@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -82,10 +83,11 @@ public class OutRequestListActivity extends AppCompatActivity {
                             books.clear();
                             for (QueryDocumentSnapshot doc : value) {
                                 String id = doc.getId();
+                                Log.d("message", id);
                                 getRequestedBook(id);
                             }
-                            listAdapter.notifyDataSetChanged();
                         }
+                        Log.d("list", books.toString());
                     }
                 });
     }
@@ -112,6 +114,7 @@ public class OutRequestListActivity extends AppCompatActivity {
 
                                 Book book = new Book(isbn, title, author, owner, status, lentTo, imageUrl);
                                 books.add(book);
+                                listAdapter.notifyDataSetChanged();
                             }
                         }
                     }
