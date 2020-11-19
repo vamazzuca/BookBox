@@ -59,7 +59,7 @@ public class BookList extends ArrayAdapter<Book> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         // view must be null for now because it bugs out the images in list view if set to convertView
-        View view = null;
+        View view = convertView;
         storageReference = FirebaseStorage.getInstance().getReference();
 
         ViewHolder holder;
@@ -103,23 +103,13 @@ public class BookList extends ArrayAdapter<Book> {
 
 
         if (imageUrl != "") {
-            StorageReference imageRef = storageReference.child(imageUrl);
 
-            imageRef.getDownloadUrl()
-                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                                Glide.with(imageView.getContext())
-                                        .load(uri)
-                                        .into(imageView);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            //Handle any errors
-                        }
-                    });
+            Uri uri = Uri.parse(imageUrl);
+
+            Glide.with(imageView.getContext())
+                    .load(uri)
+                    .into(imageView);
+
         } else {
             imageView.setImageResource(R.drawable.ic_custom_image);
         }
