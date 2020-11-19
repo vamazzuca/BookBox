@@ -13,6 +13,7 @@ public class Request {
     public static final String BORROWER = "BORROWER";
     public static final String  OWNER = "OWNER";
     public static final String DATE = "DATE";
+    public static final String BOOK = "BOOK";
     private String borrower;
     private String owner;
     private Book book;

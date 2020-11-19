@@ -10,13 +10,18 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.adapters.RequestList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -31,6 +36,7 @@ public class ViewBookRequests extends AppCompatActivity {
     private ArrayList<Request> requests;
     private String username;
     private FirebaseFirestore database;
+    private String bookID;
     private Book book;
 
     @Override
@@ -41,14 +47,20 @@ public class ViewBookRequests extends AppCompatActivity {
         // Initialize database
         database = FirebaseFirestore.getInstance();
 
+        // Get reference to the requests collection
+        final CollectionReference requestsCollectionRef = database.collection(Request.REQUESTS);
+
+        // Retrieve book ID whose requests are being viewed
+        bookID = getIntent().getStringExtra(Book.ID);
+
         // Retrieve book whose requests are being viewed
-        book = (Book) getIntent().getExtras().get("VIEW_BOOK");
+        book = (Book) getIntent().getExtras().getSerializable("VIEW_BOOK");
 
         // Retrieve username of the user
         username = getIntent().getStringExtra(User.USERNAME);
 
         TextView bookTitle = (TextView) findViewById(R.id.view_request_textview);
-        bookTitle.setText(book.getTitle());
+
 
         // Initialize request listview
         requestList = (ListView) findViewById(R.id.view_request_listview);
@@ -61,21 +73,29 @@ public class ViewBookRequests extends AppCompatActivity {
 
         bottomNavigationView();
 
-        database
-                .collection(Request.REQUESTS)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        requestsCollectionRef
+                .whereEqualTo(Book.ID, bookID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        requests.clear();
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                            String requester = queryDocumentSnapshot.getData().get(Request.BORROWER).toString();
-                            String date = queryDocumentSnapshot.getData().get(Request.DATE).toString();
-                            String owner = queryDocumentSnapshot.getData().get(Request.OWNER).toString();
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot queryDoc : task.getResult()) {
+                                String owner = queryDoc.getData().get(Request.OWNER).toString();
+                                String borrower = queryDoc.getData().get(Request.BORROWER).toString();
+                                String date = queryDoc.getData().get(Request.DATE).toString();
+                                Request request = new Request(owner, borrower, book, date);
 
-                            Request request = new Request(requester, owner, book, date);
-                            requests.add(request);
+                                requests.add(request);
+                            }
+                            requestAdapter.notifyDataSetChanged();
                         }
-                        requestAdapter.notifyDataSetChanged();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ViewBookRequests.this, "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

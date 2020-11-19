@@ -78,12 +78,14 @@ public class OutRequestListActivity extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        books.clear();
-                        for (QueryDocumentSnapshot doc : value) {
-                            String id = doc.getData().get(Book.ID).toString();
-                            getRequestedBook(id);
+                        if (value != null) {
+                            books.clear();
+                            for (QueryDocumentSnapshot doc : value) {
+                                String id = doc.getId();
+                                getRequestedBook(id);
+                            }
+                            listAdapter.notifyDataSetChanged();
                         }
-                        listAdapter.notifyDataSetChanged();
                     }
                 });
     }
@@ -109,7 +111,7 @@ public class OutRequestListActivity extends AppCompatActivity {
                                 String imageUrl = doc.getData().get(Book.IMAGE_URL).toString();
 
                                 Book book = new Book(isbn, title, author, owner, status, lentTo, imageUrl);
-                                listAdapter.add(book);
+                                books.add(book);
                             }
                         }
                     }

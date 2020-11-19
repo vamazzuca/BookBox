@@ -24,6 +24,7 @@ import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -187,10 +188,43 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         bottomNavigationView();
 
         // Set up the "View Request" button
-        setViewRequestBtn(requestsCollectionRef);
+        viewRequests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start view book requests activity
+                Intent intent = new Intent(EditBookActivity.this, ViewBookRequests.class);
+                intent.putExtra(User.USERNAME, username);
+                intent.putExtra(Book.ID, id);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("VIEW_BOOK", book);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
 
         // Set up the "Request" button
-        setRequestBtn(requestsCollectionRef, booksCollectionRef);
+        requestBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, String> requestData = new HashMap<>();
+                requestData.put(Request.OWNER, book.getOwner());
+                requestData.put(Request.BORROWER, username);
+                requestData.put(Book.ID, id);
+
+                Date today = Calendar.getInstance().getTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String date = dateFormat.format(today);
+                requestData.put(Request.DATE, date);
+                requestData.put(Request.BOOK, id);
+
+                updateRequestsCollection(
+                        requestsCollectionRef,
+                        booksCollectionRef,
+                        usersCollectionRef,
+                        requestData
+                );
+            }
+        });
 
         // Set up the "Update" button
         setUpdateBtn(booksCollectionRef);
@@ -210,7 +244,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 @Override
                 public void onSuccess(Uri uri) {
                     Picasso.get().load(uri).into(bookImageView);
-                    removeImageButton.setEnabled(true);
+                    if (book.getOwner().equals(username)) {
+                        removeImageButton.setEnabled(true);
+                    }
                     addImageButton.setText(R.string.change_picture);
                     bookImage.setUri(uri);
                 }
@@ -252,99 +288,84 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     }
 
     /**
-     * This method sets up the listener for the "View Request" button of the activity.
-     * @param requestsCollectionRef A reference to requests collection
+     * Updates the collection for REQUESTS in the database
+     * @param requestsCollectionRef reference to the requests collection
      */
-    public void setViewRequestBtn(final CollectionReference requestsCollectionRef) {
-        viewRequests.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestsCollectionRef
-                        .whereEqualTo(Book.ID, id)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful() && task.getResult() != null) {
-                                    for (QueryDocumentSnapshot queryDoc : task.getResult()) {
-                                        String owner = queryDoc.getData().get(Request.OWNER).toString();
-                                        String borrower = queryDoc.getData().get(Request.BORROWER).toString();
-                                        String date = queryDoc.getData().get(Request.DATE).toString();
-                                        Request request = new Request(owner, borrower, book, date);
-
-
-                                    }
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                // Start view book requests activity
-                Intent intent = new Intent(EditBookActivity.this, ViewBookRequests.class);
-                intent.putExtra(User.USERNAME, username);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("VIEW_BOOK", book);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        });
+    public void updateRequestsCollection(final CollectionReference requestsCollectionRef,
+                                         final CollectionReference booksCollectionRef,
+                                         final CollectionReference usersCollectionRef,
+                                         HashMap<String, String> requestData) {
+        requestsCollectionRef
+                .add(requestData)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        updateBooksCollection(
+                                booksCollectionRef,
+                                usersCollectionRef
+                        );
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**
-     * This method sets up the listener for the "Request" button of the activity
-     * @param requestsCollectionRef Reference to the requests collection
-     * @param booksCollectionRef    Reference tot the books collection
+     * Updates the collection for BOOKS in the database
+     * @param booksCollectionRef reference to the books collection
      */
-    public void setRequestBtn(final CollectionReference requestsCollectionRef,
-                              final CollectionReference booksCollectionRef) {
-        requestBook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HashMap<String, String> requestData = new HashMap<>();
-                requestData.put(Request.OWNER, book.getOwner());
-                requestData.put(Request.BORROWER, username);
-                requestData.put(Book.ID, id);
+    public void updateBooksCollection(final CollectionReference booksCollectionRef,
+                                      final CollectionReference usersCollectionRef) {
+        booksCollectionRef
+                .document(id)
+                .update(Book.STATUS, String.valueOf(Book.REQUESTED))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        updateUsersCollection(
+                                usersCollectionRef
+                        );
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
-                Date today = Calendar.getInstance().getTime();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                String date = dateFormat.format(today);
-                requestData.put(Request.DATE, date);
+    /**
+     * Updates the collection for USERS in the database
+     * @param usersCollectionRef reference to the users collection
+     */
+    public void updateUsersCollection(final CollectionReference usersCollectionRef) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put(Book.OWNER, book.getOwner());
 
-                requestsCollectionRef
-                        .add(requestData)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                booksCollectionRef
-                                        .document(id)
-                                        .update(Book.STATUS, String.valueOf(Book.REQUESTED))
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                finish();
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
-        });
+        usersCollectionRef
+                .document(username)
+                .collection(User.REQUESTED_BOOKS)
+                .document(id)
+                .set(data, SetOptions.merge())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        setResult(CommonStatusCodes.SUCCESS);
+                        Toast.makeText(EditBookActivity.this, "Book requested", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**
@@ -675,7 +696,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             bookImageView.setImageURI(imageUri);
             bookImage.setUri(imageUri);
             book.setPhotoUrl(imageUrl);
-            removeImageButton.setEnabled(true);
+            if (book.getOwner().equals(username)) {
+                removeImageButton.setEnabled(true);
+            }
             addImageButton.setText(R.string.change_picture);
         }
     }
