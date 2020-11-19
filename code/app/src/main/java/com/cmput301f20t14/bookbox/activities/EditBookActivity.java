@@ -44,7 +44,6 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -192,7 +191,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             @Override
             public void onClick(View v) {
                 // Start view book requests activity
-                Intent intent = new Intent(EditBookActivity.this, ViewBookRequests.class);
+                Intent intent = new Intent(EditBookActivity.this, ViewBookRequestsActivity.class);
                 intent.putExtra(User.USERNAME, username);
                 intent.putExtra(Book.ID, id);
                 Bundle bundle = new Bundle();

@@ -1,13 +1,11 @@
 package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,15 +20,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class ViewBookRequests extends AppCompatActivity {
+public class ViewBookRequestsActivity extends AppCompatActivity {
     private ListView requestList;
     private RequestList requestAdapter;
     private ArrayList<Request> requests;
@@ -69,7 +65,7 @@ public class ViewBookRequests extends AppCompatActivity {
         requests = new ArrayList<>();
 
         // Initialize request adapter
-        requestAdapter = new RequestList(ViewBookRequests.this, requests);
+        requestAdapter = new RequestList(ViewBookRequestsActivity.this, requests);
 
         bottomNavigationView();
 
@@ -95,7 +91,7 @@ public class ViewBookRequests extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ViewBookRequests.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ViewBookRequestsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
