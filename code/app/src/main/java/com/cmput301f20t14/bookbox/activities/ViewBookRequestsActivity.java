@@ -55,8 +55,8 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
         // Retrieve username of the user
         username = getIntent().getStringExtra(User.USERNAME);
 
-        TextView bookTitle = (TextView) findViewById(R.id.view_request_textview);
-
+        TextView bookTitle = (TextView) findViewById(R.id.view_request_book);
+        bookTitle.setText(book.getTitle());
 
         // Initialize request listview
         requestList = (ListView) findViewById(R.id.view_request_listview);
@@ -67,10 +67,12 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
         // Initialize request adapter
         requestAdapter = new RequestList(ViewBookRequestsActivity.this, requests);
 
+        requestList.setAdapter(requestAdapter);
+
         bottomNavigationView();
 
         requestsCollectionRef
-                .whereEqualTo(Book.ID, bookID)
+                .whereEqualTo(Request.BOOK, bookID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -80,7 +82,7 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                                 String owner = queryDoc.getData().get(Request.OWNER).toString();
                                 String borrower = queryDoc.getData().get(Request.BORROWER).toString();
                                 String date = queryDoc.getData().get(Request.DATE).toString();
-                                Request request = new Request(owner, borrower, book, date);
+                                Request request = new Request(borrower, owner, book, date);
 
                                 requests.add(request);
                             }

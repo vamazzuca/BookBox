@@ -15,24 +15,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/user_profile_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="24dp"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/user_profile"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:textColor="@color/colorPurpleTitle"
-                android:textSize="35sp"
-                android:textStyle="bold" />
-
             <LinearLayout
                 android:id="@+id/linear_layout_edit_book"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -46,6 +34,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical">
 
@@ -54,6 +43,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
+                        android:textColor="@color/colorWhiteBgd"
+                        android:background="@color/colorPurpleTitle"
                         android:text="@string/add_picture" />
 
                     <Button
@@ -61,7 +52,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
+                        android:padding="8dp"
                         android:enabled="false"
+                        android:textColor="@color/colorWhiteBgd"
+                        android:background="@color/colorPurpleTitle"
                         android:text="@string/remove_picture" />
                 </LinearLayout>
             </LinearLayout>
@@ -118,7 +112,8 @@
                 android:layout_margin="8dp"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/confirm"
-                android:textColor="@color/colorDarkText"
+                android:background="@color/colorPurpleTitle"
+                android:textColor="@color/colorWhiteBgd"
                 android:textSize="20sp" />
         </LinearLayout>
     </ScrollView>
@@ -128,8 +123,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
-        app:itemIconTint="@color/colorDarkBgd"
-        app:itemTextColor="@color/colorDarkText"
+        app:itemIconTint="@color/colorPurpleTitle"
+        app:itemTextColor="@color/colorPurpleTitle"
         app:itemIconSize="50sp"
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />

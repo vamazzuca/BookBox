@@ -87,7 +87,8 @@
             android:layout_gravity="center_horizontal"
             android:layout_margin="24dp"
             android:text="@string/register_button"
-            android:textColor="@color/colorDarkText"
+            android:background="@color/colorPurpleTitle"
+            android:textColor="@color/colorWhiteBgd"
             android:textSize="20sp" />
 
     </LinearLayout>

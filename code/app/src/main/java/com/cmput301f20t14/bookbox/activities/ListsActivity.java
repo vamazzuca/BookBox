@@ -32,7 +32,7 @@ import java.util.List;
  * @see ProfileActivity
  */
 public class ListsActivity extends AppCompatActivity {
-    public static final String OUTGOING_REQUESTS_LIST = "Outgoing requests";
+    public static final String OUTGOING_REQUESTS_LIST = "Requested Books";
     public static final String ACCEPTED_REQUESTS_LIST = "Accepted requests";
     public static final String BORROWED_LIST = "Borrowed books";
     private String username;

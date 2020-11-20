@@ -65,8 +65,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
-        app:itemIconTint="@color/colorDarkBgd"
-        app:itemTextColor="@color/colorDarkText"
+        app:itemIconTint="@color/colorPurpleTitle"
+        app:itemTextColor="@color/colorPurpleTitle"
         app:itemIconSize="50sp"
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />

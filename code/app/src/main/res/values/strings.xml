@@ -4,11 +4,11 @@
     <string name="welcome_message">Welcome to BookBox</string>
     <string name="account_registration">Account Registration</string>
     <string name="username_hint">Username</string>
-    <string name="email_hint">Email (optional)</string>
+    <string name="email_hint">Email</string>
     <string name="phone_hint">Phone</string>
     <string name="password_hint">Password</string>
     <string name="log_in_button">Log in</string>
-    <string name="register_button">Register</string>
+    <string name="register_button">Create account</string>
     <string name="not_registered">Not registered?</string>
     <string name="bookbox">BookBox</string>
     <string name="lists">List</string>

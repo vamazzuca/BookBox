@@ -289,6 +289,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     /**
      * Updates the collection for REQUESTS in the database
      * @param requestsCollectionRef reference to the requests collection
+     * @param booksCollectionRef    reference to the books collection
+     * @param usersCollectionRef    reference to the users collection
+     * @param requestData           HashMap containing the fields for the request document
      */
     public void updateRequestsCollection(final CollectionReference requestsCollectionRef,
                                          final CollectionReference booksCollectionRef,
@@ -316,6 +319,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     /**
      * Updates the collection for BOOKS in the database
      * @param booksCollectionRef reference to the books collection
+     * @param usersCollectionRef reference to the users collection
      */
     public void updateBooksCollection(final CollectionReference booksCollectionRef,
                                       final CollectionReference usersCollectionRef) {

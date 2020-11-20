@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,91 +10,82 @@
         android:id="@+id/welcome_to_bookbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="100dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="60dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@android:color/transparent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:text="@string/welcome_message"
         android:textColor="@color/colorPurpleTitle"
         android:textSize="35sp"
-        android:textStyle="bold"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:backgroundTint="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/username_editText"
-        android:layout_width="335dp"
+        android:layout_width="300dp"
         android:layout_height="57dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="72dp"
-        android:layout_marginEnd="16dp"
+        android:layout_below="@id/welcome_to_bookbox"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:textAlignment="center"
         android:autofillHints="@string/username_hint"
         android:hint="@string/username_hint"
         android:inputType="text"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcome_to_bookbox" />
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/password_editText"
-        android:layout_width="335dp"
+        android:layout_width="300dp"
         android:layout_height="57dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_below="@+id/username_editText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:textAlignment="center"
         android:autofillHints="@string/password_hint"
         android:hint="@string/password_hint"
         android:inputType="textPassword"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username_editText" />
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/login_button"
-        android:layout_width="335dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="16dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/password_editText"
         android:text="@string/log_in_button"
-        android:textSize="20sp"
-        android:textColor="@color/colorDarkText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_editText" />
+        android:textColor="@color/colorWhiteBgd"
+        android:background="@color/colorPurpleTitle"
+        android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/not_registered_yet"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="60dp"
-        android:text="@string/not_registered"
-        android:textColor="@color/colorDarkText"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_button" />
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        android:layout_below="@id/login_button"
+        android:layout_centerHorizontal="true" >
 
-    <Button
-        android:id="@+id/register_button"
-        android:layout_width="130dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:layout_marginEnd="48dp"
-        android:text="@string/register_button"
-        android:textColor="@color/colorDarkText"
-        android:textSize="20sp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/not_registered_yet"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/not_registered_yet" />
+        <TextView
+            android:id="@+id/not_registered_yet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_registered"
+            android:layout_margin="8dp"
+            android:textColor="@color/colorDarkText"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/register_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/register_button"
+            android:layout_margin="8dp"
+            android:textAllCaps="false"
+            android:background="@android:color/transparent"
+            android:textColor="@color/colorBlueMessage"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</RelativeLayout>
