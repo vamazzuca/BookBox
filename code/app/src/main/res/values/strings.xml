@@ -94,4 +94,5 @@
     <string name="cancel">Cancel</string>
     <string name="fragment_update_email_title">Update Email</string>
     <string name="fragment_update_password_title">Update Password</string>
+    <string name="logout">Logout</string>
 </resources>
