@@ -23,6 +23,7 @@ import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -159,22 +160,15 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         imageUrl = book.getPhotoUrl();
         //Download Image from Firebase and set it to ImageView
         if (bookImage.getUrl() != "") {
-            StorageReference imageRef = storageReference.child(bookImage.getUrl());
 
-            imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Picasso.get().load(uri).into(bookImageView);
-                    removeImageButton.setEnabled(true);
-                    addImageButton.setText(R.string.change_picture);
-                    bookImage.setUri(uri);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    //Handle any errors
-                }
-            });
+            Uri uri = Uri.parse(imageUrl);
+
+            Picasso.get().load(uri).into(bookImageView);
+            removeImageButton.setEnabled(true);
+            addImageButton.setText(R.string.change_picture);
+            bookImage.setUri(uri);
+
+
         }
 
 
@@ -459,21 +453,32 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
      */
     private void addImageToStorage(Uri imageUri){
         final String randomKey = UUID.randomUUID().toString();
-        imageUrl = "users/"+ username + randomKey;
-        bookImage.setUrl(imageUrl);
-        final StorageReference imageRef = storageReference.child("users/"+ username + randomKey);
+        String Url = "users/"+ username + randomKey;
+        bookImage.setUrl(Url);
+        final StorageReference imageRef = storageReference.child(Url);
 
-        imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        Task<Uri> urlTask = imageRef.putFile(imageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(EditBookActivity.this, "Uploaded", Toast.LENGTH_LONG).show();
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                // Continue with the task to get the download URL
+                return imageRef.getDownloadUrl();
             }
-        }).addOnFailureListener(new OnFailureListener() {
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(EditBookActivity.this, "Upload Failed", Toast.LENGTH_LONG).show();
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    imageUrl = downloadUri.toString();
+                } else {
+                    // Handle failures
+                }
             }
         });
+
     }
 
     /**
