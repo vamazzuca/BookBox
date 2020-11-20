@@ -31,7 +31,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * This activity allows the user to view requests on one of his
+ * or her book. The user can either decline or accept requests
+ * @author Olivier Vadiavaloo
+ * @version 2020.11.19
+ */
+
 public class ViewBookRequestsActivity extends AppCompatActivity {
+    public static final int ACCEPT_REQUEST = 899;
     private ListView requestList;
     private RequestList requestAdapter;
     private ArrayList<Request> requests;
@@ -114,12 +122,13 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                                                         );
 
                                                         intent.putExtra(User.USERNAME, username);
-                                                        intent.putExtra(Request.BOOK, requestID);
+                                                        intent.putExtra(Request.ID, requestID);
+                                                        intent.putExtra(Book.ID, bookID);
                                                         Bundle bundle = new Bundle();
                                                         bundle.putSerializable("REQUEST_OBJECT", request);
+                                                        bundle.putSerializable("BOOK", book);
                                                         intent.putExtras(bundle);
-
-                                                        startActivity(intent);
+                                                        startActivityForResult(intent, ACCEPT_REQUEST);
                                                     }
                                                 })
                                                 .create();
@@ -158,7 +167,8 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                                 String owner = queryDoc.getData().get(Request.OWNER).toString();
                                 String borrower = queryDoc.getData().get(Request.BORROWER).toString();
                                 String date = queryDoc.getData().get(Request.DATE).toString();
-                                Request request = new Request(borrower, owner, book, date);
+                                String isAccepted = queryDoc.getData().get(Request.IS_ACCEPTED).toString();
+                                Request request = new Request(borrower, owner, book, date, Boolean.valueOf(isAccepted), null);
 
                                 requests.add(request);
                             }

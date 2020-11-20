@@ -1,5 +1,8 @@
 package com.cmput301f20t14.bookbox.entities;
 
+import android.widget.ScrollView;
+
+import com.google.android.gms.maps.model.LatLng;
 import java.io.Serializable;
 
 /**
@@ -12,26 +15,35 @@ import java.io.Serializable;
 
 public class Request implements Serializable {
     public static final String REQUESTS = "REQUESTS";
+    public static final String ID = "REQUEST_ID";
     public static final String BORROWER = "BORROWER";
     public static final String  OWNER = "OWNER";
     public static final String DATE = "DATE";
     public static final String BOOK = "BOOK";
+    public static final String IS_ACCEPTED = "IS_ACCEPTED";
+    public static final String LAT_LNG = "LOCATION";
     private String borrower;
     private String owner;
     private Book book;
     private String date;
+    private String latLng;
+    private Boolean isAccepted;
 
     /**
      * Constructor of the Request object
-     * @param borrower username of the one making the request
-     * @param owner    username of the one owning the requested book
-     * @param book     the requested book
+     * @param borrower   username of the one making the request
+     * @param owner      username of the one owning the requested book
+     * @param book       the requested book
+     * @param isAccepted true if request was accepted and false otherwise
+     * @param latLng     set location when request is accepted
      */
-    public Request(String borrower, String owner, Book book, String date) {
+    public Request(String borrower, String owner, Book book, String date, Boolean isAccepted, String latLng) {
         this.borrower = borrower;
         this.owner = owner;
         this.book = book;
         this.date = date;
+        this.isAccepted = isAccepted;
+        this.latLng = latLng;
     }
 
     /**
@@ -50,6 +62,23 @@ public class Request implements Serializable {
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Static method that parses a string into
+     * Latlng object
+     * @param  latLngString string to be parsed
+     * @return latLng       LatLng object obtained from parsing
+     *         null         null if parsing failed
+     */
+    public static LatLng parseLatLngString(String latLngString) {
+        try {
+            double latitude = Double.parseDouble(latLngString.split(",")[0]);
+            double longitude = Double.parseDouble(latLngString.split(",")[1]);
+            return new LatLng(latitude, longitude);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -112,5 +141,21 @@ public class Request implements Serializable {
      */
     public void setBook(Book book) {
         this.book = book;
+    }
+
+    public Boolean getAccepted() {
+        return isAccepted;
+    }
+
+    public void setAccepted(Boolean accepted) {
+        isAccepted = accepted;
+    }
+
+    public String getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(String latLng) {
+        this.latLng = latLng;
     }
 }

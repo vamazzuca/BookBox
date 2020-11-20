@@ -76,6 +76,7 @@ public class OutRequestListActivity extends AppCompatActivity {
         database
                 .collection(Request.REQUESTS)
                 .whereEqualTo(Request.BORROWER, username)
+                .whereEqualTo(Request.IS_ACCEPTED, Boolean.valueOf(false).toString())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

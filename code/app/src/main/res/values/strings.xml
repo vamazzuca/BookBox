@@ -91,4 +91,10 @@
     <string name="data">Date:</string>
     <string name="accept_decline_request">Accept or Decline request?</string>
     <string name="requested">Requested</string>
+    <string name="set_Location">Set Location</string>
+    <string name="scan_to_hand_over">Hand Over</string>
+    <string name="API_KEY" translatable="false">AIzaSyD0QFgKt8W1VjpebBqwmfdSKbki2DS73PI</string>
+    <string name="cancel">Cancel</string>
+    <string name="view_location">View Location</string>
+    <string name="scan">Scan</string>
 </resources>

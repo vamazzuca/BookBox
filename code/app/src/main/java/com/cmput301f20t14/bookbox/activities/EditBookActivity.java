@@ -150,6 +150,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 updateBtn.setVisibility(View.GONE);
                 viewRequests.setVisibility(View.GONE);
                 delete.setVisibility(View.GONE);
+                addImageButton.setVisibility(View.GONE);
+                removeImageButton.setVisibility(View.GONE);
+                bookImageView.setEnabled(false);
+
+                titleEditText.setEnabled(false);
+                authorEditText.setEnabled(false);
+                isbnEditText.setEnabled(false);
             }
         } else {
             // else, book is not owned by the user
@@ -164,11 +171,6 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             titleEditText.setEnabled(false);
             authorEditText.setEnabled(false);
             isbnEditText.setEnabled(false);
-
-            // Check if book has been requested by user already
-            // If so, the request button should be disabled
-            // and displayed "Requested"
-            checkRequestedByUser(requestsCollectionRef);
         }
 
         // set info in TextViews and EditText views
@@ -216,6 +218,8 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 requestData.put(Request.OWNER, book.getOwner());
                 requestData.put(Request.BORROWER, username);
                 requestData.put(Request.BOOK, id);
+                requestData.put(Request.IS_ACCEPTED, Boolean.valueOf(false).toString());
+                requestData.put(Request.LAT_LNG, "");
 
                 Date today = Calendar.getInstance().getTime();
                 requestData.put(Request.DATE, today.toString());
@@ -291,8 +295,6 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
     /**
      * Check if book has been requested by user already
-     * This method is only called if the book being viewed is not
-     * owned by the user logged into the app
      * @param  requestsCollectionRef reference to the users collection
      */
     public void checkRequestedByUser(final CollectionReference requestsCollectionRef) {
@@ -303,9 +305,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                            requestBook.setEnabled(false);
-                            requestBook.setText(R.string.requested);
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                if (doc.exists()) {
+                                    requestBook.setEnabled(false);
+                                    requestBook.setText(R.string.requested);
+                                }
+                            }
                         }
                     }
                 })
@@ -571,6 +577,11 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                             DocumentSnapshot doc = task.getResult();
                             if (doc.getData() != null) {
                                 id = doc.getData().get(Book.ID).toString();
+
+                                // Check if book has been requested by user already
+                                // If so, the request button should be disabled
+                                // and displayed "Requested"
+                                checkRequestedByUser(database.collection(Request.REQUESTS));
                             }
                         }
                     }

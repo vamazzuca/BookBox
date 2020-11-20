@@ -69,6 +69,9 @@ public class ScanningActivity extends AppCompatActivity {
 
         // Build CameraSource object
         final CameraSource cameraSource = new CameraSource.Builder(this, barcodeDetector)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedFps(2.0f)
+                .setAutoFocusEnabled(true)
                 .build();
 
         // add a callback to the SurfaceHolder of the preview and request
