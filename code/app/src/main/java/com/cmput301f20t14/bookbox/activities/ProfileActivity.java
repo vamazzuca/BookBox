@@ -77,6 +77,12 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
         // Get the EditText views
         usernameEditText = (EditText) findViewById(R.id.profile_username_editText);
         emailEditText = (EditText) findViewById(R.id.profile_email_editText);
+        emailEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         passwordEditText = (EditText) findViewById(R.id.profile_password_editText);
         phoneEditText = (EditText) findViewById(R.id.profile_phone_editText);
 
