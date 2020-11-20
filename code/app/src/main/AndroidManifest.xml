@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ViewBookRequestsActivity"></activity>
+        <activity android:name=".activities.AcceptingRequestActivity"></activity>
+        <activity android:name=".activities.ViewBookRequestsActivity" />
         <activity android:name=".activities.OutRequestListActivity" />
         <activity android:name=".activities.EditBookActivity" />
         <activity android:name=".activities.ListsActivity" />

@@ -1,5 +1,7 @@
 package com.cmput301f20t14.bookbox.entities;
 
+import java.io.Serializable;
+
 /**
  * This entity class models a request by a user
  * to another user to borrow a specified book from
@@ -8,7 +10,7 @@ package com.cmput301f20t14.bookbox.entities;
  * @version 2020.11.10
  */
 
-public class Request {
+public class Request implements Serializable {
     public static final String REQUESTS = "REQUESTS";
     public static final String BORROWER = "BORROWER";
     public static final String  OWNER = "OWNER";

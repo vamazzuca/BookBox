@@ -44,6 +44,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -82,6 +83,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     private StorageReference storageReference;
     private Image bookImage;
     private String imageUrl;
+    private boolean isRequested;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +97,17 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         // Get original book object passed through bundle
         final Bundle bundle = getIntent().getExtras();
         book = (Book) bundle.get("VIEW_BOOK");
+
+        // Set up firestore database
+        database = FirebaseFirestore.getInstance();
+
+        // Get storage reference
+        storageReference = FirebaseStorage.getInstance().getReference();
+
+        // Get reference to books, users and requests collections
+        final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
+        final CollectionReference usersCollectionRef = database.collection(User.USERS);
+        final CollectionReference requestsCollectionRef = database.collection(Request.REQUESTS);
 
         // Retrieve book image view
         bookImageView = findViewById(R.id.book_picture_imageView);
@@ -123,6 +136,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         delete = (Button) findViewById(R.id.edit_book_delete_button);
         requestBook = (Button) findViewById(R.id.edit_book_request_book);
 
+        // Get book id
+        getBookId(usersCollectionRef);
+
         if (book.getOwner().equals(username)) {
             requestBook.setVisibility(View.GONE);      // user cannot request own book
 
@@ -130,7 +146,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             // on the book has been accepted or if the
             // book is borrowed by some other user
             if (book.getStatus() == Book.ACCEPTED ||
-                book.getStatus() == Book.BORROWED) {
+                    book.getStatus() == Book.BORROWED) {
                 updateBtn.setVisibility(View.GONE);
                 viewRequests.setVisibility(View.GONE);
                 delete.setVisibility(View.GONE);
@@ -141,25 +157,19 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             updateBtn.setVisibility(View.GONE);
             viewRequests.setVisibility(View.GONE);
             delete.setVisibility(View.GONE);
-            addImageButton.setEnabled(false);
-            removeImageButton.setEnabled(false);
+            addImageButton.setVisibility(View.GONE);
+            removeImageButton.setVisibility(View.GONE);
             bookImageView.setEnabled(false);
 
             titleEditText.setEnabled(false);
             authorEditText.setEnabled(false);
             isbnEditText.setEnabled(false);
+
+            // Check if book has been requested by user already
+            // If so, the request button should be disabled
+            // and displayed "Requested"
+            checkRequestedByUser(requestsCollectionRef);
         }
-
-        // Set up firestore database
-        database = FirebaseFirestore.getInstance();
-
-        // Get storage reference
-        storageReference = FirebaseStorage.getInstance().getReference();
-
-        // Get reference to books, users and requests collections
-        final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
-        final CollectionReference usersCollectionRef = database.collection(User.USERS);
-        final CollectionReference requestsCollectionRef = database.collection(Request.REQUESTS);
 
         // set info in TextViews and EditText views
         titleEditText.setText(book.getTitle());
@@ -179,9 +189,6 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
         CharSequence ownerText = "Owner: " + book.getOwner();
         owner.setText(ownerText);
-
-        // Get book id
-        getBookId(usersCollectionRef);
 
         // Setting up the bottom nav bar
         bottomNavigationView();
@@ -208,13 +215,10 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 HashMap<String, String> requestData = new HashMap<>();
                 requestData.put(Request.OWNER, book.getOwner());
                 requestData.put(Request.BORROWER, username);
-                requestData.put(Book.ID, id);
+                requestData.put(Request.BOOK, id);
 
                 Date today = Calendar.getInstance().getTime();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                String date = dateFormat.format(today);
-                requestData.put(Request.DATE, date);
-                requestData.put(Request.BOOK, id);
+                requestData.put(Request.DATE, today.toString());
 
                 updateRequestsCollection(
                         requestsCollectionRef,
@@ -283,7 +287,34 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 new ImageFragment().show(getSupportFragmentManager(), "Delete Image");
             }
         });
+    }
 
+    /**
+     * Check if book has been requested by user already
+     * This method is only called if the book being viewed is not
+     * owned by the user logged into the app
+     * @param  requestsCollectionRef reference to the users collection
+     */
+    public void checkRequestedByUser(final CollectionReference requestsCollectionRef) {
+        requestsCollectionRef
+                .whereEqualTo(Request.BOOK, id)
+                .whereEqualTo(Request.BORROWER, username)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            requestBook.setEnabled(false);
+                            requestBook.setText(R.string.requested);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**
@@ -329,9 +360,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        updateUsersCollection(
-                                usersCollectionRef
-                        );
+                        setResult(CommonStatusCodes.SUCCESS);
+                        Toast.makeText(EditBookActivity.this, "Book requested", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -343,6 +374,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     }
 
     /**
+     * Depracated
      * Updates the collection for USERS in the database
      * @param usersCollectionRef reference to the users collection
      */
@@ -358,9 +390,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        setResult(CommonStatusCodes.SUCCESS);
-                        Toast.makeText(EditBookActivity.this, "Book requested", Toast.LENGTH_SHORT).show();
-                        finish();
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -528,7 +558,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
      * Gets the owned book id from the database
      * @param usersCollectionRef A reference to the books collection
      */
-    public void getBookId(CollectionReference usersCollectionRef) {
+    public void getBookId(final CollectionReference usersCollectionRef) {
         usersCollectionRef
                 .document(book.getOwner())
                 .collection(User.OWNED_BOOKS)

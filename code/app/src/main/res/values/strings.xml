@@ -89,4 +89,6 @@
     <string name="requests">Requests</string>
     <string name="requested_by">Requested by:</string>
     <string name="data">Date:</string>
+    <string name="accept_decline_request">Accept or Decline request?</string>
+    <string name="requested">Requested</string>
 </resources>

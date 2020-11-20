@@ -53,22 +53,23 @@
 
                     <Button
                         android:id="@+id/add_book_picture_button"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="4dp"
-                        android:background="@color/colorPurpleTitle"
-                        android:textColor="@color/colorWhiteBgd"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@color/colorBlueMessage"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:text="@string/add_picture" />
 
                     <Button
                         android:id="@+id/remove_book_picture_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:layout_marginTop="8dp"
                         android:padding="8dp"
                         android:enabled="false"
-                        android:background="@color/colorPurpleTitle"
-                        android:textColor="@color/colorWhiteBgd"
+                        android:textColor="@color/colorBlueMessage"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:text="@string/remove_picture" />
 
                 </LinearLayout>
@@ -111,6 +112,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -150,7 +153,6 @@
                 android:layout_width="320dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
                 android:background="@color/colorPurpleTitle"
                 android:text="@string/request"
                 android:textColor="@color/colorWhiteBgd"
@@ -184,7 +186,7 @@
                     android:layout_marginEnd="8dp"
                     android:padding="8dp"
                     android:text="@string/delete"
-                    android:background="@color/colorRedMessage"
+                    android:background="@color/colorBlueMessage"
                     style="@android:attr/buttonBarButtonStyle"
                     android:textColor="@color/colorWhiteBgd"
                     android:textSize="15sp" />
@@ -196,7 +198,7 @@
                     android:layout_gravity="center_horizontal"
                     android:padding="8dp"
                     android:text="@string/view_requests"
-                    android:background="@color/colorAccent"
+                    android:background="@color/colorBlueMessage"
                     style="@android:attr/buttonBarButtonStyle"
                     android:textColor="@color/colorWhiteBgd"
                     android:textSize="15sp" />
@@ -224,8 +226,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
-        app:itemIconTint="@color/colorPurpleTitle"
-        app:itemTextColor="@color/colorPurpleTitle"
+        app:itemIconTint="@drawable/bottom_nav_bar_selector"
+        app:itemTextColor="@drawable/bottom_nav_bar_selector"
         app:itemIconSize="50sp"
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />

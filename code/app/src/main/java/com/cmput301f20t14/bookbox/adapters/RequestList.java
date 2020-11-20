@@ -13,7 +13,11 @@ import androidx.annotation.Nullable;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Request;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class RequestList extends ArrayAdapter<Request> {
     private Context context;
@@ -39,7 +43,16 @@ public class RequestList extends ArrayAdapter<Request> {
 
         Request request = requests.get(position);
         requester.setText(request.getBorrower());
-        date.setText(request.getDate());
+
+        SimpleDateFormat parser = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("EEE MMM d HH:mm zzz yyyy", Locale.getDefault());
+        try {
+            Date parsedDate = parser.parse(request.getDate());
+            String formattedDate = format.format(parsedDate);
+            date.setText(formattedDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         return view;
     }

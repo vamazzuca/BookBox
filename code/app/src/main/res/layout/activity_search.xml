@@ -16,15 +16,18 @@
             android:id="@+id/search_EditText"
             android:layout_width="200dp"
             android:layout_height="60dp"
-            android:layout_margin="8dp"
+            android:layout_gravity="center_vertical"
             android:hint="@string/enter_text"
             android:inputType="textPersonName" />
 
         <Button
             android:id="@+id/search_word_button"
             android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_margin="8dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorWhiteBgd"
+            android:layout_marginStart="16dp"
+            android:background="@color/colorPurpleTitle"
+            android:layout_gravity="center_vertical"
             android:text="@string/search" />
 
     </LinearLayout>
@@ -54,8 +57,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
-        app:itemIconTint="@color/colorPurpleTitle"
-        app:itemTextColor="@color/colorPurpleTitle"
+        app:itemIconTint="@drawable/bottom_nav_bar_selector"
+        app:itemTextColor="@drawable/bottom_nav_bar_selector"
         app:itemIconSize="50sp"
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />

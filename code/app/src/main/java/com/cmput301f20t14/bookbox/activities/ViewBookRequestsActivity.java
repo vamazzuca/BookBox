@@ -1,11 +1,15 @@
 package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +21,7 @@ import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.CollectionReference;
@@ -71,6 +76,76 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
 
         bottomNavigationView();
 
+        getRequests(requestsCollectionRef);
+
+        requestList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final Request request = requestAdapter.getItem(position);
+
+                requestsCollectionRef
+                        .whereEqualTo(Request.DATE, request.getDate())
+                        .whereEqualTo(Request.OWNER, request.getOwner())
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful() && task.getResult() != null) {
+                                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                                        final String requestID = doc.getId();
+
+                                        AlertDialog dialog = new AlertDialog.Builder(ViewBookRequestsActivity.this)
+                                                .setTitle(R.string.accept_decline_request)
+                                                .setNegativeButton("Cancel", null)
+                                                .setNeutralButton("Decline", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        deleteRequest(requestsCollectionRef, requestID);
+                                                    }
+                                                })
+                                                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        declineOtherRequests(requestsCollectionRef, requestID);
+
+                                                        Intent intent = new Intent(
+                                                                ViewBookRequestsActivity.this,
+                                                                AcceptingRequestActivity.class
+                                                        );
+
+                                                        intent.putExtra(User.USERNAME, username);
+                                                        intent.putExtra(Request.BOOK, requestID);
+                                                        Bundle bundle = new Bundle();
+                                                        bundle.putSerializable("REQUEST_OBJECT", request);
+                                                        intent.putExtras(bundle);
+
+                                                        startActivity(intent);
+                                                    }
+                                                })
+                                                .create();
+
+                                        dialog.show();
+                                    }
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast
+                                        .makeText(
+                                                ViewBookRequestsActivity.this,
+                                                "An error occurred",
+                                                Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        });
+            }
+        });
+
+    }
+
+    public void getRequests(final CollectionReference requestsCollectionRef) {
         requestsCollectionRef
                 .whereEqualTo(Request.BOOK, bookID)
                 .get()
@@ -78,6 +153,7 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
+                            requests.clear();
                             for (QueryDocumentSnapshot queryDoc : task.getResult()) {
                                 String owner = queryDoc.getData().get(Request.OWNER).toString();
                                 String borrower = queryDoc.getData().get(Request.BORROWER).toString();
@@ -88,12 +164,71 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                             }
                             requestAdapter.notifyDataSetChanged();
                         }
+
+                        if (task.getResult().isEmpty()) {
+                            database
+                                    .collection(Book.BOOKS)
+                                    .document(bookID)
+                                    .update(Book.STATUS, String.valueOf(Book.AVAILABLE));
+                        }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(ViewBookRequestsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void declineOtherRequests(final CollectionReference requestsCollectionRef, final String requestID) {
+        requestsCollectionRef
+                .whereEqualTo(Request.BOOK, bookID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                if (!requestID.equals(doc.getId())) {
+                                    deleteRequest(requestsCollectionRef, doc.getId());
+                                }
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast
+                                .makeText(
+                                        ViewBookRequestsActivity.this,
+                                        "An error occurred",
+                                        Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                });
+    }
+
+    public void deleteRequest(final CollectionReference requestsCollectionRef, String requestID) {
+        requestsCollectionRef
+                .document(requestID)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        getRequests(requestsCollectionRef);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast
+                                .makeText(
+                                        ViewBookRequestsActivity.this,
+                                        "An error occurred",
+                                        Toast.LENGTH_SHORT)
+                                .show();
                     }
                 });
     }

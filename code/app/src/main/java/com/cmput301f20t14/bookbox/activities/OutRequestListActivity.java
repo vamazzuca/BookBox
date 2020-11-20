@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.adapters.BookList;
 import com.cmput301f20t14.bookbox.entities.Book;
+import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -73,23 +74,26 @@ public class OutRequestListActivity extends AppCompatActivity {
 
     public void setUpList() {
         database
-                .collection(User.USERS)
-                .document(username)
-                .collection(User.REQUESTED_BOOKS)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .collection(Request.REQUESTS)
+                .whereEqualTo(Request.BORROWER, username)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (value != null) {
-                            books.clear();
-                            for (QueryDocumentSnapshot doc : value) {
-                                String id = doc.getId();
-                                Log.d("message", id);
-                                getRequestedBook(id);
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                getRequestedBook(doc.getData().get(Request.BOOK).toString());
                             }
                         }
-                        Log.d("list", books.toString());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(OutRequestListActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
+
     }
 
     public void getRequestedBook(String id) {
