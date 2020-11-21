@@ -87,10 +87,11 @@
                 android:layout_gravity="center_horizontal"
                 android:padding="8dp"
                 android:text="@string/set_Location"
+                android:textColor="@color/colorBlueMessage"
                 android:background="@drawable/border"
                 android:layout_marginTop="16dp" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -100,23 +101,24 @@
                 <ImageButton
                     android:id="@+id/accepting_scan_btn"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/colorWhiteBgd"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:backgroundTint="@android:color/transparent"
                     android:contentDescription="@string/scan_book"
                     android:src="@drawable/ic_camera_dark" />
 
                 <Button
                     android:id="@+id/accepting_hand_over"
                     android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:padding="8dp"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
                     android:text="@string/scan_to_hand_over"
-                    android:textColor="@color/colorWhiteBgd"
-                    android:backgroundTint="@color/colorPurpleTitle"
-                    android:background="@drawable/border"
-                    android:layout_marginTop="16dp" />
-            </LinearLayout>
+                    android:paddingEnd="0dp"
+                    android:paddingStart="30dp"
+                    android:textColor="@color/colorBlueMessage"
+                    android:background="@drawable/border" />
+            </RelativeLayout>
 
         </LinearLayout>
     </ScrollView>

@@ -20,20 +20,25 @@
             android:layout_weight="8"
             android:layout_marginTop="16dp"/>
 
-        <TextView
-            android:id="@+id/scanned_content"
-            android:layout_width="wrap_content"
+        <ScrollView
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:textColor="@color/colorDarkBgd"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:text="" />
+            android:layout_weight="1" >
+            <TextView
+                android:id="@+id/scanned_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorDarkBgd"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:text="" />
+        </ScrollView>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:layout_weight="1">
 
             <Button
@@ -41,6 +46,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/placeholder_view"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="40dp"
+                android:layout_centerVertical="true"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:background="@color/colorPurpleTitle"
                 android:textColor="@color/colorWhiteBgd"
@@ -58,6 +66,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/placeholder_view"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="40dp"
+                android:layout_centerVertical="true"
+                android:enabled="false"
+                android:alpha="0.40"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:background="@color/colorPurpleTitle"
                 android:textColor="@color/colorWhiteBgd"

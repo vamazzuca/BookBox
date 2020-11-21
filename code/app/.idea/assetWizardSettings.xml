@@ -33,8 +33,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_camera_dark" />
-                            <entry key="sourceFile" value="D:\Desktop\301 Project\BookBox\code\app" />
+                            <entry key="outputName" value="ic_scanner_60dp_dark" />
+                            <entry key="sourceFile" value="D:\Desktop\assets\ic_custom_image.svg" />
                           </map>
                         </option>
                       </PersistentState>
