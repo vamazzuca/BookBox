@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
  * Test class for ProfileActivity. All UI tests related
  * to ProfileActivity are written. Robotium test framework
  * is used.
+ * **These tests are currently outdated
  * @author Olivier Vadiavaloo
  * @version 2020.10.29
  */
