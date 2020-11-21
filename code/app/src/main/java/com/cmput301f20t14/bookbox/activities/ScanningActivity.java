@@ -2,8 +2,6 @@ package com.cmput301f20t14.bookbox.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -34,9 +32,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.io.IOException;
 
 import static com.google.android.gms.vision.barcode.Barcode.ALL_FORMATS;
-import static com.google.android.gms.vision.barcode.Barcode.EAN_13;
-import static com.google.android.gms.vision.barcode.Barcode.ISBN;
-import static com.google.android.gms.vision.barcode.Barcode.UPC_A;
 
 /**
  * This is the scanning activity. It makes use of a surface view and
@@ -83,8 +78,6 @@ public class ScanningActivity extends AppCompatActivity {
         barcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(ALL_FORMATS)
                 .build();
-
-        Log.d("TAG", String.valueOf(barcodeDetector.isOperational()));
 
         // Build CameraSource object
         final CameraSource cameraSource = new CameraSource.Builder(getApplicationContext(), barcodeDetector)

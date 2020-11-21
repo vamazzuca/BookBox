@@ -1,10 +1,5 @@
 package com.cmput301f20t14.bookbox;
 
-import android.net.Uri;
-
-import com.cmput301f20t14.bookbox.activities.HomeActivity;
-import com.cmput301f20t14.bookbox.activities.ListsActivity;
-import com.cmput301f20t14.bookbox.activities.NotificationsActivity;
 import com.cmput301f20t14.bookbox.entities.Image;
 
 import org.junit.Test;

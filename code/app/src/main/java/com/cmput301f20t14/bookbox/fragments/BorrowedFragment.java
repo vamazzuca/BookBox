@@ -1,15 +1,22 @@
-package com.cmput301f20t14.bookbox.activities;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+package com.cmput301f20t14.bookbox.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.activities.HomeActivity;
+import com.cmput301f20t14.bookbox.activities.ListsActivity;
+import com.cmput301f20t14.bookbox.activities.NotificationsActivity;
+import com.cmput301f20t14.bookbox.activities.ProfileActivity;
 import com.cmput301f20t14.bookbox.adapters.BookList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Request;
@@ -25,58 +32,62 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-/**
- * This activity shows a list of books that the user has
- * requested, but are not accepted yet. As the user clicks
- * on one of the books from the list, he can see the details
- * of that book
- * Potential feature could be to remove a request
- * @author  Olivier Vadiavaloo
- * @version 2020.11.03
- */
+import javax.annotation.Nullable;
 
-public class OutRequestListActivity extends AppCompatActivity {
+public class BorrowedFragment extends Fragment {
     private BookList listAdapter;
     private ArrayList<Book> books;
     private ListView listView;
     private String username;
     private FirebaseFirestore database;
 
+    public BorrowedFragment newInstance(String usernameArg) {
+        Bundle args = new Bundle();
+        args.putString(User.USERNAME, usernameArg);
+
+        BorrowedFragment fragment = new BorrowedFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_outgoing);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @androidx.annotation.Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_outrequest, container, false);
 
         // get username extra
-        username = getIntent().getStringExtra(User.USERNAME);
+        Bundle args = getArguments();
+        if (args != null) {
+            username = args.getString(User.USERNAME);
+        }
 
         // initialize database
         database = FirebaseFirestore.getInstance();
 
         // find listview
-        listView = (ListView) findViewById(R.id.outgoing_listview);
+        listView = (ListView) view.findViewById(R.id.outgoing_listview);
 
         // initialize adapter and books
         books = new ArrayList<>();
-        listAdapter = new BookList(this, books);
+        listAdapter = new BookList(getContext(), books);
 
-        bottomNavigationView();
         setUpList();
         listView.setAdapter(listAdapter);
+
+        return view;
     }
 
     public void setUpList() {
         database
-                .collection(Request.REQUESTS)
-                .whereEqualTo(Request.BORROWER, username)
-                .whereEqualTo(Request.IS_ACCEPTED, Boolean.valueOf(false).toString())
+                .collection(Book.BOOKS)
+                .whereEqualTo(Book.LENT_TO, username)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot doc : task.getResult()) {
-                                getRequestedBook(doc.getData().get(Request.BOOK).toString());
+                                getBorrowedBook(doc.getData().get(Request.BOOK).toString());
                             }
                         }
                     }
@@ -84,13 +95,13 @@ public class OutRequestListActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(OutRequestListActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
 
     }
 
-    public void getRequestedBook(String id) {
+    public void getBorrowedBook(String id) {
         database
                 .collection(Book.BOOKS)
                 .document(id)
@@ -120,49 +131,8 @@ public class OutRequestListActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(OutRequestListActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
-
-    /**
-     * Implementation of the bottom navigation bar for switching to different
-     * activity views, such as home, profile, notifications and lists
-     * References: https://www.youtube.com/watch?v=JjfSjMs0ImQ&feature=youtu.be
-     * @author Alex Mazzuca, Carter Sabadash
-     * @version 2020.10.25
-     */
-    private void bottomNavigationView() {
-        //Home Navigation bar implementation
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
-        bottomNavigationView.setSelectedItemId(R.id.lists_bottom_nav);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch(item.getItemId()){
-                    case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ListsActivity.class)
-                                .putExtra(User.USERNAME, username));
-                        finish();
-                        return true;
-                    case R.id.home_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), HomeActivity.class)
-                                .putExtra(User.USERNAME, username));
-                        overridePendingTransition(0,0);
-                        return true;
-                    case R.id.notification_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class )
-                                .putExtra(User.USERNAME, username));
-                        overridePendingTransition(0,0);
-                        return true;
-                    case R.id.profile_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class)
-                                .putExtra(User.USERNAME, username));
-                        overridePendingTransition(0,0);
-                        return true;
-                }
-                return false;
-            }
-        });
     }
 }

@@ -21,14 +21,17 @@ import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.type.LatLng;
 import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
 
 /**
  * This activity allows the user to set the location where
@@ -39,6 +42,7 @@ import com.squareup.picasso.Picasso;
  */
 
 public class AcceptingRequestActivity extends AppCompatActivity {
+    public static final int REQUEST_SCAN = 529;
     public static final int REQUEST_LOCATION = 5666;
     private TextView requester;
     private TextView title;
@@ -142,8 +146,14 @@ public class AcceptingRequestActivity extends AppCompatActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-
+                if (request.getLatLng() != null) {
+                    Intent intent = new Intent(getApplicationContext(), ScanningActivity.class);
+                    intent.putExtra(User.USERNAME, username);
+                    startActivityForResult(intent, REQUEST_SCAN);
+                } else {
+                    setLocation.requestFocus();
+                    setLocation.setError("Need to set location first");
+                }
             }
         });
 
@@ -182,10 +192,55 @@ public class AcceptingRequestActivity extends AppCompatActivity {
                                                 AcceptingRequestActivity.this,
                                                 "An error occurred",
                                                 Toast.LENGTH_SHORT)
-                                        .show();                            }
+                                        .show();
+                            }
                         });
             }
+        } else if (requestCode == REQUEST_SCAN) {
+            if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
+                String barcode = data.getStringExtra(HomeActivity.BARCODE);
+                if (barcode.equals(book.getIsbn())) {
+                    concludeRequest();
+                }
+            }
         }
+    }
+
+    public void concludeRequest() {
+        database
+                .collection(Book.BOOKS)
+                .document(bookID)
+                .update(Book.STATUS, String.valueOf(Book.ACCEPTED))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        database
+                                .collection(Request.REQUESTS)
+                                .document(requestID)
+                                .update(Request.IS_ACCEPTED, String.valueOf(true))
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Intent intent = new Intent();
+                                        intent.putExtra(Request.ID, requestID);
+                                        setResult(CommonStatusCodes.SUCCESS, intent);
+                                        finish();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**

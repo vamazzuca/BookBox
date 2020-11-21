@@ -2,13 +2,11 @@ package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -19,7 +17,6 @@ import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,6 +31,8 @@ import java.util.Locale;
 /**
  * This activity allows the user to set/view the location
  * where the book will be received or borrowed
+ * @author  Olivier Vadiavaloo
+ * @version 2020.11.21
  */
 
 public class LocationActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -71,7 +70,9 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
         // Set up bottom navigation bar
         bottomNavigationView();
 
-        if (!request.getOwner().equals(username)) {
+        // If the user is the borrower in the request,
+        // he or she can only view the location
+        if (request.getBorrower().equals(username)) {
             TextView header = (TextView) findViewById(R.id.location_textview);
             header.setText(R.string.view_location);
             cancelButton.setVisibility(View.GONE);

@@ -1,6 +1,7 @@
 package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +20,7 @@ import com.cmput301f20t14.bookbox.adapters.RequestList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -86,71 +88,74 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
 
         getRequests(requestsCollectionRef);
 
-        requestList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final Request request = requestAdapter.getItem(position);
 
-                requestsCollectionRef
-                        .whereEqualTo(Request.DATE, request.getDate())
-                        .whereEqualTo(Request.OWNER, request.getOwner())
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful() && task.getResult() != null) {
-                                    for (QueryDocumentSnapshot doc : task.getResult()) {
-                                        final String requestID = doc.getId();
+            requestList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    final Request request = requestAdapter.getItem(position);
 
-                                        AlertDialog dialog = new AlertDialog.Builder(ViewBookRequestsActivity.this)
-                                                .setTitle(R.string.accept_decline_request)
-                                                .setNegativeButton("Cancel", null)
-                                                .setNeutralButton("Decline", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        deleteRequest(requestsCollectionRef, requestID);
-                                                    }
-                                                })
-                                                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        declineOtherRequests(requestsCollectionRef, requestID);
+                    if (!request.getAccepted() && book.getStatus() != Book.ACCEPTED) {
+                        requestsCollectionRef
+                                .whereEqualTo(Request.DATE, request.getDate())
+                                .whereEqualTo(Request.OWNER, request.getOwner())
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful() && task.getResult() != null) {
+                                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                                final String requestID = doc.getId();
 
-                                                        Intent intent = new Intent(
-                                                                ViewBookRequestsActivity.this,
-                                                                AcceptingRequestActivity.class
-                                                        );
+                                                AlertDialog dialog = new AlertDialog.Builder(ViewBookRequestsActivity.this)
+                                                        .setTitle(R.string.accept_decline_request)
+                                                        .setNegativeButton("Cancel", null)
+                                                        .setNeutralButton("Decline", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                deleteRequest(requestsCollectionRef, requestID);
+                                                            }
+                                                        })
+                                                        .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                //declineOtherRequests(requestsCollectionRef, requestID);
 
-                                                        intent.putExtra(User.USERNAME, username);
-                                                        intent.putExtra(Request.ID, requestID);
-                                                        intent.putExtra(Book.ID, bookID);
-                                                        Bundle bundle = new Bundle();
-                                                        bundle.putSerializable("REQUEST_OBJECT", request);
-                                                        bundle.putSerializable("BOOK", book);
-                                                        intent.putExtras(bundle);
-                                                        startActivityForResult(intent, ACCEPT_REQUEST);
-                                                    }
-                                                })
-                                                .create();
+                                                                Intent intent = new Intent(
+                                                                        ViewBookRequestsActivity.this,
+                                                                        AcceptingRequestActivity.class
+                                                                );
 
-                                        dialog.show();
+                                                                intent.putExtra(User.USERNAME, username);
+                                                                intent.putExtra(Request.ID, requestID);
+                                                                intent.putExtra(Book.ID, bookID);
+                                                                Bundle bundle = new Bundle();
+                                                                bundle.putSerializable("REQUEST_OBJECT", request);
+                                                                bundle.putSerializable("BOOK", book);
+                                                                intent.putExtras(bundle);
+                                                                startActivityForResult(intent, ACCEPT_REQUEST);
+                                                            }
+                                                        })
+                                                        .create();
+
+                                                dialog.show();
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast
-                                        .makeText(
-                                                ViewBookRequestsActivity.this,
-                                                "An error occurred",
-                                                Toast.LENGTH_SHORT)
-                                        .show();
-                            }
-                        });
-            }
-        });
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast
+                                                .makeText(
+                                                        ViewBookRequestsActivity.this,
+                                                        "An error occurred",
+                                                        Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                });
+                    }
+                }
+            });
 
     }
 
@@ -241,6 +246,20 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                                 .show();
                     }
                 });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ACCEPT_REQUEST &&
+                resultCode == CommonStatusCodes.SUCCESS && data != null) {
+            String requestId = data.getStringExtra(Request.ID);
+            declineOtherRequests(database.collection(Request.REQUESTS), requestId);
+            getRequests(database.collection(Request.REQUESTS));
+            requestList.getChildAt(0)
+                    .findViewById(R.id.view_request_accepted)
+                    .setVisibility(View.VISIBLE);
+        }
     }
 
     /**

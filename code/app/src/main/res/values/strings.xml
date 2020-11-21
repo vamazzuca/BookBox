@@ -98,4 +98,8 @@
     <string name="view_location">View Location</string>
     <string name="scan">Scan</string>
     <string name="or">OR</string>
+    <string name="title_activity_list2">List2Activity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="accepted">ACCEPTED</string>
 </resources>
