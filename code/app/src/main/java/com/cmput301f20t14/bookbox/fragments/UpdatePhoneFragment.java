@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -17,17 +18,17 @@ import com.cmput301f20t14.bookbox.R;
 
 public class UpdatePhoneFragment extends DialogFragment {
     private EditText newPhoneText;
-    private UpdatePhoneFragmentInteractionListener listener;
+    private OnFragmentInteractionListener listener;
 
-    public interface UpdatePhoneFragmentInteractionListener {
-        void onOkPressed(String phone);
+    public interface OnFragmentInteractionListener {
+        void onPhoneUpdated(String phone);
     }
 
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
-        if (context instanceof UpdatePhoneFragmentInteractionListener){
-            listener = (UpdatePhoneFragmentInteractionListener) context;
+        if (context instanceof OnFragmentInteractionListener){
+            listener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -45,12 +46,32 @@ public class UpdatePhoneFragment extends DialogFragment {
                 .setView(view)
                 .setTitle(R.string.fragment_update_phone_title)
                 .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String phone = newPhoneText.getText().toString().trim();
-                        listener.onOkPressed(phone);
+                .setPositiveButton(R.string.update, null) // override in onStart
+                .create();
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+
+        AlertDialog alertDialog = (AlertDialog) getDialog();
+
+        if (alertDialog != null) {
+            // we don't want to allow dialog to close if the user clicks update and the
+            // passwords do not match
+            Button updateButton = alertDialog.getButton(Dialog.BUTTON_POSITIVE);
+            updateButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String phone = newPhoneText.getText().toString().trim();
+                    if (phone.length() != 0) {
+                        listener.onPhoneUpdated(phone);
+                        dismiss();
                     }
-                }).create();
+                    newPhoneText.setError("Required");
+                    newPhoneText.requestFocus();
+                }
+            });
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.cmput301f20t14.bookbox.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -16,34 +17,42 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cmput301f20t14.bookbox.R;
-import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.cmput301f20t14.bookbox.fragments.ImageFragment;
+import com.cmput301f20t14.bookbox.fragments.UpdateEmailFragment;
+import com.cmput301f20t14.bookbox.fragments.UpdatePasswordFragment;
+import com.cmput301f20t14.bookbox.fragments.UpdatePhoneFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 /**
  * Here is where the user can view their own profile.
  * Through this activity the user can view and edit
  * their username, email address, phone number and
- * profile photo
- * @version 2020.11.10
+ * profile photo and they can logout
+ * Logging out will remove the device notification token so they will
+ *      no longer receive notifications on this device
+ * @version 2020.11.20
  * @author Alex Mazzuca
  * @author Carter Sabadash
  * @author Olivier Vadiavaloo
@@ -51,19 +60,27 @@ import java.util.UUID;
  * @see ListsActivity
  * @see NotificationsActivity
  */
-public class ProfileActivity extends AppCompatActivity implements ImageFragment.OnFragmentInteractionListener{
+public class ProfileActivity
+        extends AppCompatActivity
+        implements  ImageFragment.OnFragmentInteractionListener,
+                    UpdatePhoneFragment.OnFragmentInteractionListener,
+                    UpdateEmailFragment.OnFragmentInteractionListener,
+                    UpdatePasswordFragment.OnFragmentInteractionListener{
     private String username;
     private FirebaseFirestore database;
     private EditText usernameEditText;
-    private EditText emailEditText;
-    private EditText passwordEditText;
-    private EditText phoneEditText;
-    private Button confirmButton, addImageButton, removeImageButton;;
+    private Button emailEditText;
+    private Button phoneEditText;
+    private Button logoutButton;
+    private Button updatePasswordButton;
+    private Button addImageButton;
+    private Button removeImageButton;;
     private ImageView userImageView;
     private Uri imageUri;
     private StorageReference storageReference;
     private Image userImage;
     private String imageUrl;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,19 +92,13 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
         username = getIntent().getExtras().getString(User.USERNAME);
 
         // Get the EditText views
-        usernameEditText = (EditText) findViewById(R.id.profile_username_editText);
-        emailEditText = (EditText) findViewById(R.id.profile_email_editText);
-        emailEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        usernameEditText = findViewById(R.id.profile_username_editText);
+        emailEditText = findViewById(R.id.profile_email_editText);
+        phoneEditText = findViewById(R.id.profile_phone_editText);
 
-            }
-        });
-        passwordEditText = (EditText) findViewById(R.id.profile_password_editText);
-        phoneEditText = (EditText) findViewById(R.id.profile_phone_editText);
-
-        // Get "Confirm" Button
-        confirmButton = (Button) findViewById(R.id.profile_confirm_button);
+        // Get the Buttons
+        logoutButton = findViewById(R.id.profile_logout_button);
+        updatePasswordButton = findViewById(R.id.profile_update_password_button);
 
         // Set the text in usernameEditText
         usernameEditText.setText(username);
@@ -105,6 +116,15 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
 
         bottomNavigationView();
 
+        // initialize firebaseAuth
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() == null) { // no user signed in --> make them login
+            Toast.makeText(this, "An Error Occurred!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, MainActivity.class);
+            finishAffinity();
+            startActivity(intent);
+        }
+
         // Initialise database
         database = FirebaseFirestore.getInstance();
 
@@ -116,72 +136,40 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
         // Get the user information to fill in the EditTexts
         getUserInfo(userCollectionRef);
 
-        confirmButton.setOnClickListener(new View.OnClickListener() {
+        logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                boolean isErrorSet = false;
-                String enteredPassword = passwordEditText.getText().toString().trim();
-                String enteredEmail = emailEditText.getText().toString().trim();
-                String enteredPhone = phoneEditText.getText().toString().trim();
-
-                if (enteredPassword.isEmpty()) {
-                    isErrorSet = true;
-                    passwordEditText.setError("Required");
-                }
-
-                if (enteredPhone.isEmpty()) {
-                    isErrorSet = true;
-                    phoneEditText.setError("Required");
-                }
-
-                if (!isErrorSet) {
-                    HashMap<String, String> updatedData = new HashMap<>();
-                    updatedData.put(User.EMAIL, enteredEmail);
-                    updatedData.put(User.PHONE, enteredPhone);
-                    updatedData.put(Book.IMAGE_URL, imageUrl);
-
-                    // update email & password as user credentials
-                    // must modify the following to ensure that the update can complete
-                    FirebaseAuth.getInstance().getCurrentUser()
-                            .updateEmail(enteredEmail);
-                    FirebaseAuth.getInstance().getCurrentUser()
-                            .updatePassword(enteredPassword);
-
-                    // and update everything in the database
-                    userCollectionRef
-                            .document(username)
-                            .set(updatedData, SetOptions.merge())
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(
-                                            ProfileActivity.this,
-                                            "User profile updated",
-                                            Toast.LENGTH_SHORT)
-                                          .show();
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(
-                                            ProfileActivity.this,
-                                            "An error occurred",
-                                            Toast.LENGTH_SHORT)
-                                            .show();
-                                }
-                            });
-                }
+            public void onClick(View view) {
+                logout();
             }
         });
 
+        updatePasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new UpdatePasswordFragment().show(getSupportFragmentManager(), "UPDATE_PASSWORD");
+            }
+        });
 
+        emailEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new UpdateEmailFragment().show(getSupportFragmentManager(), "UPDATE_EMAIL");
+            }
+        });
+
+        phoneEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new UpdatePhoneFragment().show(getSupportFragmentManager(), "UPDATE_PHONE");
+            }
+        });
 
         //Add picture button listener
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent selectImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent selectImageIntent = new Intent(Intent.ACTION_PICK,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(selectImageIntent, 1);
             }
 
@@ -203,6 +191,164 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
             }
         });
 
+    }
+
+    /**
+     * This performs the necessary operations to log a user out
+     * When a user logs out, the device token for notifications is removed
+     * so they will no longer receive notifications on this device.
+     * https://stackoverflow.com/questions/3473168/clear-the-entire-history-stack-and-start-a-new-activity-on-android
+     *  This was a good resource for resetting the application state
+     */
+    private void logout() {
+        // first we update the database and delete the current token
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (task.isSuccessful()) {
+                    String token = task.getResult();
+
+                    // remove the token from the database
+                    database.collection(User.USERS).document(username).collection("TOKENS")
+                            .document(token).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                // then we sign out the user
+                                mAuth.signOut();
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                finishAffinity();
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(ProfileActivity.this, "An Error Occurred",
+                                        Toast.LENGTH_SHORT).show();
+                                logout();
+                            }
+                        }
+                    });
+                }
+                else {
+                    Toast.makeText(ProfileActivity.this, "An Error Occurred",
+                            Toast.LENGTH_SHORT).show();
+                    logout();
+                }
+            }
+        });
+    }
+
+    /**
+     * Part of the UpdatePhoneFragment interface.
+     * @param phone The new phone number
+     */
+    @Override
+    public void onPhoneUpdated(final String phone) {
+        database.collection(User.USERS).document(username).update(User.PHONE, phone)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            phoneEditText.setText(phone);
+                        } else {
+                            Toast.makeText(ProfileActivity.this,
+                                    "An Error Occurred", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Part of the UpdateEmailFragment interface. We must try to reauthenticate the user before
+     *  updating their information.
+     * @param email The new email.
+     */
+    @Override
+    public void emailUpdatePressed(final String email, String password) {
+        final UpdateEmailFragment fragment =
+                (UpdateEmailFragment) getSupportFragmentManager().findFragmentByTag("UPDATE_EMAIL");
+        AuthCredential authCredential = EmailAuthProvider
+                .getCredential(emailEditText.getText().toString().trim(), password);
+        mAuth.getCurrentUser().reauthenticate(authCredential).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // try to update email as a credential
+                    mAuth.getCurrentUser().updateEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                // update in database
+                                fragment.emailUpdate(true);
+                                database.collection(User.USERS).document(username).update(User.EMAIL, email)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    emailEditText.setText(email);
+                                                } else {
+                                                    Toast.makeText(ProfileActivity.this,
+                                                            "An Error Occurred. Credentials Successfully Updated",
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+                            } else {
+                                fragment.emailUpdate(false);
+                            }
+                        }
+                    });
+                } else {
+                    fragment.incorrectPassword();
+                }
+            }
+        });
+    }
+
+    /**
+     * Part of the UpdatePasswordFragment interface.
+     * https://stackoverflow.com/questions/46780426/how-reauthenticate-user-at-firebase
+     *  for reauthenticating users. We user verify() to ensure that the current password
+     *  is correct
+     * @param password The password, a non-empty string
+     */
+    @Override
+    public void passwordUpdatePressed(String oldPassword, final String password) {
+        AuthCredential authCredential = EmailAuthProvider
+                .getCredential(emailEditText.getText().toString().trim(), oldPassword);
+        mAuth.getCurrentUser().reauthenticate(authCredential)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        final UpdatePasswordFragment fragment = (UpdatePasswordFragment)
+                                getSupportFragmentManager().findFragmentByTag("UPDATE_PASSWORD");
+                        if (task.isSuccessful()) {
+                            // try to update password
+                            mAuth.getCurrentUser().updatePassword(password)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                fragment.verify(true);
+                                                Toast.makeText(ProfileActivity.this,
+                                                        "Password Updated",
+                                                        Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                try {
+                                                    throw task.getException();
+                                                } catch (FirebaseAuthWeakPasswordException e) {
+                                                    fragment.weakPassword();
+                                                } catch (Exception e) {
+                                                    Toast.makeText(ProfileActivity.this,
+                                                            "An Error Occurred",
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        }
+                                    });
+                        } else {
+                            fragment.verify(false);
+                        }
+                    }
+                });
     }
 
     /**
@@ -355,20 +501,34 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
     /**
      * Part of the ImageFragment interface where when an image is changed in the fragment it will
      * get the image from the android gallery and pass it onto onActivityResult
-     * @author Alex Mazzuca
-     * @version 2020.11.04
+     * The image will also be added to the users profile here
+     * @author Alex Mazzuca, Carter Sabadash
+     * @version 2020.11.20
      */
     @Override
     public void onUpdateImage(){
         Intent selectImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(selectImageIntent, 1);
+
+        // add image to user profile in database
+        database.collection(User.USERS).document(username)
+                .update(User.IMAGE_URL, imageUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (!task.isSuccessful()) {
+                    Toast.makeText(ProfileActivity.this,
+                            "An error occurred", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     /**
      * Part of the ImageFragment interface where when an image is deleted it will changed
-     * the image view to a defualt logo and remove the image
-     * @author Alex Mazzuca
-     * @version 2020.11.04
+     * the image view to a defualt logo and remove the image. The image will also be removed
+     * from the user profile here
+     * @author Alex Mazzuca, Carter Sabadash
+     * @version 2020.11.20
      */
     @Override
     public void onDeleteImage(){
@@ -377,6 +537,21 @@ public class ProfileActivity extends AppCompatActivity implements ImageFragment.
         addImageButton.setText(R.string.add_picture);
         userImage.setUri(null);
         imageUrl = "";
+
+        // remove image from user profile in database
+        database.collection(User.USERS).document(username)
+                .update(User.IMAGE_URL, imageUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (!task.isSuccessful()) {
+                    Toast.makeText(ProfileActivity.this,
+                            "Deleted from profile", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(ProfileActivity.this,
+                            "An error occurred", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
     }
 
