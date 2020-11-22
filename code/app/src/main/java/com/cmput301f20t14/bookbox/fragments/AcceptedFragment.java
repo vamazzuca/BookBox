@@ -183,6 +183,7 @@ public class AcceptedFragment extends Fragment {
         if (requestCode == REQUEST_RECEIVE) {
             if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
                 this.setUpList();
+                this.getActivity().recreate();
             }
         }
     }
@@ -197,7 +198,7 @@ public class AcceptedFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
-                            if (doc.exists()) {
+                            if (doc != null && doc.exists()) {
                                 String lentTo = doc.getData().get(Book.LENT_TO).toString();
 
                                 if (lentTo.isEmpty()) {

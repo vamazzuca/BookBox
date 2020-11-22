@@ -103,7 +103,6 @@
     <string name="set_Location">Set Location</string>
     <string name="scan_to_hand_over">Hand Over</string>
     <string name="API_KEY" translatable="false">AIzaSyD0QFgKt8W1VjpebBqwmfdSKbki2DS73PI</string>
-    <string name="cancel">Cancel</string>
     <string name="view_location">View Location</string>
     <string name="scan">Scan</string>
     <string name="or">OR</string>

@@ -106,7 +106,7 @@ public class OutRequestFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
-                            if (doc.exists()) {
+                            if (doc != null && doc.exists()) {
                                 String title = doc.getData().get(Book.TITLE).toString();
                                 String author = doc.getData().get(Book.AUTHOR).toString();
                                 String isbn = doc.getData().get(Book.ISBN).toString();
