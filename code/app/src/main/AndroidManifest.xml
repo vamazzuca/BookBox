@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -13,9 +16,20 @@
         android:roundIcon="@mipmap/ic_launcher_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.OutRequestListActivity" />
+        <activity android:name=".activities.ReceiveActivity"></activity>
+        <activity
+            android:name=".activities.ListsActivity"
+            android:label="@string/title_activity_list2"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activities.LocationActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/API_KEY" />
+
+        <activity android:name=".activities.HandOverActivity" />
+        <activity android:name=".activities.ViewBookRequestsActivity" />
         <activity android:name=".activities.EditBookActivity" />
-        <activity android:name=".activities.ListsActivity" />
         <activity android:name=".activities.NotificationsActivity" />
         <activity android:name=".activities.ProfileActivity" />
         <activity android:name=".activities.AddBookActivity" />
@@ -43,7 +57,15 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notification_icon" />
-
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="barcode" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

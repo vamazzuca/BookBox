@@ -9,7 +9,6 @@ import androidx.test.rule.ActivityTestRule;
 import com.cmput301f20t14.bookbox.activities.HomeActivity;
 import com.cmput301f20t14.bookbox.activities.ListsActivity;
 import com.cmput301f20t14.bookbox.activities.MainActivity;
-import com.cmput301f20t14.bookbox.activities.OutRequestListActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.After;

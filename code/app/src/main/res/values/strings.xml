@@ -3,12 +3,12 @@
     <string name="placeholder">Lorem Ipsum</string>
     <string name="welcome_message">Welcome to BookBox</string>
     <string name="account_registration">Account Registration</string>
-    <string name="username_hint">User</string>
+    <string name="username_hint">Username</string>
     <string name="email_hint">Email</string>
     <string name="phone_hint">Phone</string>
     <string name="password_hint">Password</string>
     <string name="log_in_button">Log in</string>
-    <string name="register_button">Register</string>
+    <string name="register_button">Create account</string>
     <string name="not_registered">Not registered?</string>
     <string name="bookbox">BookBox</string>
     <string name="lists">List</string>
@@ -95,4 +95,24 @@
     <string name="fragment_update_email_title">Update Email</string>
     <string name="fragment_update_password_title">Update Password</string>
     <string name="logout">Logout</string>
+    <string name="requests">Requests</string>
+    <string name="requested_by">Requested by:</string>
+    <string name="data">Date:</string>
+    <string name="accept_decline_request">Accept or Decline request?</string>
+    <string name="requested">Requested</string>
+    <string name="set_Location">Set Location</string>
+    <string name="scan_to_hand_over">Hand Over</string>
+    <string name="API_KEY" translatable="false">AIzaSyD0QFgKt8W1VjpebBqwmfdSKbki2DS73PI</string>
+    <string name="cancel">Cancel</string>
+    <string name="view_location">View Location</string>
+    <string name="scan">Scan</string>
+    <string name="or">OR</string>
+    <string name="title_activity_list2">List2Activity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="accepted">ACCEPTED</string>
+    <string name="accepted_request">Accepted Request</string>
+    <string name="return_book">Return</string>
+    <string name="see_location">See Location</string>
+    <string name="receive">Receive</string>
 </resources>

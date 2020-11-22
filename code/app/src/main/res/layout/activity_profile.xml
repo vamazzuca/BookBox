@@ -16,24 +16,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/user_profile_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="24dp"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/user_profile"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:textColor="@color/colorPurpleTitle"
-                android:textSize="35sp"
-                android:textStyle="bold" />
-
             <LinearLayout
                 android:id="@+id/linear_layout_edit_book"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -47,6 +35,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical">
 
@@ -54,15 +43,20 @@
                         android:id="@+id/add_picture_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
+                        android:layout_margin="4dp"
+                        android:textColor="@color/colorBlueMessage"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:text="@string/add_picture" />
 
                     <Button
                         android:id="@+id/delete_picture_button"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
+                        android:layout_marginTop="4dp"
+                        android:padding="8dp"
                         android:enabled="false"
+                        android:textColor="@color/colorBlueMessage"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:text="@string/remove_picture" />
                 </LinearLayout>
             </LinearLayout>
@@ -131,7 +125,6 @@
                     app:layout_constraintStart_toEndOf="@+id/profile_confirm_button"
                     tools:layout_editor_absoluteY="8dp" />
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
 
@@ -140,8 +133,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
-        app:itemIconTint="@color/colorDarkBgd"
-        app:itemTextColor="@color/colorDarkText"
+        app:itemIconTint="@drawable/bottom_nav_bar_selector"
+        app:itemTextColor="@drawable/bottom_nav_bar_selector"
         app:itemIconSize="50sp"
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />

@@ -3,10 +3,10 @@ package com.cmput301f20t14.bookbox.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -21,6 +21,7 @@ import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.adapters.BookList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -41,7 +42,8 @@ import java.util.ArrayList;
  */
 
 public class SearchActivity extends AppCompatActivity {
-
+    public static final String VIEW_BOOK = "VIEW_BOOK";
+    public static final int REQUEST_CODE_FROM_SEARCH = 555;
     private FirebaseFirestore database;
     private ListView searchList;
     private EditText searchField;
@@ -68,10 +70,9 @@ public class SearchActivity extends AppCompatActivity {
         searchField = (EditText) findViewById(R.id.search_EditText);
         resultsHeader = (TextView) findViewById(R.id.search_results_textview);
 
-
         searchResults = new ArrayList<>();
 
-        searchAdapter = new BookList(this, searchResults);
+        searchAdapter = new BookList(this, searchResults, true);
 
         searchList.setAdapter(searchAdapter);
 
@@ -80,11 +81,24 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 searchResults.clear();
-                executeSearch(v);
+                executeSearch();
                 closeKeyboard();
             }
         });
 
+        // Set the OnItemClick listener of the results ListView
+        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Book book = searchAdapter.getItem(position);
+                Intent intent = new Intent(SearchActivity.this, EditBookActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(VIEW_BOOK, book);
+                intent.putExtras(bundle);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_FROM_SEARCH);
+            }
+        });
     }
 
     /**
@@ -102,7 +116,7 @@ public class SearchActivity extends AppCompatActivity {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public void executeSearch(View view){
+    public void executeSearch(){
         keyword = searchField.getText().toString().toLowerCase();
         search(Book.AVAILABLE);
         search(Book.REQUESTED);
@@ -173,6 +187,15 @@ public class SearchActivity extends AppCompatActivity {
                 lentTo,
                 imageUrl
         );
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_FROM_SEARCH && resultCode == CommonStatusCodes.SUCCESS) {
+            searchResults.clear();
+            executeSearch();
+        }
     }
 
     /**

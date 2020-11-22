@@ -2,15 +2,17 @@ package com.cmput301f20t14.bookbox.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,9 +31,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 
-import static com.google.android.gms.vision.barcode.Barcode.EAN_13;
-import static com.google.android.gms.vision.barcode.Barcode.ISBN;
-import static com.google.android.gms.vision.barcode.Barcode.UPC_A;
+import static com.google.android.gms.vision.barcode.Barcode.ALL_FORMATS;
 
 /**
  * This is the scanning activity. It makes use of a surface view and
@@ -47,6 +47,11 @@ import static com.google.android.gms.vision.barcode.Barcode.UPC_A;
 public class ScanningActivity extends AppCompatActivity {
     private String username;
     private SurfaceView scannerPreview;
+    private TextView scannedContent;
+    private Button keepScanning;
+    private Button confirm;
+    private String barcode;
+    private BarcodeDetector barcodeDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceBundle) {
@@ -56,6 +61,13 @@ public class ScanningActivity extends AppCompatActivity {
         // get username extra
         username = getIntent().getExtras().getString(User.USERNAME);
 
+        // get textview that will contain the scanned content
+        scannedContent = (TextView) findViewById(R.id.scanned_content);
+
+        // get buttons
+        keepScanning = (Button) findViewById(R.id.keep_scanning);
+        confirm = (Button) findViewById(R.id.confirm_scan);
+
         // set up the bottom navigation bar
         bottomNavigationView();
 
@@ -63,16 +75,57 @@ public class ScanningActivity extends AppCompatActivity {
         scannerPreview = (SurfaceView) findViewById(R.id.preview_camera);
 
         // initialise barcodeDectector
-        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
-                .setBarcodeFormats(EAN_13)
+        barcodeDetector = new BarcodeDetector.Builder(this)
+                .setBarcodeFormats(ALL_FORMATS)
                 .build();
 
         // Build CameraSource object
-        final CameraSource cameraSource = new CameraSource.Builder(this, barcodeDetector)
+        final CameraSource cameraSource = new CameraSource.Builder(getApplicationContext(), barcodeDetector)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedPreviewSize(1600, 1024)
+                .setRequestedFps(2.0f)
+                .setAutoFocusEnabled(true)
                 .build();
 
         // add a callback to the SurfaceHolder of the preview and request
         // permissions to launch camera if permission is not granted yet
+        setUpHolder(cameraSource);
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // finish activity and pass back barcode as extra
+                Intent intent = new Intent();
+                intent.putExtra(HomeActivity.BARCODE, barcode);
+                setResult(CommonStatusCodes.SUCCESS, intent);
+                finish();
+            }
+        });
+
+        keepScanning.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
+            @Override
+            public void onClick(View v) {
+                handlePermissions();
+                // try starting the camera source and catch any exception
+                // finish activity if camera couldn't start
+                try {
+                    cameraSource.start(scannerPreview.getHolder());
+                    setUpDetector(cameraSource);
+                    scannedContent.setText("");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ScanningActivity.this, "An Error occurred", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        });
+    }
+
+    /**
+     * Add callback to the surface holder of the scannerPreview
+     */
+    public void setUpHolder(final CameraSource cameraSource) {
         scannerPreview.getHolder().addCallback(new SurfaceHolder.Callback() {
             @SuppressLint("MissingPermission")
             @Override
@@ -83,6 +136,7 @@ public class ScanningActivity extends AppCompatActivity {
                 // finish activity if camera couldn't start
                 try {
                     cameraSource.start(scannerPreview.getHolder());
+                    setUpDetector(cameraSource);
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ScanningActivity.this, "An Error occurred", Toast.LENGTH_SHORT).show();
@@ -101,7 +155,9 @@ public class ScanningActivity extends AppCompatActivity {
             }
 
         });
+    }
 
+    public void setUpDetector(final CameraSource cameraSource) {
         // set the processor to scan any barcode showing up
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
@@ -119,51 +175,20 @@ public class ScanningActivity extends AppCompatActivity {
                 // and a negative button. The positive button finishes the activity on clicking
                 // while the negative button relauches the scanning feature
                 if (scannedBarcodes.size() > 0) {
-                    final String barcode = scannedBarcodes.valueAt(0).displayValue.toString();
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            // build Alert dialog to show user the scanned barcode
-                            // if user presses "Confirm", the Scanning activity finishes
-                            // and returns the scanned barcode to the previous activity
-                            // If the user presses "Cancel", the scanning activity resume
-                            AlertDialog dialog = new AlertDialog.Builder(ScanningActivity.this)
-                                    .setTitle("ISBN: " + barcode)
-                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                        @SuppressLint("MissingPermission")
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            Intent intent = new Intent(ScanningActivity.this, ScanningActivity.class);
-                                            intent.putExtra(User.USERNAME, username);
-                                            startActivityForResult(intent, HomeActivity.REQUEST_CODE_SCANNING);
-                                        }
-                                    })
-                                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            // finish activity and pass back barcode as extra
-                                            Intent intent = new Intent();
-                                            intent.putExtra(HomeActivity.BARCODE, barcode);
-                                            setResult(CommonStatusCodes.SUCCESS, intent);
-                                            finish();
-                                        }
-                                    })
-                                    .create();
-
-                            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                                        @Override
-                                        public void onShow(DialogInterface dialog) {
-                                            cameraSource.stop();
-                                        }
-                            });
-                            dialog.show();
+                            // stop camerasource
+                            cameraSource.stop();
+                            barcode = scannedBarcodes.valueAt(0).displayValue.toString();
+                            scannedContent.setText(barcode);
+                            confirm.setEnabled(true);
+                            confirm.setAlpha(1.0f);
                         }
                     });
                 }
             }
         });
-
     }
 
     /**
