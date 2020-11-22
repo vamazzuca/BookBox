@@ -25,10 +25,10 @@
                 android:layout_height="wrap_content"
                 android:padding="2dp"
                 android:textColor="@color/colorRedMessage"
-                android:text="@string/owner" />
+                android:text="@string/listUsername" />
 
             <TextView
-                android:id="@+id/list_content_owner"
+                android:id="@+id/list_content_Username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorRedMessage"
@@ -37,7 +37,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/list_content_title"
+            android:id="@+id/list_content_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="2dp"
@@ -45,27 +45,15 @@
             android:text="@string/placeholder" />
 
         <TextView
-            android:id="@+id/list_content_author"
+            android:id="@+id/list_content_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="2dp"
             android:text="@string/placeholder" />
 
-        <TextView
-            android:id="@+id/list_content_isbn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp"
-            android:text="@string/placeholder" />
 
-        <TextView
-            android:id="@+id/list_content_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="2dp"
-            android:textColor="@color/colorBlueMessage"
-            android:text="@string/placeholder" />
+
+
 
 
     </LinearLayout>
