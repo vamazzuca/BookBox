@@ -1,11 +1,14 @@
 package com.cmput301f20t14.bookbox.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -13,14 +16,17 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.activities.HandOverActivity;
 import com.cmput301f20t14.bookbox.activities.HomeActivity;
 import com.cmput301f20t14.bookbox.activities.ListsActivity;
 import com.cmput301f20t14.bookbox.activities.NotificationsActivity;
 import com.cmput301f20t14.bookbox.activities.ProfileActivity;
+import com.cmput301f20t14.bookbox.activities.ReceiveActivity;
 import com.cmput301f20t14.bookbox.adapters.BookList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -31,17 +37,21 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
 public class AcceptedFragment extends Fragment {
+    public static final int REQUEST_RECEIVE = 8450;
     private BookList listAdapter;
     private ArrayList<Book> books;
     private ListView listView;
     private String username;
     private FirebaseFirestore database;
+    private HashMap<String, String> requestIDHash;
+    private HashMap<String, String> bookIDHash;
 
-    public AcceptedFragment newInstance(String usernameArg) {
+    public static AcceptedFragment newInstance(String usernameArg) {
         Bundle args = new Bundle();
         args.putString(User.USERNAME, usernameArg);
 
@@ -66,6 +76,7 @@ public class AcceptedFragment extends Fragment {
 
         // find listview
         listView = (ListView) view.findViewById(R.id.outgoing_listview);
+        listView.findViewById(R.id.list_content_status).setVisibility(View.GONE);
 
         // initialize adapter and books
         books = new ArrayList<>();
@@ -73,8 +84,69 @@ public class AcceptedFragment extends Fragment {
 
         setUpList();
         listView.setAdapter(listAdapter);
+        listView.findViewById(R.id.list_content_status).setVisibility(View.GONE);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                final Book book = listAdapter.getItem(position);
+
+                if (book.getStatus() == Book.BORROWED) {
+                    AlertDialog dialog = new AlertDialog.Builder(view.getContext())
+                            .setTitle("Borrow book from " + book.getOwner())
+                            .setNegativeButton("Cancel", null)
+                            .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    getRequestInfo(book, view);
+                                }
+                            })
+                            .create();
+                }
+
+            }
+        });
 
         return view;
+    }
+
+    public void getRequestInfo(final Book book, final View view) {
+        final String bookID = bookIDHash.get(book.getIsbn());
+        final String requestID = requestIDHash.get(bookID);
+        database
+                .collection(Request.REQUESTS)
+                .document(requestID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            DocumentSnapshot doc = task.getResult();
+                            String owner = doc.getData().get(Request.OWNER).toString();
+                            String borrower = doc.getData().get(Request.BORROWER).toString();
+                            String isAccepted = doc.getData().get(Request.IS_ACCEPTED).toString();
+                            String latLng = doc.getData().get(Request.LAT_LNG).toString();
+                            String date = doc.getData().get(Request.DATE).toString();
+
+                            Request request = new Request(borrower, owner, book, date, Boolean.valueOf(isAccepted), latLng);
+                            Intent intent = new Intent(view.getContext(), ReceiveActivity.class);
+                            intent.putExtra(User.USERNAME, username);
+                            intent.putExtra(Book.ID, bookID);
+                            intent.putExtra(Request.ID, requestID);
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("REQUEST_OBJECT", request);
+                            bundle.putSerializable("BOOK", book);
+                            intent.putExtras(bundle);
+                            startActivityForResult(intent, REQUEST_RECEIVE);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getContext(), "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void setUpList() {
@@ -88,7 +160,10 @@ public class AcceptedFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot doc : task.getResult()) {
-                                getAcceptedBook(doc.getData().get(Request.BOOK).toString());
+                                String requestID = doc.getData().get(Request.ID).toString();
+                                String bookID = doc.getData().get(Request.BOOK).toString();
+                                requestIDHash.put(bookID, requestID);
+                                getAcceptedBook(bookID);
                             }
                         }
                     }
@@ -102,6 +177,16 @@ public class AcceptedFragment extends Fragment {
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_RECEIVE) {
+            if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
+                this.setUpList();
+            }
+        }
+    }
+
     public void getAcceptedBook(String id) {
         database
                 .collection(Book.BOOKS)
@@ -113,18 +198,24 @@ public class AcceptedFragment extends Fragment {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
                             if (doc.exists()) {
-                                String title = doc.getData().get(Book.TITLE).toString();
-                                String author = doc.getData().get(Book.AUTHOR).toString();
-                                String isbn = doc.getData().get(Book.ISBN).toString();
-                                String owner = doc.getData().get(Book.OWNER).toString();
-                                String statusString = doc.getData().get(Book.STATUS).toString();
-                                int status = Integer.parseInt(statusString);
                                 String lentTo = doc.getData().get(Book.LENT_TO).toString();
-                                String imageUrl = doc.getData().get(Book.IMAGE_URL).toString();
 
-                                Book book = new Book(isbn, title, author, owner, status, lentTo, imageUrl);
-                                books.add(book);
-                                listAdapter.notifyDataSetChanged();
+                                if (lentTo.isEmpty()) {
+                                    String bookID = doc.getData().get(Book.ID).toString();
+                                    String title = doc.getData().get(Book.TITLE).toString();
+                                    String author = doc.getData().get(Book.AUTHOR).toString();
+                                    String isbn = doc.getData().get(Book.ISBN).toString();
+                                    String owner = doc.getData().get(Book.OWNER).toString();
+                                    String statusString = doc.getData().get(Book.STATUS).toString();
+                                    int status = Integer.parseInt(statusString);
+                                    String imageUrl = doc.getData().get(Book.IMAGE_URL).toString();
+
+                                    Book book = new Book(isbn, title, author, owner, status, lentTo, imageUrl);
+                                    books.add(book);
+                                    listAdapter.notifyDataSetChanged();
+
+                                    bookIDHash.put(isbn, bookID);
+                                }
                             }
                         }
                     }

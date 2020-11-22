@@ -41,7 +41,7 @@ public class OutRequestFragment extends Fragment {
     private String username;
     private FirebaseFirestore database;
 
-    public OutRequestFragment newInstance(String usernameArg) {
+    public static OutRequestFragment newInstance(String usernameArg) {
         Bundle args = new Bundle();
         args.putString(User.USERNAME, usernameArg);
 

@@ -43,6 +43,7 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
     private String username;
     private Request request;
     private Geocoder geoCoder;
+    private Boolean isReceiveReturn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,8 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
 
         // Retrieve request object
         request = (Request) getIntent().getExtras().getSerializable("REQUEST");
+
+        isReceiveReturn = (boolean) getIntent().getBooleanExtra("IS_RECEIVE_RETURN", false);
 
         // Get Buttons
         cancelButton = (Button) findViewById(R.id.location_cancel);
@@ -72,7 +75,7 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
 
         // If the user is the borrower in the request,
         // he or she can only view the location
-        if (request.getBorrower().equals(username)) {
+        if (request.getBorrower().equals(username) || isReceiveReturn) {
             TextView header = (TextView) findViewById(R.id.location_textview);
             header.setText(R.string.view_location);
             cancelButton.setVisibility(View.GONE);
@@ -108,7 +111,7 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
             setMarkerOnMap(Request.parseLatLngString(request.getLatLng()));
         }
 
-        if (request.getOwner().equals(username)) {
+        if (request.getOwner().equals(username) && !isReceiveReturn) {
             map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {

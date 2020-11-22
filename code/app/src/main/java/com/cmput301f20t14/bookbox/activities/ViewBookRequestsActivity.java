@@ -51,6 +51,12 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
     private Book book;
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        recreate();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_book_requests);
@@ -88,75 +94,118 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
 
         getRequests(requestsCollectionRef);
 
+        requestList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                final Request request = requestAdapter.getItem(position);
 
-            requestList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    final Request request = requestAdapter.getItem(position);
+                requestsCollectionRef
+                        .whereEqualTo(Request.DATE, request.getDate())
+                        .whereEqualTo(Request.OWNER, request.getOwner())
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful() && task.getResult() != null) {
+                                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                                        final String requestID = doc.getId();
 
-                    if (!request.getAccepted() && book.getStatus() != Book.ACCEPTED) {
-                        requestsCollectionRef
-                                .whereEqualTo(Request.DATE, request.getDate())
-                                .whereEqualTo(Request.OWNER, request.getOwner())
-                                .get()
-                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if (task.isSuccessful() && task.getResult() != null) {
-                                            for (QueryDocumentSnapshot doc : task.getResult()) {
-                                                final String requestID = doc.getId();
+                                        if (!request.getAccepted() && book.getStatus() != Book.ACCEPTED) {
+                                            AlertDialog dialog = new AlertDialog.Builder(ViewBookRequestsActivity.this)
+                                                    .setTitle(R.string.accept_decline_request)
+                                                    .setNegativeButton("Cancel", null)
+                                                    .setNeutralButton("Decline", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            deleteRequest(requestsCollectionRef, requestID);
+                                                        }
+                                                    })
+                                                    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            acceptRequest(requestID, request, position);
+                                                        }
+                                                    })
+                                                    .create();
 
-                                                AlertDialog dialog = new AlertDialog.Builder(ViewBookRequestsActivity.this)
-                                                        .setTitle(R.string.accept_decline_request)
-                                                        .setNegativeButton("Cancel", null)
-                                                        .setNeutralButton("Decline", new DialogInterface.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                deleteRequest(requestsCollectionRef, requestID);
-                                                            }
-                                                        })
-                                                        .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                //declineOtherRequests(requestsCollectionRef, requestID);
-
-                                                                Intent intent = new Intent(
-                                                                        ViewBookRequestsActivity.this,
-                                                                        AcceptingRequestActivity.class
-                                                                );
-
-                                                                intent.putExtra(User.USERNAME, username);
-                                                                intent.putExtra(Request.ID, requestID);
-                                                                intent.putExtra(Book.ID, bookID);
-                                                                Bundle bundle = new Bundle();
-                                                                bundle.putSerializable("REQUEST_OBJECT", request);
-                                                                bundle.putSerializable("BOOK", book);
-                                                                intent.putExtras(bundle);
-                                                                startActivityForResult(intent, ACCEPT_REQUEST);
-                                                            }
-                                                        })
-                                                        .create();
-
-                                                dialog.show();
-                                            }
+                                            dialog.show();
+                                        } else {
+                                            launchHandOver(requestID, request);
                                         }
                                     }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast
-                                                .makeText(
-                                                        ViewBookRequestsActivity.this,
-                                                        "An error occurred",
-                                                        Toast.LENGTH_SHORT)
-                                                .show();
-                                    }
-                                });
-                    }
-                }
-            });
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast
+                                        .makeText(
+                                                ViewBookRequestsActivity.this,
+                                                "An error occurred",
+                                                Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        });
+            }
+        });
 
+    }
+
+    public void acceptRequest(final String requestID, final Request request, final int position) {
+        database
+                .collection(Request.REQUESTS)
+                .document(requestID)
+                .update(Request.IS_ACCEPTED, String.valueOf(true))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        request.setAccepted(true);
+                        changeBookStatus(bookID, requestID, request);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void changeBookStatus(String bookID, final String requestID, final Request request) {
+        database
+                .collection(Book.BOOKS)
+                .document(bookID)
+                .update(Book.STATUS, String.valueOf(Book.ACCEPTED))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        book.setStatus(Book.ACCEPTED);
+                        declineOtherRequests(database.collection(Request.REQUESTS), requestID, request);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void launchHandOver(String requestID, Request request) {
+        Intent intent = new Intent(
+                ViewBookRequestsActivity.this,
+                HandOverActivity.class
+        );
+
+        intent.putExtra(User.USERNAME, username);
+        intent.putExtra(Request.ID, requestID);
+        intent.putExtra(Book.ID, bookID);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("REQUEST_OBJECT", request);
+        bundle.putSerializable("BOOK", book);
+        intent.putExtras(bundle);
+        startActivityForResult(intent, ACCEPT_REQUEST);
     }
 
     public void getRequests(final CollectionReference requestsCollectionRef) {
@@ -173,7 +222,11 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                                 String borrower = queryDoc.getData().get(Request.BORROWER).toString();
                                 String date = queryDoc.getData().get(Request.DATE).toString();
                                 String isAccepted = queryDoc.getData().get(Request.IS_ACCEPTED).toString();
-                                Request request = new Request(borrower, owner, book, date, Boolean.valueOf(isAccepted), null);
+                                String latlng = queryDoc.getData().get(Request.LAT_LNG).toString();
+                                if (latlng.isEmpty()) {
+                                    latlng = null;
+                                }
+                                Request request = new Request(borrower, owner, book, date, Boolean.valueOf(isAccepted), latlng);
 
                                 requests.add(request);
                             }
@@ -196,7 +249,8 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                 });
     }
 
-    public void declineOtherRequests(final CollectionReference requestsCollectionRef, final String requestID) {
+    public void declineOtherRequests(final CollectionReference requestsCollectionRef,
+                                     final String requestID, final Request request) {
         requestsCollectionRef
                 .whereEqualTo(Request.BOOK, bookID)
                 .get()
@@ -209,6 +263,7 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                                     deleteRequest(requestsCollectionRef, doc.getId());
                                 }
                             }
+                            launchHandOver(requestID, request);
                         }
                     }
                 })
@@ -251,14 +306,11 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ACCEPT_REQUEST &&
-                resultCode == CommonStatusCodes.SUCCESS && data != null) {
-            String requestId = data.getStringExtra(Request.ID);
-            declineOtherRequests(database.collection(Request.REQUESTS), requestId);
-            getRequests(database.collection(Request.REQUESTS));
-            requestList.getChildAt(0)
-                    .findViewById(R.id.view_request_accepted)
-                    .setVisibility(View.VISIBLE);
+        if (requestCode == ACCEPT_REQUEST) {
+            if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
+                setResult(CommonStatusCodes.SUCCESS);
+                finish();
+            }
         }
     }
 

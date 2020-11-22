@@ -53,9 +53,9 @@ public class ListsActivity extends AppCompatActivity {
     private void setUpViewPager(ViewPager viewPager) {
         ListsPagerAdapter adapter = new ListsPagerAdapter(getSupportFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        adapter.addFragment(new OutRequestFragment().newInstance(username), "Requested");
-        adapter.addFragment(new AcceptedFragment().newInstance(username), "Accepted");
-        adapter.addFragment(new BorrowedFragment().newInstance(username), "Borrowed");
+        adapter.addFragment(OutRequestFragment.newInstance(username), "Requested");
+        adapter.addFragment(AcceptedFragment.newInstance(username), "Accepted");
+        adapter.addFragment(BorrowedFragment.newInstance(username), "Borrowed");
         viewPager.setAdapter(adapter);
     }
 

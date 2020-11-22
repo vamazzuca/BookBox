@@ -102,4 +102,8 @@
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="accepted">ACCEPTED</string>
+    <string name="accepted_request">Accepted Request</string>
+    <string name="return_book">Return</string>
+    <string name="see_location">See Location</string>
+    <string name="receive">Receive</string>
 </resources>

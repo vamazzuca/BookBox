@@ -59,6 +59,7 @@ import java.util.UUID;
 
 public class EditBookActivity extends AppCompatActivity implements ImageFragment.OnFragmentInteractionListener{
     public static final int RESULT_CODE_DELETE = 10;
+    public static final int REQUEST_VIEW_REQUESTS = 99;
     private String username;
     private TextView status;
     private TextView owner;
@@ -81,6 +82,12 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     private Image bookImage;
     private String imageUrl;
     private boolean isRequested;
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        recreate();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,11 +146,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         if (book.getOwner().equals(username)) {
             requestBook.setVisibility(View.GONE);      // user cannot request own book
 
-            // Hide the following buttons if a request
-            // on the book has been accepted or if the
-            // book is borrowed by some other user
-            if (book.getStatus() == Book.ACCEPTED ||
-                    book.getStatus() == Book.BORROWED) {
+            // Hide the following buttons if the book
+            // is borrowed by some other user
+            if (book.getStatus() == Book.BORROWED) {
                 updateBtn.setVisibility(View.GONE);
                 viewRequests.setVisibility(View.GONE);
                 delete.setVisibility(View.GONE);
@@ -203,7 +208,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("VIEW_BOOK", book);
                 intent.putExtras(bundle);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_VIEW_REQUESTS);
             }
         });
 
@@ -366,34 +371,6 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                         setResult(CommonStatusCodes.SUCCESS);
                         Toast.makeText(EditBookActivity.this, "Book requested", Toast.LENGTH_SHORT).show();
                         finish();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    /**
-     * Depracated
-     * Updates the collection for USERS in the database
-     * @param usersCollectionRef reference to the users collection
-     */
-    public void updateUsersCollection(final CollectionReference usersCollectionRef) {
-        HashMap<String, String> data = new HashMap<>();
-        data.put(Book.OWNER, book.getOwner());
-
-        usersCollectionRef
-                .document(username)
-                .collection(User.REQUESTED_BOOKS)
-                .document(id)
-                .set(data, SetOptions.merge())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -741,6 +718,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 removeImageButton.setEnabled(true);
             }
             addImageButton.setText(R.string.change_picture);
+
         }
     }
 

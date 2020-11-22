@@ -40,9 +40,14 @@ public class RequestList extends ArrayAdapter<Request> {
 
         TextView requester = (TextView) view.findViewById(R.id.view_request_requester);
         TextView date = (TextView) view.findViewById(R.id.view_request_date);
+        TextView isAccepted = (TextView) view.findViewById(R.id.view_request_accepted);
 
         Request request = requests.get(position);
         requester.setText(request.getBorrower());
+
+        if (request.getAccepted()) {
+            isAccepted.setVisibility(View.VISIBLE);
+        }
 
         SimpleDateFormat parser = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.getDefault());
         SimpleDateFormat format = new SimpleDateFormat("EEE MMM d HH:mm zzz yyyy", Locale.getDefault());

@@ -16,17 +16,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activities.ReceiveActivity"></activity>
         <activity
             android:name=".activities.ListsActivity"
             android:label="@string/title_activity_list2"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.LocationActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/API_KEY" />
 
-        <activity android:name=".activities.AcceptingRequestActivity" />
+        <activity android:name=".activities.HandOverActivity" />
         <activity android:name=".activities.ViewBookRequestsActivity" />
         <activity android:name=".activities.OutRequestListActivity" />
         <activity android:name=".activities.EditBookActivity" />

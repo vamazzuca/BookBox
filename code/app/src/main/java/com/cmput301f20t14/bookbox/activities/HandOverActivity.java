@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -21,17 +20,12 @@ import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
-
-import java.util.HashMap;
 
 /**
  * This activity allows the user to set the location where
@@ -41,7 +35,7 @@ import java.util.HashMap;
  * @version 2020.11.19
  */
 
-public class AcceptingRequestActivity extends AppCompatActivity {
+public class HandOverActivity extends AppCompatActivity {
     public static final int REQUEST_SCAN = 529;
     public static final int REQUEST_LOCATION = 5666;
     private TextView requester;
@@ -63,6 +57,7 @@ public class AcceptingRequestActivity extends AppCompatActivity {
     private Image bookImage;
     private String imageUrl;
     private boolean isLocationSet = false;
+    private int finalStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +82,7 @@ public class AcceptingRequestActivity extends AppCompatActivity {
         book = (Book) getIntent().getExtras().getSerializable("BOOK");
 
         // Retrieve the necessary views and buttons
+        TextView header = (TextView) findViewById(R.id.accepting_textview);
         requester = (TextView) findViewById(R.id.accepting_textview_2);
         title = (TextView) findViewById(R.id.accepting_book_title);
         author = (TextView) findViewById(R.id.accepting_book_author);
@@ -95,9 +91,25 @@ public class AcceptingRequestActivity extends AppCompatActivity {
         handOver = (Button) findViewById(R.id.accepting_hand_over);
         scan = (ImageButton) findViewById(R.id.accepting_scan_btn);
 
+        // If the book has status borrowed, this
+        // means that the user wants to return it.
+        // The finalStatus will be AVAILABLE and the
+        // the layout texts have to change.
+        if (book.getStatus() == Book.BORROWED) {
+            finalStatus = Book.AVAILABLE;
+            header.setText(R.string.return_book);
+            handOver.setText(R.string.return_book);
+            setLocation.setText(R.string.see_location);
+
+            CharSequence requesterText = "Return to " + request.getOwner();
+            requester.setText(requesterText);
+        } else {
+            finalStatus = Book.BORROWED;
+            CharSequence requesterText = "From " + request.getBorrower();
+            requester.setText(requesterText);
+        }
+
         // Set the textviews
-        CharSequence requesterText = "From " + request.getBorrower();
-        requester.setText(requesterText);
         title.setText(book.getTitle());
         author.setText(book.getAuthor());
         isbn.setText(book.getIsbn());
@@ -131,10 +143,11 @@ public class AcceptingRequestActivity extends AppCompatActivity {
             });
         }
 
+        // Set location button listener
         setLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AcceptingRequestActivity.this, LocationActivity.class);
+                Intent intent = new Intent(HandOverActivity.this, LocationActivity.class);
                 intent.putExtra(User.USERNAME, username);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("REQUEST", request);
@@ -143,6 +156,7 @@ public class AcceptingRequestActivity extends AppCompatActivity {
             }
         });
 
+        // Set scanning button listener
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -156,9 +170,6 @@ public class AcceptingRequestActivity extends AppCompatActivity {
                 }
             }
         });
-
-        bottomNavigationView();
-
     }
 
     @Override
@@ -177,7 +188,7 @@ public class AcceptingRequestActivity extends AppCompatActivity {
                                 request.setLatLng(latLng);
                                 Toast
                                         .makeText(
-                                                AcceptingRequestActivity.this,
+                                                HandOverActivity.this,
                                                 "Location set",
                                                 Toast.LENGTH_SHORT)
                                         .show();
@@ -189,7 +200,7 @@ public class AcceptingRequestActivity extends AppCompatActivity {
                             public void onFailure(@NonNull Exception e) {
                                 Toast
                                         .makeText(
-                                                AcceptingRequestActivity.this,
+                                                HandOverActivity.this,
                                                 "An error occurred",
                                                 Toast.LENGTH_SHORT)
                                         .show();
@@ -210,29 +221,15 @@ public class AcceptingRequestActivity extends AppCompatActivity {
         database
                 .collection(Book.BOOKS)
                 .document(bookID)
-                .update(Book.STATUS, String.valueOf(Book.ACCEPTED))
+                .update(Book.STATUS, String.valueOf(finalStatus))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        database
-                                .collection(Request.REQUESTS)
-                                .document(requestID)
-                                .update(Request.IS_ACCEPTED, String.valueOf(true))
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Intent intent = new Intent();
-                                        intent.putExtra(Request.ID, requestID);
-                                        setResult(CommonStatusCodes.SUCCESS, intent);
-                                        finish();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                        Intent intent = new Intent();
+                        intent.putExtra(Request.ID, requestID);
+                        intent.putExtra(Book.ID, bookID);
+                        setResult(CommonStatusCodes.SUCCESS, intent);
+                        finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -241,46 +238,5 @@ public class AcceptingRequestActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
-
-    /**
-     * Implementation of the bottom navigation bar for switching to different
-     * activity views, such as home, profile, notifications and lists
-     * References: https://www.youtube.com/watch?v=JjfSjMs0ImQ&feature=youtu.be
-     * @author Alex Mazzuca
-     * @author Carter Sabadash
-     * @version 2020.10.25
-     */
-    private void bottomNavigationView(){
-        //Home Navigation bar implementation
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
-        bottomNavigationView.setSelectedItemId(R.id.home_bottom_nav);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch(item.getItemId()){
-                    case R.id.lists_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ListsActivity.class)
-                                .putExtra(User.USERNAME, username));
-                        overridePendingTransition(0,0);
-                        return true;
-                    case R.id.home_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), HomeActivity.class)
-                                .putExtra(User.USERNAME, username));
-                        return true;
-                    case R.id.notification_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class)
-                                .putExtra(User.USERNAME, username));
-                        overridePendingTransition(0,0);
-                        return true;
-                    case R.id.profile_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class)
-                                .putExtra(User.USERNAME, username));
-                        overridePendingTransition(0,0);
-                        return true;
-                }
-                return false;
-            }
-        });
     }
 }
