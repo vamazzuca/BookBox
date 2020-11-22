@@ -18,26 +18,32 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.fragments.ImageFragment;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
-import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -53,6 +59,7 @@ import java.util.UUID;
 
 public class EditBookActivity extends AppCompatActivity implements ImageFragment.OnFragmentInteractionListener{
     public static final int RESULT_CODE_DELETE = 10;
+    public static final int REQUEST_VIEW_REQUESTS = 99;
     private String username;
     private TextView status;
     private TextView owner;
@@ -60,7 +67,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     private EditText titleEditText;
     private EditText authorEditText;
     private EditText isbnEditText;
-    private Button updateBtn, addImageButton, removeImageButton;;
+    private Button updateBtn;
+    private Button addImageButton;
+    private Button removeImageButton;
     private Button viewRequests;
     private Button delete;
     private Button requestBook;
@@ -72,6 +81,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     private StorageReference storageReference;
     private Image bookImage;
     private String imageUrl;
+    private boolean isRequested;
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        recreate();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +100,18 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
         // Get original book object passed through bundle
         final Bundle bundle = getIntent().getExtras();
-        book = (Book) bundle.get(HomeActivity.VIEW_BOOK);
+        book = (Book) bundle.get("VIEW_BOOK");
+
+        // Set up firestore database
+        database = FirebaseFirestore.getInstance();
+
+        // Get storage reference
+        storageReference = FirebaseStorage.getInstance().getReference();
+
+        // Get reference to books, users and requests collections
+        final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
+        final CollectionReference usersCollectionRef = database.collection(User.USERS);
+        final CollectionReference requestsCollectionRef = database.collection(Request.REQUESTS);
 
         // Retrieve book image view
         bookImageView = findViewById(R.id.book_picture_imageView);
@@ -113,15 +140,40 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         delete = (Button) findViewById(R.id.edit_book_delete_button);
         requestBook = (Button) findViewById(R.id.edit_book_request_book);
 
-        // Set up firestore database
-        database = FirebaseFirestore.getInstance();
+        // Get book id
+        getBookId(usersCollectionRef);
 
-        // Get storage reference
-        storageReference = FirebaseStorage.getInstance().getReference();
+        if (book.getOwner().equals(username)) {
+            requestBook.setVisibility(View.GONE);      // user cannot request own book
 
-        // Get reference to books and users collections
-        final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
-        final CollectionReference usersCollectionRef = database.collection(User.USERS);
+            // Hide the following buttons if the book
+            // is borrowed by some other user
+            if (book.getStatus() == Book.BORROWED) {
+                updateBtn.setVisibility(View.GONE);
+                viewRequests.setVisibility(View.GONE);
+                delete.setVisibility(View.GONE);
+                addImageButton.setVisibility(View.GONE);
+                removeImageButton.setVisibility(View.GONE);
+                bookImageView.setEnabled(false);
+
+                titleEditText.setEnabled(false);
+                authorEditText.setEnabled(false);
+                isbnEditText.setEnabled(false);
+            }
+        } else {
+            // else, book is not owned by the user
+            // So, no changes can be made to the book
+            updateBtn.setVisibility(View.GONE);
+            viewRequests.setVisibility(View.GONE);
+            delete.setVisibility(View.GONE);
+            addImageButton.setVisibility(View.GONE);
+            removeImageButton.setVisibility(View.GONE);
+            bookImageView.setEnabled(false);
+
+            titleEditText.setEnabled(false);
+            authorEditText.setEnabled(false);
+            isbnEditText.setEnabled(false);
+        }
 
         // set info in TextViews and EditText views
         titleEditText.setText(book.getTitle());
@@ -131,28 +183,67 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         CharSequence statusText = "Status: " + book.getStatusString();
         status.setText(statusText);
 
-        CharSequence borrowerText = "Borrower: ";
+        CharSequence borrowerText = null;
         if (book.getLentTo().isEmpty()) {
-            borrowerText = borrowerText + "None";
+            borrowerText = "Borrower: " + "None";
         } else {
-            borrowerText = borrowerText + book.getLentTo();
+            if (book.getStatus() == Book.BORROWED) {
+                borrowerText = "Borrower: " + book.getLentTo();
+            } else {
+                borrowerText = "Return unconfirmed (held by " + book.getLentTo() + ")";
+            }
         }
         borrower.setText(borrowerText);
 
         CharSequence ownerText = "Owner: " + book.getOwner();
         owner.setText(ownerText);
 
-        // Get book id
-        getBookId(usersCollectionRef);
-
         // Setting up the bottom nav bar
         bottomNavigationView();
+
+        // Set up the "View Request" button
+        viewRequests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start view book requests activity
+                Intent intent = new Intent(EditBookActivity.this, ViewBookRequestsActivity.class);
+                intent.putExtra(User.USERNAME, username);
+                intent.putExtra(Book.ID, id);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("VIEW_BOOK", book);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, REQUEST_VIEW_REQUESTS);
+            }
+        });
+
+        // Set up the "Request" button
+        requestBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, String> requestData = new HashMap<>();
+                requestData.put(Request.OWNER, book.getOwner());
+                requestData.put(Request.BORROWER, username);
+                requestData.put(Request.BOOK, id);
+                requestData.put(Request.IS_ACCEPTED, Boolean.valueOf(false).toString());
+                requestData.put(Request.LAT_LNG, "");
+
+                Date today = Calendar.getInstance().getTime();
+                requestData.put(Request.DATE, today.toString());
+
+                updateRequestsCollection(
+                        requestsCollectionRef,
+                        booksCollectionRef,
+                        usersCollectionRef,
+                        requestData
+                );
+            }
+        });
 
         // Set up the "Update" button
         setUpdateBtn(booksCollectionRef);
 
         // Set up the "Delete" button
-        setDeleteBtn(booksCollectionRef, usersCollectionRef);
+        setDeleteBtn(booksCollectionRef, usersCollectionRef, requestsCollectionRef);
 
         //Get Image URL
         bookImage.setUrl(book.getPhotoUrl());
@@ -197,14 +288,102 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 new ImageFragment().show(getSupportFragmentManager(), "Delete Image");
             }
         });
+    }
 
+    /**
+     * Check if book has been requested by user already
+     * @param  requestsCollectionRef reference to the users collection
+     */
+    public void checkRequestedByUser(final CollectionReference requestsCollectionRef) {
+        requestsCollectionRef
+                .whereEqualTo(Request.BOOK, id)
+                .whereEqualTo(Request.BORROWER, username)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                if (doc.exists()) {
+                                    requestBook.setEnabled(false);
+                                    requestBook.setText(R.string.requested);
+                                }
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /**
+     * Updates the collection for REQUESTS in the database
+     * @param requestsCollectionRef reference to the requests collection
+     * @param booksCollectionRef    reference to the books collection
+     * @param usersCollectionRef    reference to the users collection
+     * @param requestData           HashMap containing the fields for the request document
+     */
+    public void updateRequestsCollection(final CollectionReference requestsCollectionRef,
+                                         final CollectionReference booksCollectionRef,
+                                         final CollectionReference usersCollectionRef,
+                                         HashMap<String, String> requestData) {
+        requestsCollectionRef
+                .add(requestData)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        updateBooksCollection(
+                                booksCollectionRef,
+                                usersCollectionRef
+                        );
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /**
+     * Updates the collection for BOOKS in the database
+     * @param booksCollectionRef reference to the books collection
+     * @param usersCollectionRef reference to the users collection
+     */
+    public void updateBooksCollection(final CollectionReference booksCollectionRef,
+                                      final CollectionReference usersCollectionRef) {
+        booksCollectionRef
+                .document(id)
+                .update(Book.STATUS, String.valueOf(Book.REQUESTED))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        setResult(CommonStatusCodes.SUCCESS);
+                        Toast.makeText(EditBookActivity.this, "Book requested", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**
      * This method sets up the listener for the "Delete" button of the activity
-     * @param booksCollectionRef A reference to the books collection
+     * @param booksCollectionRef    A reference to the books collection
+     * @param usersCollectionRef    A reference to the users collection
+     * @param requestsCollectionRef A reference to the requests collection
      */
-    public  void setDeleteBtn(final CollectionReference booksCollectionRef, final CollectionReference usersCollectionRef) {
+    public  void setDeleteBtn(final CollectionReference booksCollectionRef, final CollectionReference usersCollectionRef,
+                              final CollectionReference requestsCollectionRef) {
         // Set the onClick listener of the "Delete" button
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -215,7 +394,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                deleteBook(booksCollectionRef, usersCollectionRef);
+                                deleteBook(booksCollectionRef, usersCollectionRef, requestsCollectionRef);
                             }
                         })
                         .create();
@@ -273,9 +452,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
     /**
      * This method deletes a book from the database
-     * @param booksCollectionRef A reference to the books collection
+     * @param booksCollectionRef    A reference to the books collection
+     * @param usersCollectionRef    A reference to the users collection
+     * @param requestsCollectionRef A reference to the requests collection
      */
-    public void deleteBook(final CollectionReference booksCollectionRef, final CollectionReference usersCollectionRef) {
+    public void deleteBook(final CollectionReference booksCollectionRef, final CollectionReference usersCollectionRef,
+                           final CollectionReference requestsCollectionRef) {
+        // First delete the book from the user's owned_book colllection
         usersCollectionRef
                 .document(username)
                 .collection(User.OWNED_BOOKS)
@@ -284,14 +467,50 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        // Then, delete the books from the books collection
                         booksCollectionRef
                                 .document(id)
                                 .delete()
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        setResult(RESULT_CODE_DELETE);
-                                        finish();
+                                        // Finally, delete the requests concerning the book
+                                        requestsCollectionRef
+                                                .whereEqualTo(Book.ID, id)
+                                                .get()
+                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        if (task.isSuccessful()) {
+                                                            for (QueryDocumentSnapshot queryDoc : task.getResult()) {
+                                                                String requestId = queryDoc.getId();
+                                                                requestsCollectionRef
+                                                                        .document(requestId)
+                                                                        .delete()
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+
+                                                                            }
+                                                                        });
+                                                            }
+                                                            setResult(RESULT_CODE_DELETE);
+                                                            finish();
+                                                        }
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -314,9 +533,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
      * Gets the owned book id from the database
      * @param usersCollectionRef A reference to the books collection
      */
-    public void getBookId(CollectionReference usersCollectionRef) {
+    public void getBookId(final CollectionReference usersCollectionRef) {
         usersCollectionRef
-                .document(username)
+                .document(book.getOwner())
                 .collection(User.OWNED_BOOKS)
                 .document(book.getIsbn())
                 .get()
@@ -325,8 +544,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             DocumentSnapshot doc = task.getResult();
-                            if (doc != null) {
+                            if (doc.getData() != null) {
                                 id = doc.getData().get(Book.ID).toString();
+
+                                // Check if book has been requested by user already
+                                // If so, the request button should be disabled
+                                // and displayed "Requested"
+                                checkRequestedByUser(database.collection(Request.REQUESTS));
                             }
                         }
                     }
@@ -496,8 +720,11 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             bookImageView.setImageURI(imageUri);
             bookImage.setUri(imageUri);
             book.setPhotoUrl(imageUrl);
-            removeImageButton.setEnabled(true);
+            if (book.getOwner().equals(username)) {
+                removeImageButton.setEnabled(true);
+            }
             addImageButton.setText(R.string.change_picture);
+
         }
     }
 

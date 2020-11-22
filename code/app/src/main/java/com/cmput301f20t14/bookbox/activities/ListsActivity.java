@@ -1,98 +1,70 @@
 package com.cmput301f20t14.bookbox.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.adapters.ListsPagerAdapter;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.cmput301f20t14.bookbox.fragments.AcceptedFragment;
+import com.cmput301f20t14.bookbox.fragments.BorrowedFragment;
+import com.cmput301f20t14.bookbox.fragments.OutRequestFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.tabs.TabLayout;
 
-import java.util.ArrayList;
-import java.util.List;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
- * This activity displays the options to select and view the
- * different lists. The lists include, outgoing requests,
- * accepted requests and currently borrowed books.
- * @author Alex Mazzuca
- * @author Carter Sabadash
- * @author Olivier Vadiavaloo
- * @version 2020.10.25
- * @see HomeActivity
- * @see NotificationsActivity
- * @see ProfileActivity
+ * This activity allows the user to interact with three
+ * lists: Requested Books, Accepted books that he/she
+ * has requested and Borrowed books. Note that this is
+ * a Tabbed activity.
+ * @author  Olivier Vadiavaloo
+ * @version 2020.11.21
  */
+
 public class ListsActivity extends AppCompatActivity {
-    public static final String OUTGOING_REQUESTS_LIST = "Outgoing requests";
-    public static final String ACCEPTED_REQUESTS_LIST = "Accepted requests";
-    public static final String BORROWED_LIST = "Borrowed books";
+    private ListsPagerAdapter listsPagerAdapter;
+    private ViewPager viewPager;
     private String username;
-    private ArrayAdapter<String> listsAdapter;
-    private ArrayList<String> lists;
-    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lists);
 
-        // get the username from whichever activity we came from
-        // this is necessary to access firebase
-        username = getIntent().getExtras().getString(User.USERNAME);
+        username = getIntent().getStringExtra(User.USERNAME);
 
-        // find ListView
-        listView = (ListView) findViewById(R.id.lists_listView);
+        listsPagerAdapter = new ListsPagerAdapter(getSupportFragmentManager(),
+                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
-        lists = new ArrayList<>();
-        lists.add(OUTGOING_REQUESTS_LIST);
-        lists.add(ACCEPTED_REQUESTS_LIST);
-        lists.add(BORROWED_LIST);
+        viewPager = findViewById(R.id.view_pager);
+        setUpViewPager(viewPager);
 
-        listsAdapter = new ArrayAdapter<>(this, R.layout.lists_content, lists);
-        listView.setAdapter(listsAdapter);
-
-        setListViewListener();
         bottomNavigationView();
+        TabLayout tabLayout = findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
-    /**
-     * Sets up the OnItemClickListener of the listView
-     * whose rows are:
-     * Outgoing requests,
-     * Accepted requests and
-     * Borrowed books
-     * @author  Olivier Vadiavaloo
-     * @version 2020.11.04
-     */
-    public void setListViewListener() {
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String list = listsAdapter.getItem(position);
-                if (list.matches(OUTGOING_REQUESTS_LIST)) {
-                    Intent intent = new Intent(ListsActivity.this, OutRequestListActivity.class);
-                    intent.putExtra(User.USERNAME, username);
-                    startActivity(intent);
-                }
-            }
-        });
+    private void setUpViewPager(ViewPager viewPager) {
+        ListsPagerAdapter adapter = new ListsPagerAdapter(getSupportFragmentManager(),
+                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        adapter.addFragment(OutRequestFragment.newInstance(username), "Requested");
+        adapter.addFragment(AcceptedFragment.newInstance(username), "Accepted");
+        adapter.addFragment(BorrowedFragment.newInstance(username), "Borrowed");
+        viewPager.setAdapter(adapter);
     }
-
 
     /**
      * Implementation of the bottom navigation bar for switching to different
      * activity views, such as home, profile, notifications and lists
      * References: https://www.youtube.com/watch?v=JjfSjMs0ImQ&feature=youtu.be
-     * @author Alex Mazzuca, Carter Sabadash
+     * @author Alex Mazzuca
+     * @author Carter Sabadash
      * @version 2020.10.25
      */
     private void bottomNavigationView(){
@@ -111,7 +83,7 @@ public class ListsActivity extends AppCompatActivity {
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.notification_bottom_nav:
-                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class )
+                        startActivity(new Intent(getApplicationContext(), NotificationsActivity.class)
                                 .putExtra(User.USERNAME, username));
                         overridePendingTransition(0,0);
                         return true;
@@ -125,5 +97,4 @@ public class ListsActivity extends AppCompatActivity {
             }
         });
     }
-
 }

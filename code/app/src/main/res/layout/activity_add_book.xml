@@ -52,17 +52,23 @@
 
                     <Button
                         android:id="@+id/add_book_picture_button"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@color/colorBlueMessage"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:text="@string/add_picture" />
 
                     <Button
                         android:id="@+id/remove_book_picture_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="8dp"
+                        android:padding="8dp"
                         android:enabled="false"
+                        android:textColor="@color/colorBlueMessage"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:text="@string/remove_picture" />
                 </LinearLayout>
             </LinearLayout>
@@ -100,6 +106,24 @@
                 android:inputType="number"
                 android:textSize="20sp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/or"
+                android:textSize="15sp"
+                android:textColor="@color/colorDarkBgd"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/add_book_scan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="@android:color/transparent"
+                android:contentDescription="@string/scan_book"
+                android:src="@drawable/ic_scanner_60dp_dark" />
+
             <Button
                 android:id="@+id/add_book_confirm_button"
                 android:layout_width="335dp"
@@ -107,7 +131,8 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="8dp"
                 android:text="@string/add"
-                android:textColor="@color/colorDarkText"
+                android:textColor="@color/colorWhiteBgd"
+                android:background="@color/colorPurpleTitle"
                 android:textSize="20sp" />
 
             <TextView
@@ -129,8 +154,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
-        app:itemIconTint="@color/colorDarkBgd"
-        app:itemTextColor="@color/colorDarkText"
+        app:itemIconTint="@drawable/bottom_nav_bar_selector"
+        app:itemTextColor="@drawable/bottom_nav_bar_selector"
         app:itemIconSize="50sp"
         android:background="@color/colorWhiteBgd"
         app:menu="@menu/bottom_nav_bar" />
