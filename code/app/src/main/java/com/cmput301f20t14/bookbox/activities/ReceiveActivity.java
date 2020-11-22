@@ -89,7 +89,7 @@ public class ReceiveActivity extends AppCompatActivity {
         // means that the user wants to receive a return.
         // The finalStatus will be AVAILABLE and the
         // the layout texts have to change.
-        if (book.getStatus() == Book.BORROWED) {
+        if (!book.getLentTo().isEmpty()) {
             finalStatus = Book.AVAILABLE;
             header.setText(R.string.return_book);
             handOver.setText(R.string.return_book);

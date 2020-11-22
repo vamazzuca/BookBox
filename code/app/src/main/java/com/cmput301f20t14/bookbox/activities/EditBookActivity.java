@@ -183,11 +183,15 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         CharSequence statusText = "Status: " + book.getStatusString();
         status.setText(statusText);
 
-        CharSequence borrowerText = "Borrower: ";
+        CharSequence borrowerText = null;
         if (book.getLentTo().isEmpty()) {
-            borrowerText = borrowerText + "None";
+            borrowerText = "Borrower: " + "None";
         } else {
-            borrowerText = borrowerText + book.getLentTo();
+            if (book.getStatus() == Book.BORROWED) {
+                borrowerText = "Borrower: " + book.getLentTo();
+            } else {
+                borrowerText = "Return unconfirmed (held by " + book.getLentTo() + ")";
+            }
         }
         borrower.setText(borrowerText);
 

@@ -113,14 +113,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/edit_book_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:text="@string/placeholder"
                     android:textColor="@color/colorBlueMessage"
                     android:layout_gravity="center_horizontal" />
@@ -129,8 +130,6 @@
                     android:id="@+id/edit_book_Borrower"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
                     android:layout_gravity="center_horizontal"
                     android:clickable="true"
                     android:text="@string/placeholder"
@@ -141,7 +140,6 @@
                     android:id="@+id/edit_book_Owner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/placeholder"
                     android:textColor="@color/colorBlueMessage" />

@@ -1,9 +1,7 @@
 package com.cmput301f20t14.bookbox.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -13,10 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.cmput301f20t14.bookbox.R;
-import com.cmput301f20t14.bookbox.activities.HomeActivity;
-import com.cmput301f20t14.bookbox.activities.ListsActivity;
-import com.cmput301f20t14.bookbox.activities.NotificationsActivity;
-import com.cmput301f20t14.bookbox.activities.ProfileActivity;
 import com.cmput301f20t14.bookbox.adapters.BookList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Request;
@@ -24,7 +18,6 @@ import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -65,11 +58,11 @@ public class OutRequestFragment extends Fragment {
         database = FirebaseFirestore.getInstance();
 
         // find listview
-        listView = (ListView) view.findViewById(R.id.outgoing_listview);
+        listView = (ListView) view.findViewById(R.id.fragment_listview);
 
         // initialize adapter and books
         books = new ArrayList<>();
-        listAdapter = new BookList(getContext(), books);
+        listAdapter = new BookList(getContext(), books, true);
 
         setUpList();
         listView.setAdapter(listAdapter);
@@ -87,6 +80,7 @@ public class OutRequestFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
+                            books.clear();
                             for (QueryDocumentSnapshot doc : task.getResult()) {
                                 getRequestedBook(doc.getData().get(Request.BOOK).toString());
                             }

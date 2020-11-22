@@ -114,7 +114,7 @@ public class HomeActivity extends AppCompatActivity {
         books = new ArrayList<>();
 
         // Initialize book adapter
-        bookAdapter = new BookList(HomeActivity.this, books);
+        bookAdapter = new BookList(HomeActivity.this, books, true);
 
         // Set adapter
         bookList.setAdapter(bookAdapter);

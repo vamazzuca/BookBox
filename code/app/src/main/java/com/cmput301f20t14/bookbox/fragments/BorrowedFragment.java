@@ -3,11 +3,11 @@ package com.cmput301f20t14.bookbox.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,10 +15,6 @@ import androidx.fragment.app.Fragment;
 
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.activities.HandOverActivity;
-import com.cmput301f20t14.bookbox.activities.HomeActivity;
-import com.cmput301f20t14.bookbox.activities.ListsActivity;
-import com.cmput301f20t14.bookbox.activities.NotificationsActivity;
-import com.cmput301f20t14.bookbox.activities.ProfileActivity;
 import com.cmput301f20t14.bookbox.adapters.BookList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Request;
@@ -27,8 +23,6 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -73,15 +67,17 @@ public class BorrowedFragment extends Fragment {
         database = FirebaseFirestore.getInstance();
 
         // find listview
-        listView = (ListView) view.findViewById(R.id.outgoing_listview);
+        listView = (ListView) view.findViewById(R.id.fragment_listview);
 
         // initialize adapter and books
         books = new ArrayList<>();
-        listAdapter = new BookList(getContext(), books);
+        listAdapter = new BookList(getContext(), books, false);
+
+        // initialize HashMaps
+        bookIdHash = new HashMap<>();
 
         setUpList();
         listView.setAdapter(listAdapter);
-        listView.findViewById(R.id.list_content_status).setVisibility(GONE);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -105,7 +101,7 @@ public class BorrowedFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot doc : task.getResult()) {
-                                String requestID = doc.getData().get(Request.ID).toString();
+                                String requestID = doc.getId();
                                 String owner = doc.getData().get(Request.OWNER).toString();
                                 String borrower = doc.getData().get(Request.BORROWER).toString();
                                 String isAccepted = doc.getData().get(Request.IS_ACCEPTED).toString();
@@ -154,8 +150,9 @@ public class BorrowedFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
+                            books.clear();
                             for (QueryDocumentSnapshot doc : task.getResult()) {
-                                String id = doc.getData().get(Book.ID).toString();
+                                String id = doc.getId();
                                 String title = doc.getData().get(Book.TITLE).toString();
                                 String author = doc.getData().get(Book.AUTHOR).toString();
                                 String isbn = doc.getData().get(Book.ISBN).toString();

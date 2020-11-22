@@ -29,7 +29,6 @@
 
         <activity android:name=".activities.HandOverActivity" />
         <activity android:name=".activities.ViewBookRequestsActivity" />
-        <activity android:name=".activities.OutRequestListActivity" />
         <activity android:name=".activities.EditBookActivity" />
         <activity android:name=".activities.NotificationsActivity" />
         <activity android:name=".activities.ProfileActivity" />

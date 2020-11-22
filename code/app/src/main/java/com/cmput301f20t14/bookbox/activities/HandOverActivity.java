@@ -62,7 +62,7 @@ public class HandOverActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_accepting_request);
+        setContentView(R.layout.activity_hand_over);
 
         // Initialise database
         database = FirebaseFirestore.getInstance();

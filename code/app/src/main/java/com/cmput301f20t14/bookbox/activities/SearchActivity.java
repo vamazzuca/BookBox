@@ -72,7 +72,7 @@ public class SearchActivity extends AppCompatActivity {
 
         searchResults = new ArrayList<>();
 
-        searchAdapter = new BookList(this, searchResults);
+        searchAdapter = new BookList(this, searchResults, true);
 
         searchList.setAdapter(searchAdapter);
 
