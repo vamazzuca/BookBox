@@ -27,7 +27,8 @@ import java.util.ArrayList;
  * a listview with each row having the layout described in
  * owned_book_content.xml
  * @author Olivier Vadiavaloo
- * @version 2020.11.04
+ * @author Alex Mazzuca
+ * @version 2020.11.22
  */
 
 public class BookList extends ArrayAdapter<Book> {
@@ -55,7 +56,6 @@ public class BookList extends ArrayAdapter<Book> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        // view must be null for now because it bugs out the images in list view if set to convertView
         View view = convertView;
         storageReference = FirebaseStorage.getInstance().getReference();
 

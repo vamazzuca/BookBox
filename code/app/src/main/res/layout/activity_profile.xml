@@ -59,6 +59,14 @@
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:text="@string/remove_picture" />
                 </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/profile_search_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/search"
+                    android:src="@drawable/ic_search" />
             </LinearLayout>
 
             <EditText

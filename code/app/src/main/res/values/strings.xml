@@ -71,6 +71,7 @@
     <string name="bookbox_item">Bookbox Item</string>
     <string name="request">Request</string>
     <string name="enter_text">Search bookbox</string>
+    <string name="enter_text_profile">Search Users</string>
     <string name="results">Results</string>
 
     <string-array name="filter_statuses">

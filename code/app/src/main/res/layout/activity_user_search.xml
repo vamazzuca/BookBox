@@ -1,9 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.UserSearchActivity">
+    android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/search_linear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/search_Text"
+            android:layout_width="200dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:hint="@string/enter_text_profile"
+            android:inputType="textPersonName" />
+
+        <Button
+            android:id="@+id/search_button_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorWhiteBgd"
+            android:layout_marginStart="16dp"
+            android:background="@color/colorPurpleTitle"
+            android:layout_gravity="center_vertical"
+            android:text="@string/search" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/search_results_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_linear"
+        android:text="@string/results"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="8dp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:textColor="@color/colorDarkText"
+        android:textSize="35sp" />
+
+    <ListView
+        android:id="@+id/search_list__user_view"
+        android:layout_width="wrap_content"
+        android:layout_height="400dp"
+        android:layout_above="@id/bottom_nav_bar"
+        android:layout_below="@+id/search_results_textview" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        app:itemIconTint="@drawable/bottom_nav_bar_selector"
+        app:itemTextColor="@drawable/bottom_nav_bar_selector"
+        app:itemIconSize="50sp"
+        android:background="@color/colorWhiteBgd"
+        app:menu="@menu/bottom_nav_bar" />
+
+</RelativeLayout>
