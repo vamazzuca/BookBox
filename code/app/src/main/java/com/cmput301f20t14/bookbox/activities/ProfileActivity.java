@@ -23,6 +23,7 @@ import com.cmput301f20t14.bookbox.fragments.ImageFragment;
 import com.cmput301f20t14.bookbox.fragments.UpdateEmailFragment;
 import com.cmput301f20t14.bookbox.fragments.UpdatePasswordFragment;
 import com.cmput301f20t14.bookbox.fragments.UpdatePhoneFragment;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

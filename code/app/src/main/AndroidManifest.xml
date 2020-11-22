@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ReceiveActivity"></activity>
+        <activity android:name=".activities.UserSearchActivity"></activity>
+        <activity android:name=".activities.ReceiveActivity" />
         <activity
             android:name=".activities.ListsActivity"
             android:label="@string/title_activity_list2"
@@ -52,8 +53,10 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <!-- Set a default notification icon; currently just the letter B
-        https://stackoverflow.com/questions/5350624/set-icon-for-android-application -->
+        <!--
+ Set a default notification icon; currently just the letter B
+        https://stackoverflow.com/questions/5350624/set-icon-for-android-application
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notification_icon" />
