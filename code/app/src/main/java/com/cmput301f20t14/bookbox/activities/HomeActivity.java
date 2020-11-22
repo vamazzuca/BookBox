@@ -52,9 +52,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.database.collection.LLRBEmptyNode;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -116,7 +114,7 @@ public class HomeActivity extends AppCompatActivity {
         books = new ArrayList<>();
 
         // Initialize book adapter
-        bookAdapter = new BookList(HomeActivity.this, books);
+        bookAdapter = new BookList(HomeActivity.this, books, true);
 
         // Set adapter
         bookList.setAdapter(bookAdapter);
@@ -193,7 +191,8 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomeActivity.this, "An error occurred 3", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
                     }
                 });
     }
@@ -312,7 +311,7 @@ public class HomeActivity extends AppCompatActivity {
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(HomeActivity.this, "An error occurred 2", Toast.LENGTH_SHORT).show();
                                 }
                             });
                 } else if (position == 1) {
@@ -428,7 +427,7 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(HomeActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomeActivity.this, "An error occurred 1", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

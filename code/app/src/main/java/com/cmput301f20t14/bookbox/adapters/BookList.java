@@ -11,19 +11,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -39,6 +34,7 @@ public class BookList extends ArrayAdapter<Book> {
     private ArrayList<Book> books;
     private Context context;
     private StorageReference storageReference;
+    private Boolean showStatus;
 
     private static class ViewHolder {
         TextView owner;
@@ -49,10 +45,11 @@ public class BookList extends ArrayAdapter<Book> {
         ImageView bookImageView;
     }
 
-    public BookList(Context context, ArrayList<Book> books) {
+    public BookList(Context context, ArrayList<Book> books, Boolean showStatus) {
         super(context, 0, books);
         this.books = books;
         this.context = context;
+        this.showStatus = showStatus;
     }
 
     @NonNull
@@ -87,11 +84,15 @@ public class BookList extends ArrayAdapter<Book> {
 
         CharSequence statusText = book.getStatusString();
 
-        if (book.getStatus() == Book.BORROWED) {
+        if (book.getStatus() == Book.BORROWED && !book.getLentTo().isEmpty()) {
             statusText = statusText + " (" + book.getLentTo() + ")";
         }
 
         holder.status.setText(statusText);
+
+        if (!showStatus) {
+            holder.status.setVisibility(View.GONE);
+        }
 
         downloadImage(holder.bookImageView, book);
         return view;

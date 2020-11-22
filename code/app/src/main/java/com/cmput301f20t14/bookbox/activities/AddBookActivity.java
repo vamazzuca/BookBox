@@ -8,10 +8,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cmput301f20t14.bookbox.FetchBook;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.fragments.ImageFragment;
 import com.cmput301f20t14.bookbox.entities.Book;
@@ -47,6 +49,8 @@ import java.util.UUID;
  * @version 2020.11.04
  */
 public class AddBookActivity extends AppCompatActivity implements ImageFragment.OnFragmentInteractionListener {
+    private static final int REQUEST_SCAN = 1234;
+    private static final int REQUEST_IMAGE = 1;
     private String username;
     private EditText titleEditText;
     private EditText authorEditText;
@@ -59,6 +63,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
     private StorageReference storageReference;
     private Image bookImage;
     private String imageUrl;
+    private ImageButton scan;
 
 
     @Override
@@ -83,6 +88,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         // Retrieve book add button and remove button
         addImageButton = findViewById(R.id.add_book_picture_button);
         removeImageButton = findViewById(R.id.remove_book_picture_button);
+        scan = findViewById(R.id.add_book_scan);
 
         // Retrieve the EditText views
         titleEditText = (EditText) findViewById(R.id.Title_editText);
@@ -174,7 +180,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
             @Override
             public void onClick(View v) {
                 Intent selectImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(selectImageIntent, 1);
+                startActivityForResult(selectImageIntent, REQUEST_IMAGE);
             }
 
         });
@@ -195,7 +201,15 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
             }
         });
 
-
+        // Set scan button listener
+        scan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AddBookActivity.this, ScanningActivity.class);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_SCAN);
+            }
+        });
     }
 
     private void addBookToDb(final CollectionReference ownedBooksCollectionRef, final Book book) {
@@ -331,13 +345,18 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
+        if (requestCode == REQUEST_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null){
             imageUri = data.getData();
             addImageToStorage(imageUri);
             bookImageView.setImageURI(imageUri);
             bookImage.setUri(imageUri);
             removeImageButton.setEnabled(true);
             addImageButton.setText("Change Picture");
+        } else if (requestCode == REQUEST_SCAN && resultCode == CommonStatusCodes.SUCCESS
+                    && data != null) {
+            String barcode = data.getStringExtra(HomeActivity.BARCODE);
+            isbnEditText.setText(barcode);
+            new FetchBook(titleEditText, authorEditText).execute(barcode);
         }
     }
 
@@ -350,7 +369,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
     @Override
     public void onUpdateImage(){
         Intent selectImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(selectImageIntent, 1);
+        startActivityForResult(selectImageIntent, REQUEST_IMAGE);
     }
 
     /**
