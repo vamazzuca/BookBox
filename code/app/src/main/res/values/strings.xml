@@ -86,6 +86,15 @@
     <string name="no_results">No results found</string>
     <string name="change_picture">Change picture</string>
     <string name="delete_pic_dialog_text">Are you sure you want to remove this picture?</string>
+    <string name="fragment_update_phone_new_phone_number">New Phone Number</string>
+    <string name="fragment_update_email_enter_email">Enter email</string>
+    <string name="fragment_update_password_new_password">New Password</string>
+    <string name="fragment_update_password_confirm_password">Confirm Password</string>
+    <string name="fragment_update_phone_title">Update Phone</string>
+    <string name="cancel">Cancel</string>
+    <string name="fragment_update_email_title">Update Email</string>
+    <string name="fragment_update_password_title">Update Password</string>
+    <string name="logout">Logout</string>
     <string name="requests">Requests</string>
     <string name="requested_by">Requested by:</string>
     <string name="data">Date:</string>
