@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
  */
 public class UserSearchActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_FROM_SEARCH = 555;
+    public static final String VIEW_USER = "VIEW_USER";
     private String username;
     private FirebaseFirestore database;
     private ListView searchList;
@@ -79,6 +81,20 @@ public class UserSearchActivity extends AppCompatActivity {
                 closeKeyboard();
             }
         });
+
+        // Set the OnItemClick listener of the results ListView
+        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User user = searchAdapter.getItem(position);
+                //Intent intent = new Intent(UserSearchActivity.this, EditBookActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(VIEW_USER, user);
+                //intent.putExtras(bundle);
+                //intent.putExtra(User.USERNAME, username);
+                //startActivityForResult(intent, REQUEST_CODE_FROM_SEARCH);
+            }
+        });
     }
 
     /**
@@ -98,7 +114,7 @@ public class UserSearchActivity extends AppCompatActivity {
 
     public void executeSearch(){
         keyword = searchField.getText().toString().toLowerCase();
-        search(User.USERNAME);
+        search(keyword);
     }
 
     /**
@@ -109,20 +125,22 @@ public class UserSearchActivity extends AppCompatActivity {
      * @author Alex Mazzuca
      * @version 2020.11.05
      */
-    public void search(String username){
+    public void search(final String username){
         CollectionReference collectionRef = database.collection(User.USERS);
+
         collectionRef
-                .whereEqualTo(User.USERNAME, username)
+                .whereEqualTo("USERNAME", true)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
-                            for (QueryDocumentSnapshot queryDoc : task.getResult()) {
-                                User user = getUserFromDb(queryDoc);
-                                String UsernameDB = user.getUsername().toLowerCase();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                User userDb = getFromDb(document);
+
+                                String UsernameDB = userDb.getUsername().toLowerCase();
                                 if (UsernameDB.contains(keyword)) {
-                                    searchResults.add(user);
+                                    searchResults.add(userDb);
                                 }
                             }
                             searchAdapter.notifyDataSetChanged();
@@ -146,28 +164,23 @@ public class UserSearchActivity extends AppCompatActivity {
 
     }
 
-    public User getUserFromDb(QueryDocumentSnapshot queryDoc) {
-        String username = queryDoc.getData().get(User.USERNAME).toString();
-        String email = queryDoc.getData().get(User.EMAIL).toString();
-        String phone = queryDoc.getData().get(User.PHONE).toString();
-        String imageUrl = queryDoc.getData().get(User.IMAGE_URL).toString();
+    public User getFromDb(QueryDocumentSnapshot documentSnapshot){
+        String username = documentSnapshot.getData().get(User.USERNAME).toString();
+        String phone = documentSnapshot.getData().get(User.PHONE).toString();
+        String image_Url = documentSnapshot.getData().get(User.IMAGE_URL).toString();
+        String email = documentSnapshot.getData().get(User.EMAIL).toString();
 
-        return new User(
-                username,
-                email,
-                phone,
-                imageUrl
-        );
+        return new User(username, email, phone, image_Url);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_FROM_SEARCH && resultCode == CommonStatusCodes.SUCCESS) {
-            searchResults.clear();
-            executeSearch();
-        }
-    }
+    //@Override
+   // protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+     //   super.onActivityResult(requestCode, resultCode, data);
+      //  if (requestCode == REQUEST_CODE_FROM_SEARCH && resultCode == CommonStatusCodes.SUCCESS) {
+     //       searchResults.clear();
+     //       executeSearch();
+     //   }
+  //  }
 
 
 

@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -67,6 +68,7 @@ public class ProfileActivity
                     UpdatePhoneFragment.OnFragmentInteractionListener,
                     UpdateEmailFragment.OnFragmentInteractionListener,
                     UpdatePasswordFragment.OnFragmentInteractionListener{
+    public static final int REQUEST_CODE_SEARCHING = 400;
     private String username;
     private FirebaseFirestore database;
     private EditText usernameEditText;
@@ -116,6 +118,7 @@ public class ProfileActivity
         removeImageButton = findViewById(R.id.delete_picture_button);
 
         bottomNavigationView();
+        setUpSearchingButton();
 
         // initialize firebaseAuth
         mAuth = FirebaseAuth.getInstance();
@@ -402,6 +405,26 @@ public class ProfileActivity
                         Toast.makeText(ProfileActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    /**
+     * Setting up the onClick listener for the search button
+     * Listener launches the search activity to find available books
+     * based on if a keyword is in the book description
+     * @author Nicholas DeMarco
+     * @author ALex Mazzuca
+     * @version 2020.11.04
+     */
+    private void setUpSearchingButton() {
+        ImageButton search = findViewById(R.id.profile_search_button);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, UserSearchActivity.class);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_SEARCHING);
+            }
+        });
     }
 
 
