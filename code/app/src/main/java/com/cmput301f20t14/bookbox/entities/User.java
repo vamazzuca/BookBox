@@ -64,6 +64,7 @@ public class User {
         this.email = email;
     }
 
+
     /**
      * This method is called when there is a need to update the username, password
      * and phone number of the user. It is then unnecessary to call the setters

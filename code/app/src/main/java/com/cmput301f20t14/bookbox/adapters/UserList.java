@@ -31,20 +31,49 @@ public class UserList extends ArrayAdapter<User> {
         TextView username;
         TextView email;
         TextView phone;
-        ImageView bookImageView;
+        ImageView userImageView;
     }
 
-    public UserList(Context context, ArrayList<User> Users) {
-        super(context, 0, Users);
+    public UserList(Context context, ArrayList<User> users) {
+        super(context, 0, users);
         this.users = users;
         this.context = context;
     }
 
+    @NonNull
+    @Override
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        View view = convertView;
+        storageReference = FirebaseStorage.getInstance().getReference();
 
-    
+        UserList.ViewHolder holder;
+        if (view == null) {
+            holder = new UserList.ViewHolder();
+            view = LayoutInflater.from(context).inflate(R.layout.user_list_content, parent, false);
+            holder.username = (TextView) view.findViewById(R.id.list_content_username);
+            holder.email = (TextView) view.findViewById(R.id.list_content_email);
+            holder.phone = (TextView) view.findViewById(R.id.list_content_phone);
+            holder.userImageView = (ImageView) view.findViewById(R.id.list_user_image);
 
-    public void downloadImage(final ImageView imageView, Book book) {
-        String imageUrl = book.getPhotoUrl();
+            view.setTag(holder);
+        } else {
+            holder = (UserList.ViewHolder) view.getTag();
+        }
+
+        User user = users.get(position);
+
+        holder.username.setText(user.getUsername());
+        holder.email.setText(user.getEmail());
+        holder.phone.setText(user.getPhone());
+
+
+        downloadImage(holder.userImageView, user);
+        return view;
+    }
+
+
+    public void downloadImage(final ImageView imageView, User user) {
+        String imageUrl = user.getPhotoUrl();
 
 
         if (imageUrl != "") {
