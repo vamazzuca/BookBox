@@ -522,8 +522,11 @@ public class ProfileActivity
             userImage.setUri(imageUri);
             removeImageButton.setEnabled(true);
             addImageButton.setText(R.string.change_picture);
+
+
         }
     }
+
 
     /**
      * Part of the ImageFragment interface where when an image is changed in the fragment it will

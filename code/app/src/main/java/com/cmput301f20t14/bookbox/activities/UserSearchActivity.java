@@ -126,10 +126,9 @@ public class UserSearchActivity extends AppCompatActivity {
      * @version 2020.11.05
      */
     public void search(final String username){
-        CollectionReference collectionRef = database.collection(User.USERS);
+        CollectionReference collectionRef = database.collection("USERS");
 
         collectionRef
-                .whereEqualTo("USERNAME", true)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -167,20 +166,20 @@ public class UserSearchActivity extends AppCompatActivity {
     public User getFromDb(QueryDocumentSnapshot documentSnapshot){
         String username = documentSnapshot.getData().get(User.USERNAME).toString();
         String phone = documentSnapshot.getData().get(User.PHONE).toString();
-        String image_Url = documentSnapshot.getData().get(User.IMAGE_URL).toString();
+        String image_url = documentSnapshot.getData().get(User.IMAGE_URL).toString();
         String email = documentSnapshot.getData().get(User.EMAIL).toString();
 
-        return new User(username, email, phone, image_Url);
+        return new User(username, null, phone, email, null, null, image_url);
     }
 
-    //@Override
-   // protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-     //   super.onActivityResult(requestCode, resultCode, data);
-      //  if (requestCode == REQUEST_CODE_FROM_SEARCH && resultCode == CommonStatusCodes.SUCCESS) {
-     //       searchResults.clear();
-     //       executeSearch();
-     //   }
-  //  }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+       super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_FROM_SEARCH && resultCode == CommonStatusCodes.SUCCESS) {
+           searchResults.clear();
+            executeSearch();
+        }
+    }
 
 
 
@@ -195,7 +194,7 @@ public class UserSearchActivity extends AppCompatActivity {
     private void bottomNavigationView(){
         //Home Navigation bar implementation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
-        bottomNavigationView.setSelectedItemId(R.id.home_bottom_nav);
+        bottomNavigationView.setSelectedItemId(R.id.profile_bottom_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -208,6 +207,7 @@ public class UserSearchActivity extends AppCompatActivity {
                     case R.id.home_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class)
                                 .putExtra(User.USERNAME, username));
+                        overridePendingTransition(0,0);
                         return true;
                     case R.id.notification_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), NotificationsActivity.class)
@@ -217,7 +217,6 @@ public class UserSearchActivity extends AppCompatActivity {
                     case R.id.profile_bottom_nav:
                         startActivity(new Intent(getApplicationContext(), ProfileActivity.class)
                                 .putExtra(User.USERNAME, username));
-                        overridePendingTransition(0,0);
                         return true;
                 }
                 return false;
