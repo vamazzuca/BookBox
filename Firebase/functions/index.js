@@ -113,7 +113,7 @@ exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{
 
     // we also want to create a NOTIFICATION entry for the requester
     admin.firestore().collection('USERS').doc(requesterUid).collection('NOTIFICATIONS')
-      .add( {TYPE: "ACCEPT REQUEST", BOOK: context.params.BookID, USER: requesterUid});
+      .add( {TYPE: "ACCEPT REQUEST", BOOK: context.params.BookID, USER: bookOwnerUid});
 
     // The snapshot to the requesters's tokens.
     const tokenReference = admin.firestore().collection('USERS').doc(`${requesterUid}`).collection('TOKENS');
@@ -168,7 +168,7 @@ exports.sendReturnBookNotification = functions.firestore.document('/BOOKS/{BookI
 
     // we also want to create a NOTIFICATION entry for the owner
     admin.firestore().collection('USERS').doc(bookOwnerUid).collection('NOTIFICATIONS')
-      .add( {TYPE: "RETURN", BOOK: context.params.BookID, USER: bookOwnerUid});
+      .add( {TYPE: "RETURN", BOOK: context.params.BookID, USER: requesterUid});
 
     // The snapshot to the user's tokens.
     const tokenReference = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
