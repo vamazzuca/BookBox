@@ -719,7 +719,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 removeImageButton.setEnabled(true);
             }
             addImageButton.setText(R.string.change_picture);
-        } else if (requestCode == REQUEST_VIEW_REQUESTS && resultCode == CommonStatusCodes.SUCCESS) {
+        } else {
             recreate();
         }
     }
