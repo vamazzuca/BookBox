@@ -39,7 +39,7 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
   const data = snap.data();
   const bookOwnerUid = data.OWNER;
   const requesterUid = data.BORROWER;
-  const bookID = data.ID;
+  const bookID = data.BOOK;
   const bookTitle = (await admin.firestore().collection('BOOKS').doc(bookID).get()).data().TITLE;
 
   // Notification details.
@@ -114,6 +114,61 @@ exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{
     // we also want to create a NOTIFICATION entry for the requester
     admin.firestore().collection('USERS').doc(requesterUid).collection('NOTIFICATIONS')
       .add( {TYPE: "ACCEPT REQUEST", BOOK: context.params.BookID, USER: bookOwnerUid});
+
+    // The snapshot to the requesters's tokens.
+    const tokenReference = admin.firestore().collection('USERS').doc(`${requesterUid}`).collection('TOKENS');
+
+    // try and send a notification for each token
+    tokenReference.get()
+    .then(snapshot => {
+        snapshot.forEach(doc => {
+          let token = doc.data().VALUE;
+          admin.messaging().sendToDevice(token, payload)
+            .then((response) => {
+              // Response is a message ID string.
+              console.log('Successfully sent message:', response);
+              return null;
+            })
+            .catch((error) => {
+              console.log('Error sending message:', error);
+              // Cleanup the tokens who are not registered anymore.
+              if (error.code === 'messaging/invalid-registration-token' ||
+                  error.code === 'messaging/registration-token-not-registered') {
+                  tokenDoc.delete();
+              }
+            });
+        });
+        return null;
+    })
+    .catch(err => {
+        console.log('Error getting documents', err);
+    });
+  }
+});
+
+exports.sendReturnBookNotification = functions.firestore.document('/BOOKS/{BookID}')
+  .onUpdate(async (snap, context) => {
+  
+  const data = snap.after.data();
+  const before_status = snap.before.data().STATUS;
+  const after_status = data.STATUS;
+  if (before_status === '69' && after_status === '66') {
+    const bookOwnerUid = data.OWNER;
+    const requesterUid = data.LENT_TO;
+    const bookTitle = data.TITLE;
+
+    // Send notifications to token.
+
+    const payload = {
+      notification: {
+        title: `Book Return`,
+        body: `${requesterUid} would like to return ${bookTitle}!`
+      }
+    };
+
+    // we also want to create a NOTIFICATION entry for the owner
+    admin.firestore().collection('USERS').doc(bookOwnerUid).collection('NOTIFICATIONS')
+      .add( {TYPE: "RETURN", BOOK: context.params.BookID, USER: requesterUid});
 
     // The snapshot to the user's tokens.
     const tokenReference = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
