@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.cmput301f20t14.bookbox.fragments.ImageFragment;
@@ -84,6 +85,7 @@ public class ProfileActivity
     private Image userImage;
     private String imageUrl;
     private FirebaseAuth mAuth;
+    private User userBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +95,8 @@ public class ProfileActivity
         // Get the username from whichever activity we came from
         // this is necessary to access firebase
         username = getIntent().getExtras().getString(User.USERNAME);
+
+
 
         // Get the EditText views
         usernameEditText = findViewById(R.id.profile_username_editText);
@@ -117,8 +121,10 @@ public class ProfileActivity
         addImageButton = findViewById(R.id.add_picture_button);
         removeImageButton = findViewById(R.id.delete_picture_button);
 
+
         bottomNavigationView();
         setUpSearchingButton();
+
 
         // initialize firebaseAuth
         mAuth = FirebaseAuth.getInstance();
@@ -175,6 +181,7 @@ public class ProfileActivity
                 Intent selectImageIntent = new Intent(Intent.ACTION_PICK,
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(selectImageIntent, 1);
+
             }
 
         });
@@ -457,11 +464,15 @@ public class ProfileActivity
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
                     imageUrl = downloadUri.toString();
+                    // add image to user profile in database
+                    database.collection(User.USERS).document(username).update(User.IMAGE_URL, imageUrl);
                 } else {
                     // Handle failures
                 }
             }
         });
+
+
 
     }
 
@@ -523,7 +534,6 @@ public class ProfileActivity
             removeImageButton.setEnabled(true);
             addImageButton.setText(R.string.change_picture);
 
-
         }
     }
 
@@ -541,16 +551,17 @@ public class ProfileActivity
         startActivityForResult(selectImageIntent, 1);
 
         // add image to user profile in database
-        database.collection(User.USERS).document(username)
-                .update(User.IMAGE_URL, imageUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (!task.isSuccessful()) {
-                    Toast.makeText(ProfileActivity.this,
-                            "An error occurred", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        database.collection(User.USERS).document(username).update(User.IMAGE_URL, imageUrl)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(ProfileActivity.this,
+                                    "An error occurred", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
     }
 
     /**
@@ -569,19 +580,7 @@ public class ProfileActivity
         imageUrl = "";
 
         // remove image from user profile in database
-        database.collection(User.USERS).document(username)
-                .update(User.IMAGE_URL, imageUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (!task.isSuccessful()) {
-                    Toast.makeText(ProfileActivity.this,
-                            "Deleted from profile", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(ProfileActivity.this,
-                            "An error occurred", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        database.collection(User.USERS).document(username).update(User.IMAGE_URL, imageUrl);
 
     }
 

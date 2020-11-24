@@ -21,6 +21,7 @@ import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.adapters.UserList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.cmput301f20t14.bookbox.fragments.ProfileFragment;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
  * @author Alex Mazzuca
  * @version 2020.11.22
  */
-public class UserSearchActivity extends AppCompatActivity {
+public class UserSearchActivity extends AppCompatActivity implements ProfileFragment.OnFragmentInteractionListener{
     public static final int REQUEST_CODE_FROM_SEARCH = 555;
     public static final String VIEW_USER = "VIEW_USER";
     private String username;
@@ -85,14 +86,9 @@ public class UserSearchActivity extends AppCompatActivity {
         // Set the OnItemClick listener of the results ListView
         searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                User user = searchAdapter.getItem(position);
-                //Intent intent = new Intent(UserSearchActivity.this, EditBookActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(VIEW_USER, user);
-                //intent.putExtras(bundle);
-                //intent.putExtra(User.USERNAME, username);
-                //startActivityForResult(intent, REQUEST_CODE_FROM_SEARCH);
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                User user = (User) adapterView.getItemAtPosition(position);
+                ProfileFragment.newInstance(user).show(getSupportFragmentManager(), "VIEW_PROFILE");
             }
         });
     }
@@ -177,7 +173,7 @@ public class UserSearchActivity extends AppCompatActivity {
        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_FROM_SEARCH && resultCode == CommonStatusCodes.SUCCESS) {
            searchResults.clear();
-            executeSearch();
+           executeSearch();
         }
     }
 
