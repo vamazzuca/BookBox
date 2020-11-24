@@ -110,15 +110,17 @@ public class BorrowedFragment extends Fragment {
 
                                 Request request = new Request(borrower, owner, book, date, Boolean.valueOf(isAccepted), latLng);
 
-                                Intent intent = new Intent(view.getContext(), HandOverActivity.class);
-                                intent.putExtra(User.USERNAME, username);
-                                intent.putExtra(Book.ID, bookID);
-                                intent.putExtra(Request.ID, requestID);
-                                Bundle bundle = new Bundle();
-                                bundle.putSerializable("REQUEST_OBJECT", request);
-                                bundle.putSerializable("BOOK", book);
-                                intent.putExtras(bundle);
-                                startActivityForResult(intent, REQUEST_RETURN);
+                                if (book.getStatus() == Book.AVAILABLE) {
+                                    Intent intent = new Intent(view.getContext(), HandOverActivity.class);
+                                    intent.putExtra(User.USERNAME, username);
+                                    intent.putExtra(Book.ID, bookID);
+                                    intent.putExtra(Request.ID, requestID);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putSerializable("REQUEST_OBJECT", request);
+                                    bundle.putSerializable("BOOK", book);
+                                    intent.putExtras(bundle);
+                                    startActivityForResult(intent, REQUEST_RETURN);
+                                }
                             }
                         }
                     }

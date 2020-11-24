@@ -25,7 +25,7 @@ import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.common.internal.service.Common;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -82,13 +82,6 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     private StorageReference storageReference;
     private Image bookImage;
     private String imageUrl;
-    private boolean isRequested;
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        recreate();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,6 +185,8 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 borrowerText = "Borrower: " + book.getLentTo();
             } else {
                 borrowerText = "Return unconfirmed (held by " + book.getLentTo() + ")";
+                viewRequests.setEnabled(false);
+                viewRequests.setAlpha(0.45f);
             }
         }
         borrower.setText(borrowerText);
@@ -676,7 +671,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
      * @version 2020.11.04
      * @param imageUri An imageuri to point to image location
      */
-    private void addImageToStorage(Uri imageUri){
+    private void addImageToStorage(final Uri imageUri){
         final String randomKey = UUID.randomUUID().toString();
         String Url = "users/"+ username + randomKey;
         bookImage.setUrl(Url);
@@ -725,7 +720,8 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 removeImageButton.setEnabled(true);
             }
             addImageButton.setText(R.string.change_picture);
-
+        } else {
+            recreate();
         }
     }
 

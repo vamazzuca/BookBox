@@ -212,6 +212,8 @@ public class HandOverActivity extends AppCompatActivity {
                 String barcode = data.getStringExtra(HomeActivity.BARCODE);
                 if (barcode.equals(book.getIsbn())) {
                     concludeRequest();
+                } else {
+                    Toast.makeText(HandOverActivity.this, "Wrong scanned ISBN", Toast.LENGTH_SHORT).show();
                 }
             }
         }
