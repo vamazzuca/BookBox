@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.internal.service.Common;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -39,12 +40,12 @@ import static com.google.android.gms.vision.barcode.Barcode.ALL_FORMATS;
  * of the app. Activity is finished when a valid barcode is scanned.
  * Control is then returned to HomeActivity class. The scanning
  * feature makes use of the Google Vision API.
- * @author Olivier Vadiavaloo
- * @version 2020.10.24
+ * @author Olivier Vadiavaloo, Carter Sabadash
+ * @version 2020.11.23
  * @see BarcodeDetector
  * @see CameraSource
  * */
-public class ScanningActivity extends AppCompatActivity {
+public class ScanningActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
     private String username;
     private SurfaceView scannerPreview;
     private TextView scannedContent;
@@ -57,6 +58,9 @@ public class ScanningActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceBundle) {
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.activity_scanning);
+        
+        // do this before creating the CameraSource
+        handlePermissions(); // will continue in continueSetup()
 
         // get username extra
         username = getIntent().getExtras().getString(User.USERNAME);
@@ -70,7 +74,12 @@ public class ScanningActivity extends AppCompatActivity {
 
         // set up the bottom navigation bar
         bottomNavigationView();
+    }
 
+    /**
+     * We need to wait for camera permissions before continuing to create the CameraSource
+     */
+    public void continueSetup() {
         // get SurfaceView object
         scannerPreview = (SurfaceView) findViewById(R.id.preview_camera);
 
@@ -130,8 +139,6 @@ public class ScanningActivity extends AppCompatActivity {
             @SuppressLint("MissingPermission")
             @Override
             public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                handlePermissions();
-
                 // try starting the camera source and catch any exception
                 // finish activity if camera couldn't start
                 try {
@@ -194,8 +201,8 @@ public class ScanningActivity extends AppCompatActivity {
     /**
      * This method handles permission checks. It requests
      * for the permission to use the device's camera
-     * @author  Olivier Vadiavaloo
-     * @version 2020.10.24
+     * @author  Olivier Vadiavaloo, Carter Sabadash
+     * @version 2020.11.23
      * */
     private void handlePermissions() {
         if (ActivityCompat.checkSelfPermission(ScanningActivity.this, Manifest.permission.CAMERA)
@@ -205,7 +212,21 @@ public class ScanningActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.CAMERA},
                     100
             );
-        }
+        } else { continueSetup(); }
+    }
+
+    /**
+     * This is part of the Interface to return the results of the camera permission request
+     * For now we continue to setup for either result (it's just a blank activity if denied)
+     * @param requestCode The requestCode
+     * @param permissions The permissions asked for
+     * @param grantResults If the permissions asked for were granted
+     * @author Carter Sabadash
+     * @version 2020.11.23
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        continueSetup();
     }
 
     /**
