@@ -2,13 +2,17 @@ package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -169,6 +173,44 @@ public class HandOverActivity extends AppCompatActivity {
                     setLocation.requestFocus();
                     setLocation.setError("Need to set location first");
                 }
+            }
+        });
+
+        // Set the handOver button's onclick listener
+        handOver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an AlertDialog builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(HandOverActivity.this);
+
+                // Create and set the content of the AlertDialog to an EditText
+                final EditText isbn = new EditText(HandOverActivity.this);
+                isbn.setInputType(InputType.TYPE_CLASS_TEXT);
+                isbn.setHint(R.string.ISBN_hint);
+                isbn.setPadding(10, 10, 10, 10);
+                builder.setView(isbn);
+
+                // Set the title and the buttons of the dialog
+                builder.setTitle("Enter ISBN for " + book.getTitle());
+                builder.setNegativeButton("Cancel", null);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Get entered ISBN
+                        String isbnString = isbn.getText().toString().trim();
+
+                        // Check if the ISBN matches the book's ISBN
+                        if (!isbnString.equals(book.getIsbn())) {
+                            Toast.makeText(HandOverActivity.this, "Wrong ISBN entered", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // If ISBN matches, then conclude the request
+                            concludeRequest();
+                        }
+                    }
+                });
+
+                // Create and show dialog
+                builder.show();
             }
         });
     }
