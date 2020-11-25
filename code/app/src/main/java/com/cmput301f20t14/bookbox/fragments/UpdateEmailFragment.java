@@ -15,6 +15,13 @@ import androidx.fragment.app.DialogFragment;
 
 import com.cmput301f20t14.bookbox.R;
 
+/**
+ * This fragment updates the email of the user in the activity
+ * to which it is attached to. In this case, it's the ProfileActivity
+ * @author Carter Sabadash
+ * @see com.cmput301f20t14.bookbox.activities.ProfileActivity
+ */
+
 public class UpdateEmailFragment extends DialogFragment {
     private EditText newEmailText;
     private EditText passwordText;
@@ -46,7 +53,7 @@ public class UpdateEmailFragment extends DialogFragment {
         return builder
                 .setView(view)
                 .setTitle(R.string.fragment_update_email_title)
-                .setNegativeButton(R.string.cancel, null)
+                .setNegativeButton(R.string.cancel_2, null)
                 .setPositiveButton(R.string.update, null) // override in onStart()
                 .create();
     }

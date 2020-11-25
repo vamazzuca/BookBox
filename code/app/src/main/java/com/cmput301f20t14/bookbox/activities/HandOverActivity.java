@@ -28,9 +28,8 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 /**
- * This activity allows the user to set the location where
- * the user will hand over a book to a borrower and to scan
- * the ISBN to hand over the book
+ * This activity allows the user hand over a book to an owner/borrower,
+ * depending on whether the transaction is a borrowing or a return.
  * @author Olivier Vadiavaloo
  * @version 2020.11.19
  */
@@ -147,6 +146,8 @@ public class HandOverActivity extends AppCompatActivity {
         setLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Start the LocationActivity to SET a location for
+                // the transaction if the user is accepting a request
                 Intent intent = new Intent(HandOverActivity.this, LocationActivity.class);
                 intent.putExtra(User.USERNAME, username);
                 Bundle bundle = new Bundle();
@@ -176,6 +177,8 @@ public class HandOverActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_LOCATION) {
+            // On successful setting of location, update the latlng field
+            // of the request document in the database
             if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
                 final String latLng = data.getStringExtra(Request.LAT_LNG);
                 database
@@ -210,6 +213,7 @@ public class HandOverActivity extends AppCompatActivity {
         } else if (requestCode == REQUEST_SCAN) {
             if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
                 String barcode = data.getStringExtra(HomeActivity.BARCODE);
+                // On successful scanning, conclude the request
                 if (barcode.equals(book.getIsbn())) {
                     concludeRequest();
                 } else {
@@ -220,6 +224,13 @@ public class HandOverActivity extends AppCompatActivity {
     }
 
     public void concludeRequest() {
+        // Update the STATUS field of the book document in the database
+        // If the book is being lent out, the status is borrowed and if
+        // it is being returned the status is available.
+        // Notice that the LENT_TO is not updated until the receiver has
+        // confirmed the transaction. When a borrower confirms a receival or
+        // when an owner confirms a return, the LENT_TO field is updated in
+        // the ReceiveActivit.java
         database
                 .collection(Book.BOOKS)
                 .document(bookID)

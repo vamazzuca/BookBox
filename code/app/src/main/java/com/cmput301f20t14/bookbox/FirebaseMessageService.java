@@ -28,7 +28,7 @@ import java.util.Objects;
 
 /**
  * This class contains all the methods related to notifications
- * Much of the code is taken from the samples at:
+ * Resources consulted:
  *      https://firebase.google.com/docs/cloud-messaging/android/client
  * @author Carter Sabadash
  * @version 2020.11.15

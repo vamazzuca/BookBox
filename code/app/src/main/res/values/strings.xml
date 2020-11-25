@@ -113,4 +113,6 @@
     <string name="return_book">Return</string>
     <string name="see_location">See Location</string>
     <string name="receive">Receive</string>
+    <string name="cancel_2">Cancel</string>
+    <string name="cancel">Cancel</string>
 </resources>

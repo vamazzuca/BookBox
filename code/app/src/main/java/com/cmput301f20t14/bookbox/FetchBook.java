@@ -10,6 +10,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+/**
+ * This class fetches the title and the author of a book
+ * based an isbn given by the user (through scanning).
+ * The class parses the JSON object returned by the post request
+ * to obtain the title and the author of the book
+ */
+
 public class FetchBook extends AsyncTask<String, Void, String> {
     private WeakReference<EditText> titleEditText;
     private WeakReference<EditText> authorEditText;

@@ -34,6 +34,13 @@ import javax.annotation.Nullable;
 
 import static android.view.View.GONE;
 
+/**
+ * This fragment is one of the tabs of the tabbed activity: listsActivity
+ * It contains a listview of the requests made by the user that have been borrowed.
+ * @author Olivier Vadiavaloo
+ * @see com.cmput301f20t14.bookbox.activities.ListsActivity
+ */
+
 public class BorrowedFragment extends Fragment {
     private static final int REQUEST_RETURN = 8007;
     private BookList listAdapter;

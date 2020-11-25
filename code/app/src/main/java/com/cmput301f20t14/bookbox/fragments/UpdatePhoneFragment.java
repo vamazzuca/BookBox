@@ -16,6 +16,13 @@ import androidx.fragment.app.DialogFragment;
 
 import com.cmput301f20t14.bookbox.R;
 
+/**
+ * This fragment updates the phone of the user in the activity
+ * to which it is attached to. In this case, it's the ProfileActivity
+ * @author Carter Sabadash
+ * @see com.cmput301f20t14.bookbox.activities.ProfileActivity
+ */
+
 public class UpdatePhoneFragment extends DialogFragment {
     private EditText newPhoneText;
     private OnFragmentInteractionListener listener;

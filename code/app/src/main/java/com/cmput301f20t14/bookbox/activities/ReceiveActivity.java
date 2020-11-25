@@ -29,6 +29,13 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
+/**
+ * This activity allows the user to confirm the receival
+ * of a book during a return or a borrowing.
+ * @author Olivier Vadiavaloo
+ * @version 2020.11.22
+ */
+
 public class ReceiveActivity extends AppCompatActivity {
     public static final int REQUEST_SCAN = 529;
     public static final int REQUEST_LOCATION = 5666;
@@ -141,6 +148,7 @@ public class ReceiveActivity extends AppCompatActivity {
         seeLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Start the LocationActivity to SEE the location
                 Intent intent = new Intent(ReceiveActivity.this, LocationActivity.class);
                 intent.putExtra(User.USERNAME, username);
                 intent.putExtra("IS_RECEIVE_RETURN", finalStatus == Book.AVAILABLE);
@@ -200,16 +208,24 @@ public class ReceiveActivity extends AppCompatActivity {
                         });
             }
         } else if (requestCode == REQUEST_SCAN) {
+            // On successful scanning, conclude the request
             if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
                 String barcode = data.getStringExtra(HomeActivity.BARCODE);
                 if (barcode.equals(book.getIsbn())) {
                     concludeRequest();
+                } else {
+                    Toast.makeText(ReceiveActivity.this, "Wrong scanned ISBN", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
 
     public void concludeRequest() {
+        // Update the LENT_TO field of the book document
+        // depending on the final status of the book.
+        // Set the LENT_TO field to an empty string if the
+        // user is confirming a return and set it to the borrower's
+        // username if the user is confirming a borrowing.
         database
                 .collection(Book.BOOKS)
                 .document(bookID)
@@ -218,6 +234,9 @@ public class ReceiveActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        // if the user is confirming a return,
+                        // the initial request made by the borrower to
+                        // borrow the book is deleted from the database
                         if (finalStatus == Book.AVAILABLE) {
                             database
                                     .collection(Request.REQUESTS)
@@ -235,6 +254,8 @@ public class ReceiveActivity extends AppCompatActivity {
                                         }
                                     });
                         }
+
+                        // Finish this activity and set the result to success
                         Intent intent = new Intent();
                         intent.putExtra(Request.ID, requestID);
                         intent.putExtra(Book.ID, bookID);
