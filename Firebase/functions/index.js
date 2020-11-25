@@ -52,7 +52,7 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
 
   // we also want to create a NOTIFICATION entry for the book owner
   admin.firestore().collection('USERS').doc(bookOwnerUid).collection('NOTIFICATIONS')
-    .add( {TYPE: "BOOK REQUEST", BOOK: bookID, USER: requesterUid});
+    .add( {TYPE: "BOOK REQUEST", BOOK: bookID, USER: requesterUid, REQUEST_ID: context.params.RequestID});
 
   // The snapshot to the user's tokens.
   const tokenReference = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
