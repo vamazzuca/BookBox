@@ -1,6 +1,8 @@
 package com.cmput301f20t14.bookbox.entities;
 
 import java.io.Serializable;
+import android.util.Patterns;
+
 import java.util.ArrayList;
 
 /**
@@ -97,6 +99,22 @@ public class User implements Serializable {
         this.password = password;
         this.phone = phone;
         this.email = email;
+    }
+
+    /**
+     * Checks if email has valid syntax
+     * @param email user's registered email
+     */
+    public static boolean isEmailSyntaxValid(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    /**
+     * Checks if phone number has valid syntax
+     * @param phone user's registered phone
+     */
+    public static boolean  isPhoneSyntaxValid(String phone) {
+        return Patterns.PHONE.matcher(phone).matches();
     }
 
     /**

@@ -34,9 +34,9 @@
     <string name="email">email</string>
     <string name="phone">phone</string>
     <string name="add_book_picture">Add_book_picture</string>
-    <string name="Title_hint">Title_hint</string>
-    <string name="Author_hint">Author_hint</string>
-    <string name="ISBN_hint">ISBN_hint</string>
+    <string name="Title_hint">Enter title</string>
+    <string name="Author_hint">Enter author</string>
+    <string name="ISBN_hint">Enter ISBN</string>
     <string name="add_an_awesome_book">Add an awesome book!</string>
     <string name="title">Title</string>
     <string name="author">Author</string>
@@ -115,4 +115,6 @@
     <string name="return_book">Return</string>
     <string name="see_location">See Location</string>
     <string name="receive">Receive</string>
+    <string name="cancel_2">Cancel</string>
+    <string name="cancel">Cancel</string>
 </resources>

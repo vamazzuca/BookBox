@@ -15,6 +15,13 @@ import androidx.fragment.app.DialogFragment;
 
 import com.cmput301f20t14.bookbox.R;
 
+/**
+ * This fragment updates the password of the user in the activity
+ * to which it is attached to. In this case, it's the ProfileActivity
+ * @author Carter Sabadash
+ * @see com.cmput301f20t14.bookbox.activities.ProfileActivity
+ */
+
 public class UpdatePasswordFragment extends DialogFragment {
     private EditText oldPassword;
     private EditText newPassword;
@@ -48,7 +55,7 @@ public class UpdatePasswordFragment extends DialogFragment {
         return builder
                 .setView(view)
                 .setTitle(R.string.fragment_update_password_title)
-                .setNegativeButton(R.string.cancel, null)
+                .setNegativeButton(R.string.cancel_2, null)
                 .setPositiveButton(R.string.update, null) // override in onStart
                 .create();
     }

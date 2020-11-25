@@ -2,13 +2,17 @@ package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,9 +32,8 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 /**
- * This activity allows the user to set the location where
- * the user will hand over a book to a borrower and to scan
- * the ISBN to hand over the book
+ * This activity allows the user hand over a book to an owner/borrower,
+ * depending on whether the transaction is a borrowing or a return.
  * @author Olivier Vadiavaloo
  * @version 2020.11.19
  */
@@ -147,6 +150,8 @@ public class HandOverActivity extends AppCompatActivity {
         setLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Start the LocationActivity to SET a location for
+                // the transaction if the user is accepting a request
                 Intent intent = new Intent(HandOverActivity.this, LocationActivity.class);
                 intent.putExtra(User.USERNAME, username);
                 Bundle bundle = new Bundle();
@@ -170,12 +175,52 @@ public class HandOverActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Set the handOver button's onclick listener
+        handOver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an AlertDialog builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(HandOverActivity.this);
+
+                // Create and set the content of the AlertDialog to an EditText
+                final EditText isbn = new EditText(HandOverActivity.this);
+                isbn.setInputType(InputType.TYPE_CLASS_TEXT);
+                isbn.setHint(R.string.ISBN_hint);
+                isbn.setPadding(20, 10, 20, 10);
+                builder.setView(isbn);
+
+                // Set the title and the buttons of the dialog
+                builder.setTitle("Enter ISBN for " + book.getTitle());
+                builder.setNegativeButton("Cancel", null);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Get entered ISBN
+                        String isbnString = isbn.getText().toString().trim();
+
+                        // Check if the ISBN matches the book's ISBN
+                        if (!isbnString.equals(book.getIsbn())) {
+                            Toast.makeText(HandOverActivity.this, "Wrong ISBN entered", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // If ISBN matches, then conclude the request
+                            concludeRequest();
+                        }
+                    }
+                });
+
+                // Create and show dialog
+                builder.show();
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_LOCATION) {
+            // On successful setting of location, update the latlng field
+            // of the request document in the database
             if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
                 final String latLng = data.getStringExtra(Request.LAT_LNG);
                 database
@@ -210,6 +255,7 @@ public class HandOverActivity extends AppCompatActivity {
         } else if (requestCode == REQUEST_SCAN) {
             if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
                 String barcode = data.getStringExtra(HomeActivity.BARCODE);
+                // On successful scanning, conclude the request
                 if (barcode.equals(book.getIsbn())) {
                     concludeRequest();
                 } else {
@@ -220,6 +266,13 @@ public class HandOverActivity extends AppCompatActivity {
     }
 
     public void concludeRequest() {
+        // Update the STATUS field of the book document in the database
+        // If the book is being lent out, the status is borrowed and if
+        // it is being returned the status is available.
+        // Notice that the LENT_TO is not updated until the receiver has
+        // confirmed the transaction. When a borrower confirms a receival or
+        // when an owner confirms a return, the LENT_TO field is updated in
+        // the ReceiveActivit.java
         database
                 .collection(Book.BOOKS)
                 .document(bookID)
