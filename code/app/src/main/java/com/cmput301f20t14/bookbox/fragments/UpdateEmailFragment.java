@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.User;
 
 /**
  * This fragment updates the email of the user in the activity
@@ -77,6 +78,9 @@ public class UpdateEmailFragment extends DialogFragment {
                         passwordText.requestFocus();
                     } else if (email.length() != 0) {
                         listener.emailUpdatePressed(email, password);
+                    } else if (!User.isEmailSyntaxValid(email)) {
+                        newEmailText.setError("Invalid email");
+                        newEmailText.requestFocus();
                     } else {
                         newEmailText.setError("Required");
                         newEmailText.requestFocus();
