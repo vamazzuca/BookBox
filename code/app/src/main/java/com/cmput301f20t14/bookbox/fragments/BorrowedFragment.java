@@ -117,7 +117,7 @@ public class BorrowedFragment extends Fragment {
 
                                 Request request = new Request(borrower, owner, book, date, Boolean.valueOf(isAccepted), latLng);
 
-                                if (book.getStatus() == Book.AVAILABLE) {
+                                if (book.getStatus() == Book.BORROWED) {
                                     Intent intent = new Intent(view.getContext(), HandOverActivity.class);
                                     intent.putExtra(User.USERNAME, username);
                                     intent.putExtra(Book.ID, bookID);
