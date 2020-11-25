@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.User;
 
 /**
  * This fragment updates the phone of the user in the activity
@@ -71,12 +72,18 @@ public class UpdatePhoneFragment extends DialogFragment {
                 @Override
                 public void onClick(View view) {
                     String phone = newPhoneText.getText().toString().trim();
+                    if (!User.isPhoneSyntaxValid(phone)) {
+                        newPhoneText.setError("Invalid phone number");
+                        newPhoneText.requestFocus();
+                    }
+
                     if (phone.length() != 0) {
                         listener.onPhoneUpdated(phone);
                         dismiss();
+                    } else {
+                        newPhoneText.setError("Required");
+                        newPhoneText.requestFocus();
                     }
-                    newPhoneText.setError("Required");
-                    newPhoneText.requestFocus();
                 }
             });
         }

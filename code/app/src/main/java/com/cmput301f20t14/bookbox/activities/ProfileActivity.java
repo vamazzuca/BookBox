@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cmput301f20t14.bookbox.R;
@@ -70,7 +71,7 @@ public class ProfileActivity
                     UpdatePasswordFragment.OnFragmentInteractionListener{
     private String username;
     private FirebaseFirestore database;
-    private EditText usernameEditText;
+    private TextView usernameEditText;
     private Button emailEditText;
     private Button phoneEditText;
     private Button logoutButton;

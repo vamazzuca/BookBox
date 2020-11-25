@@ -140,9 +140,19 @@ public class RegisterUserActivity extends AppCompatActivity {
                     email.setError("Required");
                 }
 
+                if (!User.isEmailSyntaxValid(enteredEmail)) {
+                    isErrorSet = true;
+                    email.setError("Invalid email");
+                }
+
                 if (enteredPhone.isEmpty()) {
                     isErrorSet = true;
                     phone.setError("Required");
+                }
+
+                if (!User.isPhoneSyntaxValid(enteredPhone)) {
+                    isErrorSet = true;
+                    phone.setError("Invalid phone");
                 }
 
                 // if the required fields are not empty, check if the

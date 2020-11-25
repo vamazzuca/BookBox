@@ -187,7 +187,7 @@ public class HandOverActivity extends AppCompatActivity {
                 final EditText isbn = new EditText(HandOverActivity.this);
                 isbn.setInputType(InputType.TYPE_CLASS_TEXT);
                 isbn.setHint(R.string.ISBN_hint);
-                isbn.setPadding(10, 10, 10, 10);
+                isbn.setPadding(20, 10, 20, 10);
                 builder.setView(isbn);
 
                 // Set the title and the buttons of the dialog
