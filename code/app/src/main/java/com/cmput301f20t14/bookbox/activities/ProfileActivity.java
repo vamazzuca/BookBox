@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
@@ -410,7 +411,9 @@ public class ProfileActivity
 
                                     Uri uri = Uri.parse(imageUrl);
 
-                                    Picasso.get().load(uri).into(userImageView);
+                                    Glide.with(userImageView.getContext())
+                                            .load(uri)
+                                            .into(userImageView);
                                     removeImageButton.setEnabled(true);
                                     addImageButton.setText("Change Picture");
                                     userImage.setUri(uri);

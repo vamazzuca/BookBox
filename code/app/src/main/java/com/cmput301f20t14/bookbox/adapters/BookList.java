@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -30,7 +31,6 @@ import java.util.ArrayList;
  * @author Alex Mazzuca
  * @version 2020.11.22
  */
-
 public class BookList extends ArrayAdapter<Book> {
     private ArrayList<Book> books;
     private Context context;
@@ -56,6 +56,7 @@ public class BookList extends ArrayAdapter<Book> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
         View view = convertView;
         storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -98,7 +99,11 @@ public class BookList extends ArrayAdapter<Book> {
         return view;
     }
 
-
+    /**
+     * This will grab the image from Firebase and put it into the Image View
+     * @author Alex Mazzuca
+     * @version 2020.11.22
+     */
     public void downloadImage(final ImageView imageView, Book book) {
         String imageUrl = book.getPhotoUrl();
 
@@ -107,11 +112,10 @@ public class BookList extends ArrayAdapter<Book> {
 
             Uri uri = Uri.parse(imageUrl);
 
-            Glide.with(imageView.getContext())
-                    .load(uri)
-                    .into(imageView);
+            Picasso.get().load(uri).into(imageView);
 
         } else {
+            Picasso.get().cancelRequest(imageView);
             imageView.setImageResource(R.drawable.ic_custom_image);
         }
 

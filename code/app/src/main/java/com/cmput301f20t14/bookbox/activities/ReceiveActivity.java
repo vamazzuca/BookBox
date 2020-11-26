@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
@@ -131,21 +132,15 @@ public class ReceiveActivity extends AppCompatActivity {
 
         imageUrl = book.getPhotoUrl();
         //Download Image from Firebase and set it to ImageView
-        if (!bookImage.getUrl().equals("")) {
-            StorageReference imageRef = storageReference.child(bookImage.getUrl());
+        if (bookImage.getUrl() != "") {
 
-            imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Picasso.get().load(uri).into(bookImageView);
-                    bookImage.setUri(uri);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    //Handle any errors
-                }
-            });
+            Uri uri = Uri.parse(imageUrl);
+
+            Glide.with(bookImageView.getContext())
+                    .load(uri)
+                    .into(bookImageView);
+            bookImage.setUri(uri);
+
         }
 
         // Set location button listener

@@ -33,6 +33,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -108,6 +109,11 @@ public class UserSearchActivity extends AppCompatActivity implements ProfileFrag
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    /**
+     * Executes the search with the given Username
+     * @author Alex Mazzuca
+     * @version 2020.11.25
+     */
     public void executeSearch(){
         keyword = searchField.getText().toString().toLowerCase();
         search(keyword);
@@ -159,6 +165,11 @@ public class UserSearchActivity extends AppCompatActivity implements ProfileFrag
 
     }
 
+    /**
+     * Get the User form the Firebase Database
+     * @author Alex Mazzuca
+     * @version 2020.11.05
+     */
     public User getFromDb(QueryDocumentSnapshot documentSnapshot){
         String username = documentSnapshot.getData().get(User.USERNAME).toString();
         String phone = documentSnapshot.getData().get(User.PHONE).toString();

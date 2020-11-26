@@ -21,6 +21,12 @@ import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.squareup.picasso.Picasso;
 
+/**
+ * A Dialog Fragment for viewing a user profile.
+ * References: Lab 3 Instructions - FragmentsFile from the University of Alberta
+ * @author Alex Mazzuca
+ * @version 2020.11.25
+ */
 public class ProfileFragment extends DialogFragment {
     private ImageView profileImageView;
     private ProfileFragment.OnFragmentInteractionListener listener;
@@ -32,6 +38,11 @@ public class ProfileFragment extends DialogFragment {
     public interface OnFragmentInteractionListener{
     }
 
+    /**
+     * Attach fragment onto activity that implements ProfileFragment
+     * @author Alex Mazzuca
+     * @version 2020.11.25
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -43,6 +54,13 @@ public class ProfileFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Creates a new instance the takes an user from the attached
+     * activity an bundles it to be used later for the profile view.
+     * @author Alex Mazzuca
+     * @version 2020.11.25
+     * @param user A user object
+     */
     public static ProfileFragment newInstance(User user) {
         Bundle args = new Bundle();
         args.putSerializable("user", user);
@@ -53,6 +71,12 @@ public class ProfileFragment extends DialogFragment {
     }
 
 
+    /**
+     * Sets the Fragment to the proper xml layout to view a user profile.
+     * @author Alex Mazzuca
+     * @version 2020.11.25
+     * @return Dialog fragment builder
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

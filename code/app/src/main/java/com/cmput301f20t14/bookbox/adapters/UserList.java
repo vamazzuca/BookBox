@@ -18,10 +18,19 @@ import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * This is the adapter used to represent a user in
+ * a listview with each row having the layout described in
+ * user_list_content.xml
+ * @author Alex Mazzuca
+ * @version 2020.11.22
+ */
 public class UserList extends ArrayAdapter<User> {
     private ArrayList<User> users;
     private Context context;
@@ -43,6 +52,7 @@ public class UserList extends ArrayAdapter<User> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        // convertView bugs out the images in the list adapter so must be null fo now
         View view = convertView;
         storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -71,7 +81,11 @@ public class UserList extends ArrayAdapter<User> {
         return view;
     }
 
-
+    /**
+     * This will grab the image from Firebase and put it into the Image View
+     * @author Alex Mazzuca
+     * @version 2020.11.22
+     */
     public void downloadImage(final ImageView imageView, User user) {
         String imageUrl = user.getPhotoUrl();
 
@@ -79,12 +93,11 @@ public class UserList extends ArrayAdapter<User> {
         if (imageUrl != "") {
 
             Uri uri = Uri.parse(imageUrl);
+            Picasso.get().load(uri).into(imageView);
 
-            Glide.with(imageView.getContext())
-                    .load(uri)
-                    .into(imageView);
 
         } else {
+            Picasso.get().cancelRequest(imageView);
             imageView.setImageResource(R.drawable.ic_custom_image);
         }
 

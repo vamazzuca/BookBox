@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.fragments.ImageFragment;
 import com.cmput301f20t14.bookbox.R;
@@ -26,6 +27,7 @@ import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.internal.service.Common;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -250,7 +252,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
             Uri uri = Uri.parse(imageUrl);
 
-            Picasso.get().load(uri).into(bookImageView);
+            Glide.with(bookImageView.getContext())
+                    .load(uri)
+                    .into(bookImageView);
             removeImageButton.setEnabled(true);
             addImageButton.setText(R.string.change_picture);
             bookImage.setUri(uri);
