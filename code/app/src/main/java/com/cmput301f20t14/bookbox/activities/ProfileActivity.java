@@ -15,17 +15,21 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.cmput301f20t14.bookbox.R;
+import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.cmput301f20t14.bookbox.fragments.ImageFragment;
 import com.cmput301f20t14.bookbox.fragments.UpdateEmailFragment;
 import com.cmput301f20t14.bookbox.fragments.UpdatePasswordFragment;
 import com.cmput301f20t14.bookbox.fragments.UpdatePhoneFragment;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -69,6 +73,7 @@ public class ProfileActivity
                     UpdatePhoneFragment.OnFragmentInteractionListener,
                     UpdateEmailFragment.OnFragmentInteractionListener,
                     UpdatePasswordFragment.OnFragmentInteractionListener{
+    public static final int REQUEST_CODE_SEARCHING = 400;
     private String username;
     private FirebaseFirestore database;
     private TextView usernameEditText;
@@ -84,6 +89,8 @@ public class ProfileActivity
     private Image userImage;
     private String imageUrl;
     private FirebaseAuth mAuth;
+    private User userBundle;
+    private EditText userSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +101,13 @@ public class ProfileActivity
         // this is necessary to access firebase
         username = getIntent().getExtras().getString(User.USERNAME);
 
+
+
         // Get the EditText views
         usernameEditText = findViewById(R.id.profile_username_editText);
         emailEditText = findViewById(R.id.profile_email_editText);
         phoneEditText = findViewById(R.id.profile_phone_editText);
+        userSearch = findViewById(R.id.profile_search_user);
 
         // Get the Buttons
         logoutButton = findViewById(R.id.profile_logout_button);
@@ -119,6 +129,8 @@ public class ProfileActivity
 
         closeKeyboard();
         bottomNavigationView();
+        setUpSearchingButton();
+
 
         // initialize firebaseAuth
         mAuth = FirebaseAuth.getInstance();
@@ -168,6 +180,15 @@ public class ProfileActivity
             }
         });
 
+        userSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, UserSearchActivity.class);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_SEARCHING);
+            }
+        });
+
         //Add picture button listener
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,6 +196,7 @@ public class ProfileActivity
                 Intent selectImageIntent = new Intent(Intent.ACTION_PICK,
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(selectImageIntent, 1);
+
             }
 
         });
@@ -397,22 +419,16 @@ public class ProfileActivity
 
                                 //Download Image from Firebase and set it to ImageView
                                 if (userImage.getUrl() != "") {
-                                    StorageReference imageRef = storageReference.child(userImage.getUrl());
 
-                                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            Picasso.get().load(uri).into(userImageView);
-                                            removeImageButton.setEnabled(true);
-                                            addImageButton.setText("Change Picture");
-                                            userImage.setUri(uri);
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception exception) {
-                                            //Handle any errors
-                                        }
-                                    });
+                                    Uri uri = Uri.parse(imageUrl);
+
+                                    Glide.with(userImageView.getContext())
+                                            .load(uri)
+                                            .into(userImageView);
+                                    removeImageButton.setEnabled(true);
+                                    addImageButton.setText("Change Picture");
+                                    userImage.setUri(uri);
+
                                 }
 
 
@@ -430,6 +446,26 @@ public class ProfileActivity
                 });
     }
 
+    /**
+     * Setting up the onClick listener for the search button
+     * Listener launches the search activity to find available books
+     * based on if a keyword is in the book description
+     * @author Nicholas DeMarco
+     * @author ALex Mazzuca
+     * @version 2020.11.04
+     */
+    private void setUpSearchingButton() {
+        ImageButton search = findViewById(R.id.profile_search_button);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, UserSearchActivity.class);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_SEARCHING);
+            }
+        });
+    }
+
 
     /**
      * This method will add the selected image from the android gallery and upload it to the
@@ -440,21 +476,36 @@ public class ProfileActivity
      */
     private void addImageToStorage(Uri imageUri){
         final String randomKey = UUID.randomUUID().toString();
-        imageUrl = "users/"+ username + randomKey;
-        userImage.setUrl(imageUrl);
-        final StorageReference imageRef = storageReference.child(imageUrl);
+        String Url = "users/"+ username + randomKey;
+        userImage.setUrl(Url);
+        final StorageReference imageRef = storageReference.child(Url);
 
-        imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        Task<Uri> urlTask = imageRef.putFile(imageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(ProfileActivity.this, "Uploaded", Toast.LENGTH_LONG).show();
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                // Continue with the task to get the download URL
+                return imageRef.getDownloadUrl();
             }
-        }).addOnFailureListener(new OnFailureListener() {
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(ProfileActivity.this, "Upload Failed", Toast.LENGTH_LONG).show();
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    imageUrl = downloadUri.toString();
+                    // add image to user profile in database
+                    database.collection(User.USERS).document(username).update(User.IMAGE_URL, imageUrl);
+                } else {
+                    // Handle failures
+                }
             }
         });
+
+
+
     }
 
     /**
@@ -514,8 +565,10 @@ public class ProfileActivity
             userImage.setUri(imageUri);
             removeImageButton.setEnabled(true);
             addImageButton.setText(R.string.change_picture);
+
         }
     }
+
 
     /**
      * Part of the ImageFragment interface where when an image is changed in the fragment it will
@@ -530,16 +583,17 @@ public class ProfileActivity
         startActivityForResult(selectImageIntent, 1);
 
         // add image to user profile in database
-        database.collection(User.USERS).document(username)
-                .update(User.IMAGE_URL, imageUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (!task.isSuccessful()) {
-                    Toast.makeText(ProfileActivity.this,
-                            "An error occurred", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        database.collection(User.USERS).document(username).update(User.IMAGE_URL, imageUrl)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(ProfileActivity.this,
+                                    "An error occurred", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
     }
 
     /**
@@ -558,19 +612,7 @@ public class ProfileActivity
         imageUrl = "";
 
         // remove image from user profile in database
-        database.collection(User.USERS).document(username)
-                .update(User.IMAGE_URL, imageUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (!task.isSuccessful()) {
-                    Toast.makeText(ProfileActivity.this,
-                            "Deleted from profile", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(ProfileActivity.this,
-                            "An error occurred", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        database.collection(User.USERS).document(username).update(User.IMAGE_URL, imageUrl);
 
     }
 

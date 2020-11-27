@@ -1,5 +1,6 @@
 package com.cmput301f20t14.bookbox.entities;
 
+import java.io.Serializable;
 import android.util.Patterns;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
  * @version 2020.11.04
  */
 
-public class User {
+public class User implements Serializable {
     public static final String USERS = "USERS";
     public static final String USERNAME = "USERNAME";
     public static final String PASSWORD = "PASSWORD";
@@ -65,6 +66,7 @@ public class User {
         this.phone = phone;
         this.email = email;
     }
+
 
     /**
      * This method is called when there is a need to update the username, password

@@ -17,6 +17,35 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="6"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/profile_search_user"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:hint="@string/enter_text_profile"
+                    android:layout_weight="5"
+                    android:focusable="false"
+                    android:autofillHints="@string/enter_text_profile"
+                    android:inputType="textPersonName" />
+
+                <ImageButton
+                    android:id="@+id/profile_search_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/search"
+                    android:src="@drawable/ic_search" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/linear_layout_edit_book"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
