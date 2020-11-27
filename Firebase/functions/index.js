@@ -53,7 +53,11 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
 
   // we also want to create a NOTIFICATION entry for the book owner
   admin.firestore().collection('USERS').doc(bookOwnerUid).collection('NOTIFICATIONS')
-    .add( {TYPE: "BOOK REQUEST", BOOK: bookID, USER: requesterUid, REQUEST_ID: context.params.RequestID, DATE: admin.firestore.FieldValue.serverTimestamp()});
+    .add( {TYPE: "BOOK REQUEST", 
+          BOOK: bookID, 
+          USER: requesterUid, 
+          REQUEST_ID: context.params.RequestID, 
+          DATE: admin.firestore.FieldValue.serverTimestamp()});
 
   // The snapshot to the user's tokens.
   const tokenReference = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
@@ -87,21 +91,22 @@ exports.sendRequestNotification = functions.firestore.document('/REQUESTS/{Reque
 
 
   /**
-   * Triggers when a book is updated
+   * Triggers when a request is updated
    * 
-   * We are specifically paying attention to the STATUS field
-   * When it changes to ACCEPTED (68) then we send a notification to the borrower
+   * We are specifically paying attention to the IS_ACCEPTED field
+   * When it changes to 'true' then we send a notification to the borrower
    */
-exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{BookID}')
+exports.sendAcceptedRequestNotification = functions.firestore.document('/REQUESTS/{RequestID}')
   .onUpdate(async (snap, context) => {
   
   const data = snap.after.data();
-  const before_status = snap.before.data().STATUS;
-  const after_status = data.STATUS;
-  if (before_status !== '68' && after_status === '68') {
+  const before_status = snap.before.data().IS_ACCEPTED;
+  const after_status = data.IS_ACCEPTED;
+  if (before_status === 'false' && after_status === 'true') {
     const bookOwnerUid = data.OWNER;
-    const requesterUid = data.LENT_TO;
-    const bookTitle = data.TITLE;
+    const requesterUid = data.BORROWER;
+    const bookID = data.BOOK;
+    const bookTitle = (await admin.firestore().collection('BOOKS').doc(bookID).get()).data().TITLE;
 
     // Send notifications to token.
 
@@ -114,7 +119,11 @@ exports.sendAcceptedRequestNotification = functions.firestore.document('/BOOKS/{
 
     // we also want to create a NOTIFICATION entry for the requester
     admin.firestore().collection('USERS').doc(requesterUid).collection('NOTIFICATIONS')
-      .add( {TYPE: "ACCEPT REQUEST", BOOK: context.params.BookID, USER: bookOwnerUid, DATE: admin.firestore.FieldValue.serverTimestamp()});
+      .add( {TYPE: "ACCEPT REQUEST", 
+            BOOK: bookID, 
+            USER: bookOwnerUid, 
+            DATE: admin.firestore.FieldValue.serverTimestamp(),
+            REQUEST_ID: context.params.RequestID});
 
     // The snapshot to the requesters's tokens.
     const tokenReference = admin.firestore().collection('USERS').doc(`${requesterUid}`).collection('TOKENS');
@@ -167,9 +176,22 @@ exports.sendReturnBookNotification = functions.firestore.document('/BOOKS/{BookI
       }
     };
 
-    // we also want to create a NOTIFICATION entry for the owner
-    admin.firestore().collection('USERS').doc(bookOwnerUid).collection('NOTIFICATIONS')
-      .add( {TYPE: "RETURN", BOOK: context.params.BookID, USER: requesterUid, DATE: admin.firestore.FieldValue.serverTimestamp()});
+    // we also want to create a NOTIFICATION entry for the owner -- we need to get the request id
+    const requestSnapshot = await admin.firestore().collection('REQUESTS').where("BOOK", '==', context.params.BookID).get();
+    
+    // should only be one result
+    if (requestSnapshot.size !== 1) {
+      console.log("An Error Occurred: There are", requestSnapshot.size, "requests with", BookID);
+    } else {
+      requestSnapshot.forEach(doc => {
+        admin.firestore().collection('USERS').doc(bookOwnerUid).collection('NOTIFICATIONS')
+          .add( {TYPE: "RETURN", 
+              BOOK: context.params.BookID, 
+              USER: requesterUid, 
+              REQUEST_ID: doc.id,
+              DATE: admin.firestore.FieldValue.serverTimestamp()});
+      })
+    }
 
     // The snapshot to the user's tokens.
     const tokenReference = admin.firestore().collection('USERS').doc(`${bookOwnerUid}`).collection('TOKENS');
