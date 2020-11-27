@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -27,9 +28,9 @@ import java.util.ArrayList;
  * a listview with each row having the layout described in
  * owned_book_content.xml
  * @author Olivier Vadiavaloo
- * @version 2020.11.04
+ * @author Alex Mazzuca
+ * @version 2020.11.22
  */
-
 public class BookList extends ArrayAdapter<Book> {
     private ArrayList<Book> books;
     private Context context;
@@ -55,8 +56,8 @@ public class BookList extends ArrayAdapter<Book> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        // view must be null for now because it bugs out the images in list view if set to convertView
-        View view = null;
+
+        View view = convertView;
         storageReference = FirebaseStorage.getInstance().getReference();
 
         ViewHolder holder;
@@ -98,30 +99,23 @@ public class BookList extends ArrayAdapter<Book> {
         return view;
     }
 
-
+    /**
+     * This will grab the image from Firebase and put it into the Image View
+     * @author Alex Mazzuca
+     * @version 2020.11.22
+     */
     public void downloadImage(final ImageView imageView, Book book) {
         String imageUrl = book.getPhotoUrl();
 
 
         if (imageUrl != "") {
-            StorageReference imageRef = storageReference.child(imageUrl);
 
-            imageRef.getDownloadUrl()
-                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                                Glide.with(imageView.getContext())
-                                        .load(uri)
-                                        .into(imageView);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            //Handle any errors
-                        }
-                    });
+            Uri uri = Uri.parse(imageUrl);
+
+            Picasso.get().load(uri).into(imageView);
+
         } else {
+            Picasso.get().cancelRequest(imageView);
             imageView.setImageResource(R.drawable.ic_custom_image);
         }
 

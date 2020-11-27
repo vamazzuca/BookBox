@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/search_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:weightSum="6"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/search_text_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="5"
+            android:hint="@string/enter_text_profile"
+            android:autofillHints="@string/enter_text_profile"
+            android:inputType="textPersonName" />
+
+        <ImageButton
+            android:id="@+id/search_button_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/search"
+            android:src="@drawable/ic_search" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/search_results_textview_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_linear"
+        android:text="@string/results"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="8dp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:textColor="@color/colorDarkText"
+        android:textSize="35sp" />
+
+    <ListView
+        android:id="@+id/search_list_user_view"
+        android:layout_width="wrap_content"
+        android:layout_height="400dp"
+        android:layout_above="@id/bottom_nav_bar"
+        android:layout_below="@+id/search_results_textview_user" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        app:itemIconTint="@drawable/bottom_nav_bar_selector"
+        app:itemTextColor="@drawable/bottom_nav_bar_selector"
+        app:itemIconSize="50sp"
+        android:background="@color/colorWhiteBgd"
+        app:menu="@menu/bottom_nav_bar" />
+
+</RelativeLayout>
