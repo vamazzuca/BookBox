@@ -61,7 +61,12 @@ public class ScanningActivity extends AppCompatActivity implements ActivityCompa
         
         // do this before creating the CameraSource
         handlePermissions(); // will continue in continueSetup()
+    }
 
+    /**
+     * We need to wait for camera permissions before continuing to create the CameraSource
+     */
+    public void continueSetup() {
         // get username extra
         username = getIntent().getExtras().getString(User.USERNAME);
 
@@ -74,12 +79,7 @@ public class ScanningActivity extends AppCompatActivity implements ActivityCompa
 
         // set up the bottom navigation bar
         bottomNavigationView();
-    }
 
-    /**
-     * We need to wait for camera permissions before continuing to create the CameraSource
-     */
-    public void continueSetup() {
         // get SurfaceView object
         scannerPreview = (SurfaceView) findViewById(R.id.preview_camera);
 
