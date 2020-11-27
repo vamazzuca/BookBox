@@ -1,14 +1,21 @@
 package com.cmput301f20t14.bookbox;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
+import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.fragment.app.Fragment;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.cmput301f20t14.bookbox.activities.HomeActivity;
 import com.cmput301f20t14.bookbox.activities.MainActivity;
 import com.cmput301f20t14.bookbox.activities.ProfileActivity;
+import com.cmput301f20t14.bookbox.fragments.UpdatePhoneFragment;
+import com.google.firebase.auth.FirebaseAuth;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -23,9 +30,11 @@ import static org.junit.Assert.assertTrue;
  * Test class for ProfileActivity. All UI tests related
  * to ProfileActivity are written. Robotium test framework
  * is used.
- * **These tests are currently outdated
+ * *The user must be logged out before the tests start
+ * (If it fails, running twice should fix it as we are logged out each time)
  * @author Olivier Vadiavaloo
- * @version 2020.10.29
+ * @author Carter Sabadash
+ * @version 2020.11.26
  */
 
 public class ProfileActivityTest {
@@ -56,8 +65,8 @@ public class ProfileActivityTest {
     public void checkActivitySwitch() {
         solo.assertCurrentActivity("Wrong activity", MainActivity.class);
 
-        solo.enterText((EditText) solo.getView(R.id.username_editText), "correctUsername");
-        solo.enterText((EditText) solo.getView(R.id.password_editText), "correctPassword");
+        solo.enterText((EditText) solo.getView(R.id.username_editText), "bookboxtest1@bookbox.com");
+        solo.enterText((EditText) solo.getView(R.id.password_editText), "bookboxtest1");
         solo.clickOnButton("Log in");
         solo.assertCurrentActivity("Wrong Activity/Unsuccessful login", HomeActivity.class);
         solo.clickOnView(solo.getView(R.id.profile_bottom_nav));
@@ -65,46 +74,124 @@ public class ProfileActivityTest {
     }
 
     @Test
-    public void checkProfileEditFail() {
+    public void checkPhoneEditFail(){
         checkActivitySwitch();
 
-        solo.enterText((EditText) solo.getView(R.id.profile_password_editText), "");
-        solo.enterText((EditText) solo.getView(R.id.profile_phone_editText), "");
-        solo.clickOnButton("Confirm");
-        solo.clickOnView(solo.getView(R.id.home_bottom_nav));
-        solo.clickOnView(solo.getView(R.id.profile_bottom_nav));
-
-        assertTrue(solo.searchText("correctUsername"));
-        assertTrue(solo.searchText("correctPassword"));
+        solo.clickOnButton("0000000000");
+        solo.enterText((EditText) solo.getView(R.id.update_phone_editText), "01i3/");
+        solo.clickOnButton("Update");
+        solo.sleep(500);
+        solo.searchText("Invalid phone number");
     }
 
     @Test
-    public void checkProfileEditSuccess() {
+    public void checkPhoneEditSuccess(){
         checkActivitySwitch();
 
-        solo.enterText((EditText) solo.getView(R.id.profile_password_editText), "");
-        solo.enterText((EditText) solo.getView(R.id.profile_phone_editText), "");
-        solo.clickOnButton("Confirm");
+        solo.clickOnButton("0000000000");
+        solo.waitForFragmentByTag("UPDATE_PHONE");
+        solo.enterText((EditText) solo.getView(R.id.update_phone_editText), "123456789");
+        solo.clickOnView(solo.getView(android.R.id.button1)); // https://stackoverflow.com/questions/33560746/how-to-test-alertdialog-item-click-in-robotium-for-android-studio
+        solo.sleep(500);
+        solo.searchText("123456789");
 
-        solo.enterText((EditText) solo.getView(R.id.profile_password_editText), "correctPassword2");
-        solo.enterText((EditText) solo.getView(R.id.profile_phone_editText), "000 000 0001");
-        solo.enterText((EditText) solo.getView(R.id.profile_email_editText), "correctEmail@bookbox.com");
-        solo.clickOnButton("Confirm");
-        solo.clickOnView(solo.getView(R.id.home_bottom_nav));
-        solo.clickOnView(solo.getView(R.id.profile_bottom_nav));
+        // switch it back so the test will work next time
+        solo.clickOnButton("123456789");
+        solo.waitForFragmentByTag("UPDATE_PHONE");
+        solo.enterText((EditText) solo.getView(R.id.update_phone_editText), "0000000000");
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.sleep(500);
+        solo.searchText("0000000000");
+    }
+    @Test
+    public void checkEmailEditFail(){
+        checkActivitySwitch();
 
-        assertTrue(solo.searchText("correctPassword2"));
-        assertTrue(solo.searchText("000 000 0001"));
-        assertTrue(solo.searchText("correctEmail@bookbox.com"));
+        solo.clickOnButton("bookboxtest1@bookbox.com");
+        solo.waitForFragmentByTag("UPDATE_EMAIL");
+        solo.enterText((EditText) solo.getView(R.id.update_email_editText), "badEmail"); // check bad email, good password
+        solo.enterText((EditText) solo.getView(R.id.update_email_password), "bookboxtest1");
 
-        solo.enterText((EditText) solo.getView(R.id.profile_password_editText), "");
-        solo.enterText((EditText) solo.getView(R.id.profile_phone_editText), "");
-        solo.enterText((EditText) solo.getView(R.id.profile_email_editText), "");
-        solo.clickOnButton("Confirm");
+        solo.clickOnView(solo.getView(android.R.id.button1)); // https://stackoverflow.com/questions/33560746/how-to-test-alertdialog-item-click-in-robotium-for-android-studio
+        solo.sleep(500);
 
-        solo.enterText((EditText) solo.getView(R.id.profile_password_editText), "correctPassword");
-        solo.enterText((EditText) solo.getView(R.id.profile_phone_editText), "780 999 1111");
-        solo.clickOnButton("Confirm");
+        solo.clearEditText((EditText) solo.getView(R.id.update_email_editText));
+        solo.clearEditText((EditText) solo.getView(R.id.update_email_password));
+        solo.enterText((EditText) solo.getView(R.id.update_email_editText), "newEmail@bookbox.com"); // check good email, bad password
+        solo.enterText((EditText) solo.getView(R.id.update_email_password), "badPAssword");
+
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.clickOnView(solo.getView(android.R.id.button2));
+        solo.searchText("bookboxtest1@bookbox.com");
+    }
+
+    @Test
+    public void checkEmailEditSuccess(){
+        checkActivitySwitch();
+
+        solo.clickOnButton("bookboxtest1@bookbox.com");
+        solo.waitForFragmentByTag("UPDATE_EMAIL");
+        solo.enterText((EditText) solo.getView(R.id.update_email_editText), "newEmail@bookbox.com");
+        solo.enterText((EditText) solo.getView(R.id.update_email_password), "bookboxtest1");
+
+        solo.clickOnView(solo.getView(android.R.id.button1)); // https://stackoverflow.com/questions/33560746/how-to-test-alertdialog-item-click-in-robotium-for-android-studio
+        solo.sleep(500);
+        solo.searchText("newEmail@bookbox.com");
+
+        // change back so future tests work
+        solo.clickOnButton("newEmail@bookbox.com");
+        solo.waitForFragmentByTag("UPDATE_EMAIL");
+        solo.enterText((EditText) solo.getView(R.id.update_email_editText), "bookboxtest1@bookbox.com"); // check good email, bad password
+        solo.enterText((EditText) solo.getView(R.id.update_email_password), "bookboxtest1");
+
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.searchText("bookboxtest1@bookbox.com");
+    }
+
+    @Test
+    public void checkPasswordEditFail(){
+        // check with correct password, incorrect new passwords
+        // and with matching new passwords, bad old password
+        checkActivitySwitch();
+
+        solo.clickOnButton("Update Password");
+        solo.waitForFragmentByTag("UPDATE_PASSWORD");
+        solo.enterText((EditText) solo.getView(R.id.update_password_old_poassword_editText), "bookboxtest1");
+        solo.enterText((EditText) solo.getView(R.id.update_password_password_editText), "password1");
+        solo.enterText((EditText) solo.getView(R.id.update_password_password_confirm_editText), "password2");
+
+        solo.clickOnView(solo.getView(android.R.id.button1));
+
+        solo.clearEditText((EditText) solo.getView(R.id.update_password_old_poassword_editText));
+        solo.enterText((EditText) solo.getView(R.id.update_password_old_poassword_editText), "badPassword");
+        solo.clearEditText((EditText) solo.getView(R.id.update_password_password_confirm_editText));
+        solo.enterText((EditText) solo.getView(R.id.update_password_password_confirm_editText), "password1");
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.clickOnView(solo.getView(android.R.id.button2));
+    }
+
+    @Test
+    public void checkPasswordEditSuccess(){
+        checkActivitySwitch();
+
+        solo.clickOnButton("Update Password");
+        solo.waitForFragmentByTag("UPDATE_PASSWORD");
+        solo.enterText((EditText) solo.getView(R.id.update_password_old_poassword_editText), "bookboxtest1");
+        solo.enterText((EditText) solo.getView(R.id.update_password_password_editText), "password1");
+        solo.enterText((EditText) solo.getView(R.id.update_password_password_confirm_editText), "password1");
+
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.sleep(500);
+
+        // and change back the password
+        solo.clickOnButton("Update Password");
+        solo.waitForFragmentByTag("UPDATE_PASSWORD");
+        solo.enterText((EditText) solo.getView(R.id.update_password_old_poassword_editText), "password1");
+        solo.enterText((EditText) solo.getView(R.id.update_password_password_editText), "bookboxtest1");
+        solo.enterText((EditText) solo.getView(R.id.update_password_password_confirm_editText), "bookboxtest1");
+
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.sleep(500);
     }
 
     /**
@@ -112,7 +199,8 @@ public class ProfileActivityTest {
      * @throws Exception
      */
     @After
-    public void tearDown() throws  Exception{
+    public void tearDown() throws  Exception {
         solo.finishOpenedActivities();
+        FirebaseAuth.getInstance().signOut();
     }
 }
