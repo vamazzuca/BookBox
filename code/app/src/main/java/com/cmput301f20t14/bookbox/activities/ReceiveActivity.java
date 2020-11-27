@@ -2,13 +2,17 @@ package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,6 +33,13 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
+/**
+ * This activity allows the user to confirm the receival
+ * of a book during a return or a borrowing.
+ * @author Olivier Vadiavaloo
+ * @version 2020.11.22
+ */
+
 public class ReceiveActivity extends AppCompatActivity {
     public static final int REQUEST_SCAN = 529;
     public static final int REQUEST_LOCATION = 5666;
@@ -37,7 +48,7 @@ public class ReceiveActivity extends AppCompatActivity {
     private TextView author;
     private TextView isbn;
     private Button seeLocation;
-    private Button handOver;
+    private Button receive;
     private ImageButton scan;
     private FirebaseFirestore database;
     private String username;
@@ -82,7 +93,7 @@ public class ReceiveActivity extends AppCompatActivity {
         author = (TextView) findViewById(R.id.receive_author);
         isbn = (TextView) findViewById(R.id.receive_isbn);
         seeLocation = (Button) findViewById(R.id.receive_see_location);
-        handOver = (Button) findViewById(R.id.receive_button);
+        receive = (Button) findViewById(R.id.receive_button);
         scan = (ImageButton) findViewById(R.id.receive_scan);
 
         // If the book has status borrowed, this
@@ -92,7 +103,7 @@ public class ReceiveActivity extends AppCompatActivity {
         if (!book.getLentTo().isEmpty()) {
             finalStatus = Book.AVAILABLE;
             header.setText(R.string.return_book);
-            handOver.setText(R.string.return_book);
+            receive.setText(R.string.return_book);
             seeLocation.setText(R.string.see_location);
 
             CharSequence requesterText = "From " + request.getBorrower();
@@ -141,6 +152,7 @@ public class ReceiveActivity extends AppCompatActivity {
         seeLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Start the LocationActivity to SEE the location
                 Intent intent = new Intent(ReceiveActivity.this, LocationActivity.class);
                 intent.putExtra(User.USERNAME, username);
                 intent.putExtra("IS_RECEIVE_RETURN", finalStatus == Book.AVAILABLE);
@@ -160,6 +172,44 @@ public class ReceiveActivity extends AppCompatActivity {
                     intent.putExtra(User.USERNAME, username);
                     startActivityForResult(intent, REQUEST_SCAN);
                 }
+            }
+        });
+
+        // Set the receive button's onclick listener
+        receive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an AlertDialog builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(ReceiveActivity.this);
+
+                // Create and set the content of the AlertDialog to an EditText
+                final EditText isbn = new EditText(ReceiveActivity.this);
+                isbn.setInputType(InputType.TYPE_CLASS_TEXT);
+                isbn.setHint(R.string.ISBN_hint);
+                isbn.setPadding(10, 10, 10, 10);
+                builder.setView(isbn);
+
+                // Set the title and the buttons of the dialog
+                builder.setTitle("Enter ISBN for " + book.getTitle());
+                builder.setNegativeButton("Cancel", null);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Get entered ISBN
+                        String isbnString = isbn.getText().toString().trim();
+
+                        // Check if the ISBN matches the book's ISBN
+                        if (!isbnString.equals(book.getIsbn())) {
+                            Toast.makeText(ReceiveActivity.this, "Wrong ISBN entered", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // If ISBN matches, then conclude the request
+                            concludeRequest();
+                        }
+                    }
+                });
+
+                // Create and show dialog
+                builder.show();
             }
         });
     }
@@ -200,16 +250,24 @@ public class ReceiveActivity extends AppCompatActivity {
                         });
             }
         } else if (requestCode == REQUEST_SCAN) {
+            // On successful scanning, conclude the request
             if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
                 String barcode = data.getStringExtra(HomeActivity.BARCODE);
                 if (barcode.equals(book.getIsbn())) {
                     concludeRequest();
+                } else {
+                    Toast.makeText(ReceiveActivity.this, "Wrong scanned ISBN", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
 
     public void concludeRequest() {
+        // Update the LENT_TO field of the book document
+        // depending on the final status of the book.
+        // Set the LENT_TO field to an empty string if the
+        // user is confirming a return and set it to the borrower's
+        // username if the user is confirming a borrowing.
         database
                 .collection(Book.BOOKS)
                 .document(bookID)
@@ -218,6 +276,9 @@ public class ReceiveActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        // if the user is confirming a return,
+                        // the initial request made by the borrower to
+                        // borrow the book is deleted from the database
                         if (finalStatus == Book.AVAILABLE) {
                             database
                                     .collection(Request.REQUESTS)
@@ -235,6 +296,8 @@ public class ReceiveActivity extends AppCompatActivity {
                                         }
                                     });
                         }
+
+                        // Finish this activity and set the result to success
                         Intent intent = new Intent();
                         intent.putExtra(Request.ID, requestID);
                         intent.putExtra(Book.ID, bookID);

@@ -27,6 +27,14 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
+/**
+ * This fragment is one of the tabs of the tabbed activity: listsActivity
+ * It contains a listview of the requests made by the user that haven't been
+ * accepted yet.
+ * @author Olivier Vadiavaloo
+ * @see com.cmput301f20t14.bookbox.activities.ListsActivity
+ */
+
 public class OutRequestFragment extends Fragment {
     private BookList listAdapter;
     private ArrayList<Book> books;
@@ -106,7 +114,7 @@ public class OutRequestFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
-                            if (doc.exists()) {
+                            if (doc != null && doc.exists()) {
                                 String title = doc.getData().get(Book.TITLE).toString();
                                 String author = doc.getData().get(Book.AUTHOR).toString();
                                 String isbn = doc.getData().get(Book.ISBN).toString();

@@ -37,6 +37,13 @@ import javax.annotation.Nullable;
 
 import static android.view.View.GONE;
 
+/**
+ * This fragment is one of the tabs of the tabbed activity: listsActivity
+ * It contains a listview of the requests made by the user that have been accepted.
+ * @author Olivier Vadiavaloo
+ * @see com.cmput301f20t14.bookbox.activities.ListsActivity
+ */
+
 public class AcceptedFragment extends Fragment {
     public static final int REQUEST_RECEIVE = 8450;
     private BookList listAdapter;
@@ -183,6 +190,7 @@ public class AcceptedFragment extends Fragment {
         if (requestCode == REQUEST_RECEIVE) {
             if (resultCode == CommonStatusCodes.SUCCESS && data != null) {
                 this.setUpList();
+                this.getActivity().recreate();
             }
         }
     }
@@ -197,7 +205,7 @@ public class AcceptedFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
-                            if (doc.exists()) {
+                            if (doc != null && doc.exists()) {
                                 String lentTo = doc.getData().get(Book.LENT_TO).toString();
 
                                 if (lentTo.isEmpty()) {
