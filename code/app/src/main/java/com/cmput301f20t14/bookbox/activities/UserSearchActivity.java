@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.adapters.UserList;
 import com.cmput301f20t14.bookbox.entities.Book;
+import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.cmput301f20t14.bookbox.fragments.ProfileFragment;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -52,7 +54,7 @@ public class UserSearchActivity extends AppCompatActivity implements ProfileFrag
     private EditText searchField;
     private String keyword;
     private UserList searchAdapter;
-    private Button searchButton;
+    private ImageButton searchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +71,14 @@ public class UserSearchActivity extends AppCompatActivity implements ProfileFrag
         searchField = (EditText) findViewById(R.id.search_text_user);
         resultsHeader = (TextView) findViewById(R.id.search_results_textview_user);
 
+        searchField.requestFocus();
+
         searchResults = new ArrayList<>();
 
         searchAdapter = new UserList(this, searchResults);
         searchList.setAdapter(searchAdapter);
 
-        searchButton = (Button) findViewById(R.id.search_button_user);
+        searchButton = (ImageButton) findViewById(R.id.search_button_user);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

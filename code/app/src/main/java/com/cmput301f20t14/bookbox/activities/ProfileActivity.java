@@ -90,6 +90,7 @@ public class ProfileActivity
     private String imageUrl;
     private FirebaseAuth mAuth;
     private User userBundle;
+    private EditText userSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +107,7 @@ public class ProfileActivity
         usernameEditText = findViewById(R.id.profile_username_editText);
         emailEditText = findViewById(R.id.profile_email_editText);
         phoneEditText = findViewById(R.id.profile_phone_editText);
+        userSearch = findViewById(R.id.profile_search_user);
 
         // Get the Buttons
         logoutButton = findViewById(R.id.profile_logout_button);
@@ -175,6 +177,15 @@ public class ProfileActivity
             @Override
             public void onClick(View view) {
                 new UpdatePhoneFragment().show(getSupportFragmentManager(), "UPDATE_PHONE");
+            }
+        });
+
+        userSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, UserSearchActivity.class);
+                intent.putExtra(User.USERNAME, username);
+                startActivityForResult(intent, REQUEST_CODE_SEARCHING);
             }
         });
 

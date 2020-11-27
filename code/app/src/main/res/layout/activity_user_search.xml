@@ -7,28 +7,30 @@
 
     <LinearLayout
         android:id="@+id/search_linear"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="30dp"
+        android:layout_margin="16dp"
+        android:weightSum="6"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/search_text_user"
-            android:layout_width="200dp"
-            android:layout_height="60dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_weight="5"
             android:hint="@string/enter_text_profile"
+            android:autofillHints="@string/enter_text_profile"
             android:inputType="textPersonName" />
 
-        <Button
+        <ImageButton
             android:id="@+id/search_button_user"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorWhiteBgd"
-            android:layout_marginStart="16dp"
-            android:background="@color/colorPurpleTitle"
-            android:layout_gravity="center_vertical"
-            android:text="@string/search" />
+            android:layout_weight="1"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/search"
+            android:src="@drawable/ic_search" />
 
     </LinearLayout>
 
