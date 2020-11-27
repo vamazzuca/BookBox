@@ -75,14 +75,14 @@ public class UpdatePhoneFragment extends DialogFragment {
                     if (!User.isPhoneSyntaxValid(phone)) {
                         newPhoneText.setError("Invalid phone number");
                         newPhoneText.requestFocus();
-                    }
-
-                    if (phone.length() != 0) {
-                        listener.onPhoneUpdated(phone);
-                        dismiss();
                     } else {
-                        newPhoneText.setError("Required");
-                        newPhoneText.requestFocus();
+                        if (phone.length() != 0) {
+                            listener.onPhoneUpdated(phone);
+                            dismiss();
+                        } else {
+                            newPhoneText.setError("Required");
+                            newPhoneText.requestFocus();
+                        }
                     }
                 }
             });
