@@ -77,10 +77,12 @@ public class UpdateEmailFragment extends DialogFragment {
                         passwordText.setError("Required");
                         passwordText.requestFocus();
                     } else if (email.length() != 0) {
-                        listener.emailUpdatePressed(email, password);
-                    } else if (!User.isEmailSyntaxValid(email)) {
-                        newEmailText.setError("Invalid email");
-                        newEmailText.requestFocus();
+                        if (!User.isEmailSyntaxValid(email)) {
+                            newEmailText.setError("Invalid email");
+                            newEmailText.requestFocus();
+                        } else {
+                            listener.emailUpdatePressed(email, password);
+                        }
                     } else {
                         newEmailText.setError("Required");
                         newEmailText.requestFocus();
