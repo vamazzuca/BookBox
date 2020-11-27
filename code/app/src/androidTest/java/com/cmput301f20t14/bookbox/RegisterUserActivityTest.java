@@ -66,7 +66,7 @@ public class RegisterUserActivityTest {
     @Test
     public void checkActivitySwitch() {
         solo.assertCurrentActivity("Wrong activity", MainActivity.class);
-        solo.clickOnButton("Register");
+        solo.clickOnButton("Create account");
         solo.assertCurrentActivity("Wrong activity/No activity switch", RegisterUserActivity.class);
     }
 
@@ -78,7 +78,7 @@ public class RegisterUserActivityTest {
         solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
         solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "");
 
-        solo.clickOnButton("Register");
+        solo.clickOnButton("Create account");
         solo.assertCurrentActivity("Wrong activity", RegisterUserActivity.class);
     }
 
@@ -90,7 +90,7 @@ public class RegisterUserActivityTest {
         solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
         solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "000 000 0000");
 
-        solo.clickOnButton("Register");
+        solo.clickOnButton("Create account");
         solo.assertCurrentActivity("Wrong activity", RegisterUserActivity.class);
     }
 
@@ -102,7 +102,7 @@ public class RegisterUserActivityTest {
         solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
         solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "000 000 0000");
 
-        solo.clickOnButton("Register");
+        solo.clickOnButton("Create account");
         solo.assertCurrentActivity("Wrong activity", RegisterUserActivity.class);
     }
 
@@ -114,7 +114,7 @@ public class RegisterUserActivityTest {
         solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
         solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "000 000 0000");
 
-        solo.clickOnButton("Register");
+        solo.clickOnButton("Create account");
         solo.assertCurrentActivity("Wrong activity", RegisterUserActivity.class);
     }
 
@@ -126,7 +126,7 @@ public class RegisterUserActivityTest {
         solo.enterText((EditText) solo.getView(R.id.register_email_editText), "testEmail@bookbox.com");
         solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "");
 
-        solo.clickOnButton("Register");
+        solo.clickOnButton("Create account");
         solo.assertCurrentActivity("Wrong activity", RegisterUserActivity.class);
     }
 
@@ -138,7 +138,7 @@ public class RegisterUserActivityTest {
         solo.enterText((EditText) solo.getView(R.id.register_email_editText), "");
         solo.enterText((EditText) solo.getView(R.id.register_phone_editText), "000 000 0000");
 
-        solo.clickOnButton("Register");
+        solo.clickOnButton("Create account");
         solo.assertCurrentActivity("Wrong activity", RegisterUserActivity.class);
     }
 
@@ -157,7 +157,7 @@ public class RegisterUserActivityTest {
             solo.enterText((EditText) solo.getView(R.id.register_username_editText), username);
             solo.enterText((EditText) solo.getView(R.id.register_password_editText), password);
             solo.enterText((EditText) solo.getView(R.id.register_email_editText), email);
-            solo.clickOnButton("Register");
+            solo.clickOnButton("Create account");
 
             try {
                 solo.sleep(5000);
