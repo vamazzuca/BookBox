@@ -496,7 +496,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                                                                         .addOnFailureListener(new OnFailureListener() {
                                                                             @Override
                                                                             public void onFailure(@NonNull Exception e) {
-
+                                                                                Toast
+                                                                                        .makeText(
+                                                                                                EditBookActivity.this,
+                                                                                                "An Error occurred",
+                                                                                                Toast.LENGTH_SHORT
+                                                                                        )
+                                                                                        .show();
                                                                             }
                                                                         });
                                                             }
