@@ -117,4 +117,5 @@
     <string name="receive">Receive</string>
     <string name="cancel_2">Cancel</string>
     <string name="cancel">Cancel</string>
+    <string name="keep_scanning">Keep scanning</string>
 </resources>

@@ -115,13 +115,13 @@ public class ScanningActivity extends AppCompatActivity implements ActivityCompa
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
-                handlePermissions();
                 // try starting the camera source and catch any exception
                 // finish activity if camera couldn't start
                 try {
                     cameraSource.start(scannerPreview.getHolder());
                     setUpDetector(cameraSource);
                     scannedContent.setText("");
+                    confirm.setEnabled(false);
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ScanningActivity.this, "An Error occurred", Toast.LENGTH_SHORT).show();
@@ -187,6 +187,7 @@ public class ScanningActivity extends AppCompatActivity implements ActivityCompa
                         public void run() {
                             // stop camerasource
                             cameraSource.stop();
+                            keepScanning.setText(R.string.keep_scanning);
                             barcode = scannedBarcodes.valueAt(0).displayValue.toString();
                             scannedContent.setText(barcode);
                             confirm.setEnabled(true);

@@ -161,7 +161,7 @@ public class HandOverActivity extends AppCompatActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (request.getLatLng() != null && request.getLatLng().isEmpty()) {
+                if (request.getLatLng() != null && !request.getLatLng().isEmpty()) {
                     Intent intent = new Intent(getApplicationContext(), ScanningActivity.class);
                     intent.putExtra(User.USERNAME, username);
                     startActivityForResult(intent, REQUEST_SCAN);
@@ -209,6 +209,9 @@ public class HandOverActivity extends AppCompatActivity {
 
                     // Create and show dialog
                     builder.show();
+                } else {
+                    setLocation.requestFocus();
+                    setLocation.setError("Need to set location first");
                 }
             }
         });
