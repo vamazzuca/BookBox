@@ -6,6 +6,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test file for the Book entity class.
+ * @author Carter Sabadash
+ * @author Olivier Vadiavaloo
+ */
+
 public class BookTest {
 
     private Book mockBook(){

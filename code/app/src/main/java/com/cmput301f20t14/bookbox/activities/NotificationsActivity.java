@@ -144,11 +144,11 @@ public class NotificationsActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
                             if (doc != null && doc.exists()) {
-                                String owner = Objects.requireNonNull(doc.getData().get(Request.OWNER)).toString();
-                                String borrower = Objects.requireNonNull(doc.getData().get(Request.BORROWER)).toString();
-                                String latLng = Objects.requireNonNull(doc.getData().get(Request.LAT_LNG)).toString();
-                                String date = Objects.requireNonNull(doc.getData().get(Request.DATE)).toString();
-                                String isAccepted = Objects.requireNonNull(doc.getData().get(Request.IS_ACCEPTED)).toString();
+                                String owner = doc.getData().get(Request.OWNER).toString();
+                                String borrower = doc.getData().get(Request.BORROWER).toString();
+                                String latLng = doc.getData().get(Request.LAT_LNG).toString();
+                                String date = doc.getData().get(Request.DATE).toString();
+                                String isAccepted = doc.getData().get(Request.IS_ACCEPTED).toString();
 
                                 Request request = new Request(
                                         borrower,
@@ -194,7 +194,7 @@ public class NotificationsActivity extends AppCompatActivity {
         }
 
         if (intent != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(NotificationsActivity.this);
             String title = "";
             String negativeText = "";
             String positiveText = "";
@@ -207,6 +207,8 @@ public class NotificationsActivity extends AppCompatActivity {
                     finalIntent.putExtra(User.USERS, username);
                     finalIntent.putExtra(Request.ID, notification.getRequest());
                     finalIntent.putExtra(Book.ID, bookIDHash.get(book.getIsbn()));
+
+                    deleteNotification(notificationIDHash.get(notification.getDate()));
 
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("REQUEST_OBJECT", request);
@@ -263,13 +265,23 @@ public class NotificationsActivity extends AppCompatActivity {
                                             database
                                                     .collection(Book.BOOKS)
                                                     .document(
-                                                            Objects.requireNonNull(bookIDHash.get(book.getIsbn()))
+                                                            bookIDHash.get(book.getIsbn())
                                                     )
                                                     .update(Book.STATUS, String.valueOf(Book.ACCEPTED))
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
-                                                            declineOtherRequests(bookIDHash.get(book.getIsbn()));
+                                                            declineOtherRequests(bookIDHash.get(book.getIsbn()), notification);
+                                                            deleteNotification(notificationIDHash.get(notification.getDate()));
+                                                            finalIntent.putExtra(User.USERS, username);
+                                                            finalIntent.putExtra(Request.ID, notification.getRequest());
+                                                            finalIntent.putExtra(Book.ID, bookIDHash.get(book.getIsbn()));
+
+                                                            Bundle bundle = new Bundle();
+                                                            bundle.putSerializable("REQUEST_OBJECT", request);
+                                                            bundle.putSerializable("BOOK", book);
+                                                            finalIntent.putExtras(bundle);
+                                                            startActivityForResult(finalIntent, finalREQUEST_CODE);
                                                         }
                                                     });
                                         }
@@ -288,16 +300,19 @@ public class NotificationsActivity extends AppCompatActivity {
                                     });
                         }
                     };
+                    break;
 
                 case REQUEST_RECEIVE_ACCEPT:
                     title = "Borrow " + book.getTitle();
                     negativeText = "Cancel";
                     positiveText = "Confirm";
+                    break;
 
                 case REQUEST_RETURN:
                     title = "Receive return";
                     negativeText = "Cancel";
                     positiveText = "Confirm";
+                    break;
             }
 
             builder
@@ -309,7 +324,7 @@ public class NotificationsActivity extends AppCompatActivity {
         }
     }
 
-    public void declineOtherRequests(String bookID) {
+    public void declineOtherRequests(String bookID, final Notification notification) {
         database
                 .collection(Request.REQUESTS)
                 .whereEqualTo(Request.BOOK, bookID)
@@ -320,10 +335,12 @@ public class NotificationsActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             if (task.getResult() != null) {
                                 for (QueryDocumentSnapshot doc : task.getResult()) {
-                                    database
-                                            .collection(Request.REQUESTS)
-                                            .document(doc.getId())
-                                            .delete();
+                                    if (!doc.getId().equals(notification.getRequest())) {
+                                        database
+                                                .collection(Request.REQUESTS)
+                                                .document(doc.getId())
+                                                .delete();
+                                    }
                                 }
                             }
                         }
@@ -412,6 +429,12 @@ public class NotificationsActivity extends AppCompatActivity {
                         Toast.makeText(NotificationsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        recreate();
     }
 
     /**

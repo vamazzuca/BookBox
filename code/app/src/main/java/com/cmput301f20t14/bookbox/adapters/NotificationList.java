@@ -74,7 +74,7 @@ public class NotificationList extends ArrayAdapter<Notification> {
                 break;
         }
 
-        SimpleDateFormat parser = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.getDefault());
+        SimpleDateFormat parser = new SimpleDateFormat("EEE MMM, d HH:mm:ss zzz yyyy", Locale.getDefault());
         SimpleDateFormat format = new SimpleDateFormat("EEE MMM d HH:mm zzz yyyy", Locale.getDefault());
         try {
             Date parsedDate = parser.parse(notification.getDate());
