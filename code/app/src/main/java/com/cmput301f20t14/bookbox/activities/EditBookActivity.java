@@ -693,7 +693,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             @Override
             public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                 if (!task.isSuccessful()) {
-                    throw task.getException();
+                    Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                 }
 
                 // Continue with the task to get the download URL
@@ -707,6 +707,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                     imageUrl = downloadUri.toString();
                 } else {
                     // Handle failures
+                    Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                 }
             }
         });
