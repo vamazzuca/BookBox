@@ -75,7 +75,7 @@ public class FirebaseMessageService extends FirebaseMessagingService {
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String name = "BookBox";
-            String description = "BookBox Notifications";
+            String description = "BookBox Notification";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);

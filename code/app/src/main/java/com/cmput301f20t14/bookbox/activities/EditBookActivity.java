@@ -19,6 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.fragments.ImageFragment;
 import com.cmput301f20t14.bookbox.R;
@@ -248,18 +251,16 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
 
         imageUrl = book.getPhotoUrl();
         //Download Image from Firebase and set it to ImageView
-        if (bookImage.getUrl() != "") {
+        if (!bookImage.getUrl().equals("") && bookImage.getUrl() != null) {
 
-            Uri uri = Uri.parse(imageUrl);
+            final Uri uri = Uri.parse(imageUrl);
 
             Glide.with(bookImageView.getContext())
                     .load(uri)
+                    .error(R.drawable.ic_custom_image)
                     .into(bookImageView);
-            removeImageButton.setEnabled(true);
+
             addImageButton.setText(R.string.change_picture);
-            bookImage.setUri(uri);
-
-
         }
 
 
@@ -496,7 +497,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                                                                         .addOnFailureListener(new OnFailureListener() {
                                                                             @Override
                                                                             public void onFailure(@NonNull Exception e) {
-
+                                                                                Toast
+                                                                                        .makeText(
+                                                                                                EditBookActivity.this,
+                                                                                                "An Error occurred",
+                                                                                                Toast.LENGTH_SHORT
+                                                                                        )
+                                                                                        .show();
                                                                             }
                                                                         });
                                                             }
@@ -685,7 +692,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             @Override
             public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                 if (!task.isSuccessful()) {
-                    throw task.getException();
+                    Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                 }
 
                 // Continue with the task to get the download URL
@@ -697,8 +704,13 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
                     imageUrl = downloadUri.toString();
+                    Glide.with(bookImageView.getContext())
+                            .load(downloadUri)
+                            .error(R.drawable.ic_custom_image)
+                            .into(bookImageView);
                 } else {
                     // Handle failures
+                    Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -21,6 +21,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/notification_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -33,7 +34,7 @@
             android:textSize="15sp" />
 
         <ListView
-            android:id="@+id/main_page_books_listView"
+            android:id="@+id/notfications_listView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

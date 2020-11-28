@@ -16,17 +16,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
-/**
- * Test class for OutRequestListActivity. All UI tests related
- * to OutRequestListActivity are written. Robotium test framework
- * is used.
- * @author Olivier Vadiavaloo
- * @version 2020.10.29
- */
-
-public class OutRequestListActivityTest {
+public class ListsActivityTest {
     private Solo solo;
 
     @Rule
@@ -37,7 +27,7 @@ public class OutRequestListActivityTest {
      * Runs before all tests; creates solo instance
      */
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception{
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
     }
 
@@ -50,25 +40,46 @@ public class OutRequestListActivityTest {
         Activity activity = rule.getActivity();
     }
 
-    @Test
     public void checkActivitySwitch() {
-        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
-        solo.enterText((EditText) solo.getView(R.id.username_editText), "Olivier");
+        solo.assertCurrentActivity("Wrong activity", MainActivity.class);
+
+        solo.enterText((EditText) solo.getView(R.id.username_editText), "joe@ualberta.ca");
         solo.enterText((EditText) solo.getView(R.id.password_editText), "password");
-
         solo.clickOnButton("Log in");
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
+        solo.assertCurrentActivity("Wrong Activity/Unsuccessful login", HomeActivity.class);
         solo.clickOnView(solo.getView(R.id.lists_bottom_nav));
         solo.assertCurrentActivity("Wrong Activity", ListsActivity.class);
-
-        solo.clickInList(1);
-        solo.assertCurrentActivity("Wrong Activity", OutRequestListActivity.class);
-
-        assertTrue(solo.searchText("Requested"));
     }
 
-    /** Close activity after each test */
+    @Test
+    public void checkRequestedTab() {
+        checkActivitySwitch();
+        solo.clickOnText("Requested");
+        solo.assertCurrentActivity("Wrong Activity", ListsActivity.class);
+
+    }
+
+    @Test
+    public void checkAcceptedTab() {
+        checkActivitySwitch();
+        solo.clickOnText("Accepted");
+        solo.assertCurrentActivity("Wrong Activity", ListsActivity.class);
+
+    }
+
+    @Test
+    public void checkBorrowedTab() {
+        checkActivitySwitch();
+        solo.clickOnText("Borrowed");
+        solo.assertCurrentActivity("Wrong Activity", ListsActivity.class);
+
+    }
+
+    /**
+     * Close activity after each test
+     * @throws Exception
+     */
     @After
     public void tearDown() throws  Exception{
         solo.finishOpenedActivities();

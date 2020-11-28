@@ -58,7 +58,7 @@ public class ScanningActivity extends AppCompatActivity implements ActivityCompa
     protected void onCreate(Bundle savedInstanceBundle) {
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.activity_scanning);
-        
+
         // do this before creating the CameraSource
         handlePermissions(); // will continue in continueSetup()
     }

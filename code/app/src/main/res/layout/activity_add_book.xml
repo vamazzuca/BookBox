@@ -104,6 +104,7 @@
                 android:autofillHints="@string/ISBN_hint"
                 android:hint="@string/isbn"
                 android:inputType="number"
+                android:maxLength="13"
                 android:textSize="20sp" />
 
             <TextView

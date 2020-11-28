@@ -161,7 +161,7 @@ public class HandOverActivity extends AppCompatActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (request.getLatLng() != null) {
+                if (request.getLatLng() != null && request.getLatLng().isEmpty()) {
                     Intent intent = new Intent(getApplicationContext(), ScanningActivity.class);
                     intent.putExtra(User.USERNAME, username);
                     startActivityForResult(intent, REQUEST_SCAN);
@@ -177,36 +177,39 @@ public class HandOverActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Create an AlertDialog builder
-                AlertDialog.Builder builder = new AlertDialog.Builder(HandOverActivity.this);
+                if (request.getLatLng() != null && !request.getLatLng().isEmpty()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(HandOverActivity.this);
 
-                // Create and set the content of the AlertDialog to an EditText
-                final EditText isbn = new EditText(HandOverActivity.this);
-                isbn.setInputType(InputType.TYPE_CLASS_TEXT);
-                isbn.setHint(R.string.ISBN_hint);
-                isbn.setPadding(20, 10, 20, 10);
-                builder.setView(isbn);
+                    // Create and set the content of the AlertDialog to an EditText
+                    final EditText isbn = new EditText(HandOverActivity.this);
+                    isbn.setInputType(InputType.TYPE_CLASS_TEXT);
+                    isbn.setHint(R.string.ISBN_hint);
+                    isbn.setPadding(20, 10, 20, 10);
+                    builder.setView(isbn);
 
-                // Set the title and the buttons of the dialog
-                builder.setTitle("Enter ISBN for " + book.getTitle());
-                builder.setNegativeButton("Cancel", null);
-                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Get entered ISBN
-                        String isbnString = isbn.getText().toString().trim();
+                    // Set the title and the buttons of the dialog
+                    builder.setTitle("Enter ISBN for " + book.getTitle());
+                    builder.setNegativeButton("Cancel", null);
+                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Get entered ISBN
+                            String isbnString = isbn.getText().toString().trim();
 
-                        // Check if the ISBN matches the book's ISBN
-                        if (!isbnString.equals(book.getIsbn())) {
-                            Toast.makeText(HandOverActivity.this, "Wrong ISBN entered", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // If ISBN matches, then conclude the request
-                            concludeRequest();
+                            Toast.makeText(HandOverActivity.this, isbnString, Toast.LENGTH_SHORT).show();
+                            // Check if the ISBN matches the book's ISBN
+                            if (!isbnString.equals(book.getIsbn())) {
+                                Toast.makeText(HandOverActivity.this, "Wrong ISBN entered", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // If ISBN matches, then conclude the request
+                                concludeRequest();
+                            }
                         }
-                    }
-                });
+                    });
 
-                // Create and show dialog
-                builder.show();
+                    // Create and show dialog
+                    builder.show();
+                }
             }
         });
     }

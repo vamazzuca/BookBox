@@ -5,7 +5,6 @@ import com.cmput301f20t14.bookbox.entities.Image;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
-
 /**
  * Image Test
  * @author ALex Mazzuca
