@@ -2,8 +2,10 @@ package com.cmput301f20t14.bookbox.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -17,9 +19,11 @@ import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.adapters.NotificationList;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Notification;
+import com.cmput301f20t14.bookbox.entities.Request;
 import com.cmput301f20t14.bookbox.entities.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,6 +35,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
+
+import static com.cmput301f20t14.bookbox.entities.User.USERS;
 
 /**
  * This is the activity where the user can view their
@@ -46,12 +54,17 @@ import java.util.ArrayList;
  * @see ProfileActivity
  */
 public class NotificationsActivity extends AppCompatActivity {
+    private final int REQUEST_ACCEPT = 10;
+    private final int REQUEST_RECEIVE_ACCEPT = 11;
+    private final int REQUEST_RETURN = 13;
     private FirebaseFirestore database;
     private String username;
     private ListView listView;
     private TextView notificationNumber;
     private ArrayList<Notification> notifications;
     private NotificationList adapter;
+    private HashMap<String, String> bookIDHash;
+    private HashMap<String, String> notificationIDHash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +73,12 @@ public class NotificationsActivity extends AppCompatActivity {
 
         // Initialize database
         database = FirebaseFirestore.getInstance();
+
+        // Initialise bookIDHash
+        bookIDHash = new HashMap<>();
+
+        // Initialize notificationIDHash
+        notificationIDHash = new HashMap<>();
 
         // get the username from whichever activity we came from
         // this is necessary to access firebase
@@ -80,7 +99,7 @@ public class NotificationsActivity extends AppCompatActivity {
         bottomNavigationView();
 
         database
-                .collection(User.USERS)
+                .collection(USERS)
                 .document(username)
                 .collection(Notification.NOTIFICATIONS)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -96,8 +115,10 @@ public class NotificationsActivity extends AppCompatActivity {
                             }
                             String user = doc.getData().get(Notification.USER).toString();
                             String type = doc.getData().get(Notification.TYPE).toString();
+                            String requestID = doc.getData().get(Notification.REQUEST).toString();
 
-                            getBook(notificationId, bookId, date, user, type);
+                            notificationIDHash.put(date, notificationId);
+                            getBook(notificationId, bookId, date, user, type, requestID);
                         }
                     }
                 });
@@ -107,20 +128,223 @@ public class NotificationsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Notification notification = adapter.getItem(position);
 
-                switch (notification.getType()) {
-                    case Notification.ACCEPT:
-
-                        break;
-                    case Notification.BOOK_REQUEST:
-                        break;
-                    case Notification.RETURN:
-                        break;
-                }
+                getRequest(notification);
             }
         });
     }
 
-    public void getBook(final String notificationId, String bookId, final String date, final String user, final String type) {
+    public void getRequest(final Notification notification) {
+        database
+                .collection(Request.REQUESTS)
+                .document(notification.getRequest())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot doc = task.getResult();
+                            if (doc != null && doc.exists()) {
+                                String owner = Objects.requireNonNull(doc.getData().get(Request.OWNER)).toString();
+                                String borrower = Objects.requireNonNull(doc.getData().get(Request.BORROWER)).toString();
+                                String latLng = Objects.requireNonNull(doc.getData().get(Request.LAT_LNG)).toString();
+                                String date = Objects.requireNonNull(doc.getData().get(Request.DATE)).toString();
+                                String isAccepted = Objects.requireNonNull(doc.getData().get(Request.IS_ACCEPTED)).toString();
+
+                                Request request = new Request(
+                                        borrower,
+                                        owner,
+                                        notification.getBook(),
+                                        date,
+                                        Boolean.valueOf(isAccepted),
+                                        latLng
+                                );
+
+                                launchActivity(request, notification);
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(NotificationsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void launchActivity(final Request request, final Notification notification) {
+        Intent intent = null;
+        int REQUEST_CODE = 0;
+        final Book book = notification.getBook();
+        switch (notification.getType()) {
+            case Notification.ACCEPT:
+                if (book.getStatus() == Book.BORROWED) {
+                    intent = new Intent(NotificationsActivity.this, ReceiveActivity.class);
+                    REQUEST_CODE = REQUEST_RECEIVE_ACCEPT;
+                }
+                break;
+            case Notification.BOOK_REQUEST:
+                intent = new Intent(NotificationsActivity.this, HandOverActivity.class);
+                REQUEST_CODE = REQUEST_ACCEPT;
+                break;
+            case Notification.RETURN:
+                intent = new Intent(NotificationsActivity.this, ReceiveActivity.class);
+                REQUEST_CODE = REQUEST_RETURN;
+                break;
+        }
+
+        if (intent != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+            String title = "";
+            String negativeText = "";
+            String positiveText = "";
+            DialogInterface.OnClickListener negativeBtnListener = null;
+            final Intent finalIntent = intent;
+            final int finalREQUEST_CODE = REQUEST_CODE;
+            DialogInterface.OnClickListener positiveBtnListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finalIntent.putExtra(User.USERS, username);
+                    finalIntent.putExtra(Request.ID, notification.getRequest());
+                    finalIntent.putExtra(Book.ID, bookIDHash.get(book.getIsbn()));
+
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("REQUEST_OBJECT", request);
+                    bundle.putSerializable("BOOK", book);
+                    finalIntent.putExtras(bundle);
+                    startActivityForResult(finalIntent, finalREQUEST_CODE);
+                }
+            };
+
+            switch (REQUEST_CODE) {
+                case REQUEST_ACCEPT:
+                    title = "Would you like to accept this request?";
+                    negativeText = "Decline";
+                    positiveText = "Accept";
+
+                    negativeBtnListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            database
+                                    .collection(Request.REQUESTS)
+                                    .document(notification.getRequest())
+                                    .delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            deleteNotification(notificationIDHash.get(notification.getDate()));
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast
+                                                    .makeText(
+                                                            NotificationsActivity.this,
+                                                            "Could not decline request",
+                                                            Toast.LENGTH_SHORT
+                                                    )
+                                                    .show();
+                                        }
+                                    });
+                        }
+                    };
+
+                    positiveBtnListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            database
+                                    .collection(Request.REQUESTS)
+                                    .document(notification.getRequest())
+                                    .update(Request.IS_ACCEPTED, String.valueOf(true))
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            database
+                                                    .collection(Book.BOOKS)
+                                                    .document(
+                                                            Objects.requireNonNull(bookIDHash.get(book.getIsbn()))
+                                                    )
+                                                    .update(Book.STATUS, String.valueOf(Book.ACCEPTED))
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            declineOtherRequests(bookIDHash.get(book.getIsbn()));
+                                                        }
+                                                    });
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast
+                                                    .makeText(
+                                                            NotificationsActivity.this,
+                                                            "Could not accept request",
+                                                            Toast.LENGTH_SHORT
+                                                    )
+                                                    .show();
+                                        }
+                                    });
+                        }
+                    };
+
+                case REQUEST_RECEIVE_ACCEPT:
+                    title = "Borrow " + book.getTitle();
+                    negativeText = "Cancel";
+                    positiveText = "Confirm";
+
+                case REQUEST_RETURN:
+                    title = "Receive return";
+                    negativeText = "Cancel";
+                    positiveText = "Confirm";
+            }
+
+            builder
+                    .setTitle(title)
+                    .setNegativeButton(negativeText, negativeBtnListener)
+                    .setPositiveButton(positiveText, positiveBtnListener)
+                    .create()
+                    .show();
+        }
+    }
+
+    public void declineOtherRequests(String bookID) {
+        database
+                .collection(Request.REQUESTS)
+                .whereEqualTo(Request.BOOK, bookID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult() != null) {
+                                for (QueryDocumentSnapshot doc : task.getResult()) {
+                                    database
+                                            .collection(Request.REQUESTS)
+                                            .document(doc.getId())
+                                            .delete();
+                                }
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast
+                                .makeText(
+                                        NotificationsActivity.this,
+                                        "Could not accept request",
+                                        Toast.LENGTH_SHORT
+                                )
+                                .show();
+                    }
+                });
+    }
+
+    public void getBook(final String notificationId, final String bookId, final String date,
+                        final String user, final String type, final String requestID) {
         database
                 .collection(Book.BOOKS)
                 .document(bookId)
@@ -150,7 +374,9 @@ public class NotificationsActivity extends AppCompatActivity {
                                         imageUrl
                                 );
 
-                                initNotification(book, date, user, type);
+                                bookIDHash.put(book.getIsbn(), bookId);
+
+                                initNotification(book, date, user, type, requestID);
                             } else {
                                 deleteNotification(notificationId);
                             }
@@ -165,8 +391,8 @@ public class NotificationsActivity extends AppCompatActivity {
                 });
     }
 
-    public void initNotification(Book book, String date, String user, String type) {
-        Notification notification = new Notification(user, book, type, date);
+    public void initNotification(Book book, String date, String user, String type, String requestID) {
+        Notification notification = new Notification(user, book, type, date, requestID);
         notifications.add(notification);
         adapter.notifyDataSetChanged();
         CharSequence numberText = "You have " + notifications.size() + " new notifications!";
@@ -175,7 +401,7 @@ public class NotificationsActivity extends AppCompatActivity {
 
     public void deleteNotification(String id) {
         database
-                .collection(User.USERS)
+                .collection(USERS)
                 .document(username)
                 .collection(Notification.NOTIFICATIONS)
                 .document(id)
