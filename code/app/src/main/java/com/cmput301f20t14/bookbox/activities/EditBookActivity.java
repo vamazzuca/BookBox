@@ -255,7 +255,9 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             Glide.with(bookImageView.getContext())
                     .load(uri)
                     .into(bookImageView);
-            removeImageButton.setEnabled(true);
+            if (book.getOwner().equals(username)) {
+                removeImageButton.setEnabled(true);
+            }
             addImageButton.setText(R.string.change_picture);
             bookImage.setUri(uri);
 
