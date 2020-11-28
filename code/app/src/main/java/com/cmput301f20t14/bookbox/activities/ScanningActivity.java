@@ -115,7 +115,6 @@ public class ScanningActivity extends AppCompatActivity implements ActivityCompa
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
-                handlePermissions();
                 // try starting the camera source and catch any exception
                 // finish activity if camera couldn't start
                 try {
