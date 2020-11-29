@@ -235,6 +235,7 @@ public class NotificationsActivity extends AppCompatActivity {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             deleteNotification(notificationIDHash.get(notification.getDate()));
+                                            deleteRequest(notification.getRequest(), notification.getBook());
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -322,6 +323,59 @@ public class NotificationsActivity extends AppCompatActivity {
                     .create()
                     .show();
         }
+    }
+
+    public void deleteRequest(String requestID, final Book book) {
+        database
+                .collection(Request.REQUESTS)
+                .document(requestID)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        database
+                                .collection(Request.REQUESTS)
+                                .whereEqualTo(Request.BOOK, bookIDHash.get(book.getIsbn()))
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            int count = 0;
+                                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                                count += 1;
+                                            }
+                                            if (count == 0) {
+                                                database
+                                                        .collection(Book.BOOKS)
+                                                        .document(bookIDHash.get(book.getIsbn()))
+                                                        .update(Book.STATUS, String.valueOf(Book.AVAILABLE));
+                                            }
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(
+                                        new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast
+                                                        .makeText(NotificationsActivity.this, "An error occurred", Toast.LENGTH_SHORT)
+                                                        .show();
+                                            }
+                                        }
+                                );
+                    }
+                })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast
+                                        .makeText(NotificationsActivity.this, "An error occurred", Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        }
+                );
     }
 
     public void declineOtherRequests(String bookID, final Notification notification) {

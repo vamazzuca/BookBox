@@ -56,7 +56,7 @@ public class NotificationList extends ArrayAdapter<Notification> {
 
         switch (notification.getType()) {
             case Notification.ACCEPT: {
-                CharSequence text = notification.getUserField() + "accepted your request";
+                CharSequence text = notification.getUserField() + " accepted your request";
                 mainText.setText(text);
                 break;
             }
