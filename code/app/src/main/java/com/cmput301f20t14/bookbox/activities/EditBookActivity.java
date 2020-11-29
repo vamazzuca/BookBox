@@ -261,6 +261,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                     .into(bookImageView);
 
             addImageButton.setText(R.string.change_picture);
+            removeImageButton.setEnabled(true);
             bookImage.setUri(uri);
         }
 
