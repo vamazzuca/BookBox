@@ -498,6 +498,7 @@ public class ProfileActivity
                     imageUrl = downloadUri.toString();
                     // add image to user profile in database
                     database.collection(User.USERS).document(username).update(User.IMAGE_URL, imageUrl);
+                    Toast.makeText(ProfileActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
                 } else {
                     // Handle failures
                 }

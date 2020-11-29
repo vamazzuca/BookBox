@@ -261,6 +261,8 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                     .into(bookImageView);
 
             addImageButton.setText(R.string.change_picture);
+            removeImageButton.setEnabled(true);
+            bookImage.setUri(uri);
         }
 
 
@@ -704,10 +706,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
                     imageUrl = downloadUri.toString();
-                    Glide.with(bookImageView.getContext())
-                            .load(downloadUri)
-                            .error(R.drawable.ic_custom_image)
-                            .into(bookImageView);
+                    Toast.makeText(EditBookActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
                 } else {
                     // Handle failures
                     Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
