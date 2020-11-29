@@ -93,6 +93,7 @@ public class ImageFragment extends DialogFragment {
             bookImageView = view.findViewById(R.id.imageViewFrag);
             final Image image = (Image) getArguments().getSerializable("image");
             imageUri = image.getUri();
+
             if (imageUri == null){
                 bookImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_custom_image));
             } else{

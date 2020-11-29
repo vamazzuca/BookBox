@@ -299,6 +299,7 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
                     imageUrl = downloadUri.toString();
+                    Toast.makeText(AddBookActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
                 } else {
                     // Handle failures
                 }
