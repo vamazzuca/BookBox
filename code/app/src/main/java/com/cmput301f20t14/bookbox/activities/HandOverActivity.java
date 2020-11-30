@@ -267,14 +267,16 @@ public class HandOverActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Update the STATUS field of the book document in the database
+     * If the book is being lent out, the status is borrowed and if
+     * it is being returned the status is available.
+     * Notice that the LENT_TO is not updated until the receiver has
+     * confirmed the transaction. When a borrower confirms a receival or
+     * when an owner confirms a return, the LENT_TO field is updated in
+     * the ReceiveActivity.java
+     */
     public void concludeRequest() {
-        // Update the STATUS field of the book document in the database
-        // If the book is being lent out, the status is borrowed and if
-        // it is being returned the status is available.
-        // Notice that the LENT_TO is not updated until the receiver has
-        // confirmed the transaction. When a borrower confirms a receival or
-        // when an owner confirms a return, the LENT_TO field is updated in
-        // the ReceiveActivit.java
         database
                 .collection(Book.BOOKS)
                 .document(bookID)

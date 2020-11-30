@@ -21,10 +21,11 @@ import com.squareup.picasso.Picasso;
 /**
  * A Dialog Fragment for viewing an image
  * and a confirmation message for deleting an
- * image.
+ * image. It also allows anyone to view an image without being able to change it
  * References: Lab 3 Instructions - FragmentsFile from the University of Alberta
  * @author Alex Mazzuca
- * @version 2020.11.04
+ * @author Carter Sabadash
+ * @version 2020.11.29
  */
 public class ImageFragment extends DialogFragment {
     private ImageView bookImageView;
@@ -67,6 +68,25 @@ public class ImageFragment extends DialogFragment {
     public static ImageFragment newInstance(Image image) {
         Bundle args = new Bundle();
         args.putSerializable("image", image);
+        args.putSerializable("owner", true);
+
+        ImageFragment fragment = new ImageFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    /**
+     * Creates a new instance that takes an image from the attached activity
+     * and bundles it to be used later for the imageView. This creates a
+     * fragment for people to view the image (and doesn't provide the edit
+     * functionality)
+     * @param image
+     * @param isOwner
+     */
+    public static ImageFragment newInstance(Image image, boolean isOwner) {
+        Bundle args = new Bundle();
+        args.putSerializable("image", image);
+        args.putSerializable("owner", isOwner);
 
         ImageFragment fragment = new ImageFragment();
         fragment.setArguments(args);
@@ -99,15 +119,23 @@ public class ImageFragment extends DialogFragment {
             } else{
                 Picasso.get().load(imageUri).into(bookImageView);
             }
-            return builder
-                    .setView(view)
-                    .setNeutralButton("Cancel", null)
-                    .setPositiveButton("Change", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int i) {
-                            listener.onUpdateImage();
-                        }
-                    }).create();
+            // if the uwer is the owner enable the positive button, otherwise don't include it
+            if ((boolean) getArguments().getSerializable("owner")) {
+                return builder
+                        .setView(view)
+                        .setNeutralButton("Cancel", null)
+                        .setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                listener.onUpdateImage();
+                            }
+                        }).create();
+            } else {
+                return builder
+                        .setView(view)
+                        .setNeutralButton("Back", null)
+                        .create();
+            }
         } else{
             View viewDelete = LayoutInflater.from(getActivity()).inflate(R.layout.delete_image_fragment_layout, null);
             return builder

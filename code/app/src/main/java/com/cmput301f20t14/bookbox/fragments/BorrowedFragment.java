@@ -98,6 +98,12 @@ public class BorrowedFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Gets the details of the request that is associated with the book
+     * @param bookID The firestore id of the Book
+     * @param book The Book
+     * @param view The View
+     */
     public void getRequestInfo(final String bookID, final Book book, final View view) {
         database
                 .collection(Request.REQUESTS)
@@ -150,6 +156,9 @@ public class BorrowedFragment extends Fragment {
         }
     }
 
+    /**
+     * Set up the list of borrowed books
+     */
     public void setUpList() {
         database
                 .collection(Book.BOOKS)

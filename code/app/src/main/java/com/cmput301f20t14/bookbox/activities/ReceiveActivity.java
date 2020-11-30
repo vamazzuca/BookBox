@@ -257,12 +257,14 @@ public class ReceiveActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Update the LENT_TO field of the book document
+     * depending on the final status of the book.
+     * Set the LENT_TO field to an empty string if the
+     * user is confirming a return and set it to the borrower's
+     * username if the user is confirming a borrowing.
+     */
     public void concludeRequest() {
-        // Update the LENT_TO field of the book document
-        // depending on the final status of the book.
-        // Set the LENT_TO field to an empty string if the
-        // user is confirming a return and set it to the borrower's
-        // username if the user is confirming a borrowing.
         database
                 .collection(Book.BOOKS)
                 .document(bookID)
