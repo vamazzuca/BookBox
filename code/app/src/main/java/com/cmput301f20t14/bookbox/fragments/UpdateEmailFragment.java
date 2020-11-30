@@ -92,11 +92,19 @@ public class UpdateEmailFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Call if the password is incorrect. Will notify the user to input the correct password
+     */
     public void incorrectPassword(){
         passwordText.setError("Incorrect");
         passwordText.requestFocus();
     }
 
+    /**
+     * Close the fragment if the email was successfully updated, otherwise notify them
+     * that the email is already in use
+     * @param success If the email was successfully updated
+     */
     public void emailUpdate(boolean success) {
         if (success) {
             dismiss();

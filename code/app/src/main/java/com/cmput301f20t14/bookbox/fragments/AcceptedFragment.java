@@ -116,6 +116,11 @@ public class AcceptedFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Gets the request info from firestore
+     * @param book The book associated with the request
+     * @param view The view
+     */
     public void getRequestInfo(final Book book, final View view) {
         final String bookID = bookIDHash.get(book.getIsbn());
         final String requestID = requestIDHash.get(bookID);
@@ -155,6 +160,9 @@ public class AcceptedFragment extends Fragment {
                 });
     }
 
+    /**
+     * Sets up the list of accepted requests
+     */
     public void setUpList() {
         database
                 .collection(Request.REQUESTS)
@@ -195,6 +203,10 @@ public class AcceptedFragment extends Fragment {
         }
     }
 
+    /**
+     * Get the accepted book
+     * @param id The firestore id of the Book
+     */
     public void getAcceptedBook(String id) {
         database
                 .collection(Book.BOOKS)

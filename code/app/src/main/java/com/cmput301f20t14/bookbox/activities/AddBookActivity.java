@@ -213,6 +213,11 @@ public class AddBookActivity extends AppCompatActivity implements ImageFragment.
         });
     }
 
+    /**
+     * Adds a book to firestore and updated the users Owned Books
+     * @param ownedBooksCollectionRef The CollectionReference to the users owned books
+     * @param book The book
+     */
     private void addBookToDb(final CollectionReference ownedBooksCollectionRef, final Book book) {
         final CollectionReference booksCollectionRef = database.collection(Book.BOOKS);
         HashMap<String, String> data = new HashMap<>();

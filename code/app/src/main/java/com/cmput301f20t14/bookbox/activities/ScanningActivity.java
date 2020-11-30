@@ -164,6 +164,10 @@ public class ScanningActivity extends AppCompatActivity implements ActivityCompa
         });
     }
 
+    /**
+     * Set up the barcode detector
+     * @param cameraSource The cameraSource from which to find the barcode
+     */
     public void setUpDetector(final CameraSource cameraSource) {
         // set the processor to scan any barcode showing up
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {

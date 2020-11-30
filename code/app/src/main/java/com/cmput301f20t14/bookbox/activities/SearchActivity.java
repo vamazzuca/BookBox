@@ -116,6 +116,10 @@ public class SearchActivity extends AppCompatActivity {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    /**
+     * Searches for books with the set keyword that have a status of
+     * AVAILABLE or REQUESTED
+     */
     public void executeSearch(){
         keyword = searchField.getText().toString().toLowerCase();
         search(Book.AVAILABLE);
@@ -168,6 +172,11 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Gets a book from firestore
+     * @param queryDoc The Book document
+     * @return The book from firestore
+     */
     public Book getBookFromDb(QueryDocumentSnapshot queryDoc) {
         String isbn = queryDoc.getData().get(Book.ISBN).toString();
         String title = queryDoc.getData().get(Book.TITLE).toString();

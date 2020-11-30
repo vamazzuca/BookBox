@@ -152,6 +152,12 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Accepts a request and changes the book status
+     * @param requestID The request ID
+     * @param request The Request to accept
+     * @param position The position in the request list
+     */
     public void acceptRequest(final String requestID, final Request request, final int position) {
         database
                 .collection(Request.REQUESTS)
@@ -172,6 +178,12 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Changes the books status in the database and declines all other requests on the same book
+     * @param bookID The ID of the book associated with the request
+     * @param requestID The request id in firestore
+     * @param request The request
+     */
     public void changeBookStatus(String bookID, final String requestID, final Request request) {
         database
                 .collection(Book.BOOKS)
@@ -192,6 +204,11 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Launches the activity to allow the user to hand over the book
+     * @param requestID The id of the associated request in firestore
+     * @param request The request
+     */
     public void launchHandOver(String requestID, Request request) {
         Intent intent = new Intent(
                 ViewBookRequestsActivity.this,
@@ -208,6 +225,10 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
         startActivityForResult(intent, ACCEPT_REQUEST);
     }
 
+    /**
+     * Gets all requests associated with the selected book
+     * @param requestsCollectionRef A CollectionReference to the requests
+     */
     public void getRequests(final CollectionReference requestsCollectionRef) {
         requestsCollectionRef
                 .whereEqualTo(Request.BOOK, bookID)
@@ -249,6 +270,12 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Called when a request is accepted. This deletes all other requests on the accepted book
+     * @param requestsCollectionRef A CollectionReference to the requests
+     * @param requestID The request ID in firestore
+     * @param request The request
+     */
     public void declineOtherRequests(final CollectionReference requestsCollectionRef,
                                      final String requestID, final Request request) {
         requestsCollectionRef
@@ -280,6 +307,11 @@ public class ViewBookRequestsActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Deletes a request
+     * @param requestsCollectionRef The CollectionReference of requests
+     * @param requestID The id of the request to be deleted
+     */
     public void deleteRequest(final CollectionReference requestsCollectionRef, String requestID) {
         requestsCollectionRef
                 .document(requestID)

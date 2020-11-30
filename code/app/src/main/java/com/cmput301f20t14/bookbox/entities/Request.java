@@ -143,18 +143,34 @@ public class Request implements Serializable {
         this.book = book;
     }
 
+    /**
+     * Gets whether or not the request is accepted
+     * @return If the request is accepted
+     */
     public Boolean getAccepted() {
         return isAccepted;
     }
 
+    /**
+     * Set the accepted state of the request
+     * @param accepted The new state of the request
+     */
     public void setAccepted(Boolean accepted) {
         isAccepted = accepted;
     }
 
+    /**
+     * Gets a string of the location associated with the request
+     * @return The location associated with the request Latitude and Longitude
+     */
     public String getLatLng() {
         return latLng;
     }
 
+    /**
+     * Set the location to transfer the book
+     * @param latLng The latitude and longitude
+     */
     public void setLatLng(String latLng) {
         this.latLng = latLng;
     }

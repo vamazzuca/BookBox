@@ -78,6 +78,9 @@ public class OutRequestFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Set up the list of requested books
+     */
     public void setUpList() {
         database
                 .collection(Request.REQUESTS)
@@ -104,6 +107,10 @@ public class OutRequestFragment extends Fragment {
 
     }
 
+    /**
+     * Get the specified book and add it to the list
+     * @param id The firestore id of the book
+     */
     public void getRequestedBook(String id) {
         database
                 .collection(Book.BOOKS)

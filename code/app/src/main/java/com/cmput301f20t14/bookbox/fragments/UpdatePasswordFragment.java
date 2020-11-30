@@ -105,6 +105,9 @@ public class UpdatePasswordFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Call if the new password is too weak. This will tell the user to enter a stronger password
+     */
     public void weakPassword() {
         newPassword.setError("Weak Password");
         newPassword.requestFocus();

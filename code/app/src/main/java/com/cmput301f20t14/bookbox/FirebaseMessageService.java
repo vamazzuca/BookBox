@@ -37,6 +37,11 @@ public class FirebaseMessageService extends FirebaseMessagingService {
     private final String TAG = "FCM Service";
     private final String CHANNEL_ID = "BookBox";
 
+    /**
+     * Called when the app is open and a message is received
+     * (or when it is in the background and a data message is sent)
+     * @param remoteMessage The message sent
+     */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         // we will not be using messages with a data payload
