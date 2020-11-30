@@ -150,7 +150,6 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
                 delete.setVisibility(View.GONE);
                 addImageButton.setVisibility(View.GONE);
                 removeImageButton.setVisibility(View.GONE);
-                bookImageView.setEnabled(false);
 
                 titleEditText.setEnabled(false);
                 authorEditText.setEnabled(false);
@@ -164,7 +163,6 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             delete.setVisibility(View.GONE);
             addImageButton.setVisibility(View.GONE);
             removeImageButton.setVisibility(View.GONE);
-            bookImageView.setEnabled(true);
 
             titleEditText.setEnabled(false);
             authorEditText.setEnabled(false);
@@ -278,7 +276,8 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             @Override
             public void onClick(View v) {
                 // if the viewer is the owner allow them to edit the image
-                if (book.getOwner().equals(username)) {
+                if (book.getOwner().equals(username)
+                    && book.getStatus() != Book.BORROWED) {
                     new ImageFragment().newInstance(bookImage)
                             .show(getSupportFragmentManager(), "View Image");
                 } else {
