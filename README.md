@@ -4,6 +4,6 @@
   
 An Android application that allows users to list the books they own, loan them out to other users and borrow books from them. 
 
-Demo - https://youtu.be/dnKkCAykg50
+### Demo - https://youtu.be/dnKkCAykg50
 
 ***
