@@ -219,7 +219,7 @@ public class NotificationsActivity extends AppCompatActivity {
             DialogInterface.OnClickListener positiveBtnListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    finalIntent.putExtra(User.USERS, username);
+                    finalIntent.putExtra(User.USERNAME, username);
                     finalIntent.putExtra(Request.ID, notification.getRequest());
                     finalIntent.putExtra(Book.ID, bookIDHash.get(book.getIsbn()));
 
@@ -245,7 +245,7 @@ public class NotificationsActivity extends AppCompatActivity {
                                 deleteNotification(notificationIDHash.get(notification.getDate()));
                             }
                         };
-                    } else {
+                    } else if (book.getLentTo().isEmpty()) {
                         title = "Would you like to accept this request?";
                         negativeText = "Decline";
                         positiveText = "Accept";
@@ -363,6 +363,20 @@ public class NotificationsActivity extends AppCompatActivity {
                         title = "Receive return";
                         negativeText = "Cancel";
                         positiveText = "Confirm";
+
+                        positiveBtnListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finalIntent.putExtra(User.USERNAME, username);
+                                finalIntent.putExtra(Request.ID, notification.getRequest());
+                                finalIntent.putExtra(Book.ID, bookIDHash.get(book.getIsbn()));
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("REQUEST_OBJECT", request);
+                                bundle.putSerializable("BOOK", book);
+                                finalIntent.putExtras(bundle);
+                                startActivityForResult(finalIntent, finalREQUEST_CODE);
+                            }
+                        };
                     }
                     break;
             }
