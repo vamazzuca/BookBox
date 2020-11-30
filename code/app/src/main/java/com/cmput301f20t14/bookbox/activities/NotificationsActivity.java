@@ -165,7 +165,7 @@ public class NotificationsActivity extends AppCompatActivity {
                                 builder
                                         .setTitle("Outdated request! Delete?")
                                         .setNegativeButton("Cancel", null)
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 deleteNotification(notificationIDHash.get(notification.getDate()));
@@ -235,99 +235,135 @@ public class NotificationsActivity extends AppCompatActivity {
 
             switch (REQUEST_CODE) {
                 case REQUEST_ACCEPT:
-                    title = "Would you like to accept this request?";
-                    negativeText = "Decline";
-                    positiveText = "Accept";
+                    if (book.getStatus() == Book.ACCEPTED || book.getStatus() == Book.BORROWED) {
+                        title = "Outdated request! Delete?";
+                        negativeText = "Cancel";
+                        positiveText = "Delete";
+                        positiveBtnListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deleteNotification(notificationIDHash.get(notification.getDate()));
+                            }
+                        };
+                    } else {
+                        title = "Would you like to accept this request?";
+                        negativeText = "Decline";
+                        positiveText = "Accept";
 
-                    negativeBtnListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            database
-                                    .collection(Request.REQUESTS)
-                                    .document(notification.getRequest())
-                                    .delete()
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            deleteNotification(notificationIDHash.get(notification.getDate()));
-                                            deleteRequest(notification.getRequest(), notification.getBook());
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast
-                                                    .makeText(
-                                                            NotificationsActivity.this,
-                                                            "Could not decline request",
-                                                            Toast.LENGTH_SHORT
-                                                    )
-                                                    .show();
-                                        }
-                                    });
-                        }
-                    };
+                        negativeBtnListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                database
+                                        .collection(Request.REQUESTS)
+                                        .document(notification.getRequest())
+                                        .delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                deleteNotification(notificationIDHash.get(notification.getDate()));
+                                                deleteRequest(notification.getRequest(), notification.getBook());
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast
+                                                        .makeText(
+                                                                NotificationsActivity.this,
+                                                                "Could not decline request",
+                                                                Toast.LENGTH_SHORT
+                                                        )
+                                                        .show();
+                                            }
+                                        });
+                            }
+                        };
 
-                    positiveBtnListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            database
-                                    .collection(Request.REQUESTS)
-                                    .document(notification.getRequest())
-                                    .update(Request.IS_ACCEPTED, String.valueOf(true))
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            database
-                                                    .collection(Book.BOOKS)
-                                                    .document(
-                                                            bookIDHash.get(book.getIsbn())
-                                                    )
-                                                    .update(Book.STATUS, String.valueOf(Book.ACCEPTED))
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            declineOtherRequests(bookIDHash.get(book.getIsbn()), notification);
-                                                            deleteNotification(notificationIDHash.get(notification.getDate()));
-                                                            finalIntent.putExtra(User.USERNAME, username);
-                                                            finalIntent.putExtra(Request.ID, notification.getRequest());
-                                                            finalIntent.putExtra(Book.ID, bookIDHash.get(book.getIsbn()));
+                        positiveBtnListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                database
+                                        .collection(Request.REQUESTS)
+                                        .document(notification.getRequest())
+                                        .update(Request.IS_ACCEPTED, String.valueOf(true))
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                database
+                                                        .collection(Book.BOOKS)
+                                                        .document(
+                                                                bookIDHash.get(book.getIsbn())
+                                                        )
+                                                        .update(Book.STATUS, String.valueOf(Book.ACCEPTED))
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                declineOtherRequests(bookIDHash.get(book.getIsbn()), notification);
+                                                                deleteNotification(notificationIDHash.get(notification.getDate()));
+                                                                finalIntent.putExtra(User.USERNAME, username);
+                                                                finalIntent.putExtra(Request.ID, notification.getRequest());
+                                                                finalIntent.putExtra(Book.ID, bookIDHash.get(book.getIsbn()));
 
-                                                            Bundle bundle = new Bundle();
-                                                            bundle.putSerializable("REQUEST_OBJECT", request);
-                                                            bundle.putSerializable("BOOK", book);
-                                                            finalIntent.putExtras(bundle);
-                                                            startActivityForResult(finalIntent, finalREQUEST_CODE);
-                                                        }
-                                                    });
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast
-                                                    .makeText(
-                                                            NotificationsActivity.this,
-                                                            "Could not accept request",
-                                                            Toast.LENGTH_SHORT
-                                                    )
-                                                    .show();
-                                        }
-                                    });
-                        }
-                    };
+                                                                Bundle bundle = new Bundle();
+                                                                bundle.putSerializable("REQUEST_OBJECT", request);
+                                                                bundle.putSerializable("BOOK", book);
+                                                                finalIntent.putExtras(bundle);
+                                                                startActivityForResult(finalIntent, finalREQUEST_CODE);
+                                                            }
+                                                        });
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast
+                                                        .makeText(
+                                                                NotificationsActivity.this,
+                                                                "Could not accept request",
+                                                                Toast.LENGTH_SHORT
+                                                        )
+                                                        .show();
+                                            }
+                                        });
+                            }
+                        };
+                    }
                     break;
 
                 case REQUEST_RECEIVE_ACCEPT:
-                    title = "Borrow " + book.getTitle();
-                    negativeText = "Cancel";
-                    positiveText = "Confirm";
+                    if (!book.getLentTo().isEmpty()) {
+                        title = "Outdated request! Delete?";
+                        negativeText = "Cancel";
+                        positiveText = "Delete";
+                        positiveBtnListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deleteNotification(notificationIDHash.get(notification.getDate()));
+                            }
+                        };
+                    } else {
+                        title = "Borrow " + book.getTitle();
+                        negativeText = "Cancel";
+                        positiveText = "Confirm";
+                    }
                     break;
 
                 case REQUEST_RETURN:
-                    title = "Receive return";
-                    negativeText = "Cancel";
-                    positiveText = "Confirm";
+                    if (book.getLentTo().isEmpty()) {
+                        title = "Outdated request! Delete?";
+                        negativeText = "Cancel";
+                        positiveText = "Delete";
+                        positiveBtnListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deleteNotification(notificationIDHash.get(notification.getDate()));
+                            }
+                        };
+                    } else {
+                        title = "Receive return";
+                        negativeText = "Cancel";
+                        positiveText = "Confirm";
+                    }
                     break;
             }
 
@@ -337,6 +373,7 @@ public class NotificationsActivity extends AppCompatActivity {
                     .setPositiveButton(positiveText, positiveBtnListener)
                     .create()
                     .show();
+
         }
     }
 
@@ -492,6 +529,14 @@ public class NotificationsActivity extends AppCompatActivity {
                 .collection(Notification.NOTIFICATIONS)
                 .document(id)
                 .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        adapter.notifyDataSetChanged();
+                        CharSequence numberText = "You have " + notifications.size() + " new notifications!";
+                        notificationNumber.setText(numberText);
+                    }
+                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
