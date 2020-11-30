@@ -48,7 +48,8 @@ import static com.cmput301f20t14.bookbox.entities.User.USERS;
  * @author Olivier Vadiavaloo
  * @author Alex Mazzuca
  * @author Carter Sabadash
- * @version 2020.10.25
+ * @author Faiyaz Ahmed
+ * @version 2020.10.29
  * @see HomeActivity
  * @see ListsActivity
  * @see ProfileActivity
