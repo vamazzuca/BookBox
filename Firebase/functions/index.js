@@ -156,6 +156,12 @@ exports.sendAcceptedRequestNotification = functions.firestore.document('/REQUEST
   }
 });
 
+/**
+ * Triggers when a book is updated
+ * 
+ * We are specifically looking for the STATUS to change from BORROWED to AVAILABLE (69 to 66)
+ * When this occurs we send a notification to the owner
+ */
 exports.sendReturnBookNotification = functions.firestore.document('/BOOKS/{BookID}')
   .onUpdate(async (snap, context) => {
   
@@ -223,3 +229,65 @@ exports.sendReturnBookNotification = functions.firestore.document('/BOOKS/{BookI
     });
   }
 });
+
+/**
+ * Triggers when a request is deleted
+ * 
+ * We are specifically paying attention to deleted requests that have not been accepted
+ * This have been declined so we send a notification to the BORROWER that their request
+ * was declined
+ */
+exports.sendDeclinedRequestNotification = functions.firestore.document('/REQUESTS/{RequestID}')
+  .onDelete(async (snap, context) => {
+    const data = snap.data();
+    const requester = data.BORROWER;
+    const bookID = data.BOOK;
+    const status = data.IS_ACCEPTED;
+    const owner = data.OWNER;
+    const bookTitle = (await admin.firestore().collection('BOOKS').doc(bookID).get()).data().TITLE;
+    if (status === 'false') { // send declined notification
+      const payload = {
+        notification: {
+          title: `Request Declined`,
+          body: `${owner} has declined your request on ${bookTitle}!`
+        }
+      };
+
+      /*
+      // we also want to create a NOTIFICATION entry for the requester
+      admin.firestore().collection('USERS').doc(requesterUid).collection('NOTIFICATIONS')
+      .add( {TYPE: "REQUEST DECLINED", 
+            BOOK: bookID, 
+            USER: bookOwnerUid, 
+            DATE: admin.firestore.FieldValue.serverTimestamp()});
+      */
+      // The snapshot to the requesters's tokens.
+      const tokenReference = admin.firestore().collection('USERS').doc(`${requester}`).collection('TOKENS');
+
+      // try and send a notification for each token
+      tokenReference.get()
+      .then(snapshot => {
+          snapshot.forEach(doc => {
+            let token = doc.data().VALUE;
+            admin.messaging().sendToDevice(token, payload)
+              .then((response) => {
+                // Response is a message ID string.
+                console.log('Successfully sent message:', response);
+                return null;
+              })
+              .catch((error) => {
+                console.log('Error sending message:', error);
+                // Cleanup the tokens who are not registered anymore.
+                if (error.code === 'messaging/invalid-registration-token' ||
+                    error.code === 'messaging/registration-token-not-registered') {
+                    tokenDoc.delete();
+                }
+              });
+          });
+          return null;
+      })
+      .catch(err => {
+          console.log('Error getting documents', err);
+      });
+    }
+  })
