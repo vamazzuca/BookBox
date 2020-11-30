@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -107,11 +109,19 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        if (request.getLatLng() != null) {
+        if (request.getLatLng() != null && !request.getLatLng().equals("")) {
+            Log.d("Here", request.getLatLng());
             setMarkerOnMap(Request.parseLatLngString(request.getLatLng()));
         }
 
+        //Toast.makeText(LocationActivity.this, String.valueOf(request.getLatLng().isEmpty()), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(LocationActivity.this, isReceiveReturn.toString(), Toast.LENGTH_SHORT).show();
+
+        Log.d("Here", request.getOwner());
+        Log.d("Here", String.valueOf(isReceiveReturn));
+        Log.d("Here", username);
         if (request.getOwner().equals(username) && !isReceiveReturn) {
+            Log.d("Here", "Here");
             map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {

@@ -160,6 +160,19 @@ public class NotificationsActivity extends AppCompatActivity {
                                 );
 
                                 launchActivity(request, notification);
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(NotificationsActivity.this);
+                                builder
+                                        .setTitle("Outdated request! Delete?")
+                                        .setNegativeButton("Cancel", null)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                deleteNotification(notificationIDHash.get(notification.getDate()));
+                                            }
+                                        })
+                                        .create()
+                                        .show();
                             }
                         }
                     }
@@ -184,8 +197,10 @@ public class NotificationsActivity extends AppCompatActivity {
                 }
                 break;
             case Notification.BOOK_REQUEST:
-                intent = new Intent(NotificationsActivity.this, HandOverActivity.class);
-                REQUEST_CODE = REQUEST_ACCEPT;
+                if (book.getStatus() != Book.ACCEPTED) {
+                    intent = new Intent(NotificationsActivity.this, HandOverActivity.class);
+                    REQUEST_CODE = REQUEST_ACCEPT;
+                }
                 break;
             case Notification.RETURN:
                 intent = new Intent(NotificationsActivity.this, ReceiveActivity.class);
@@ -274,7 +289,7 @@ public class NotificationsActivity extends AppCompatActivity {
                                                         public void onSuccess(Void aVoid) {
                                                             declineOtherRequests(bookIDHash.get(book.getIsbn()), notification);
                                                             deleteNotification(notificationIDHash.get(notification.getDate()));
-                                                            finalIntent.putExtra(User.USERS, username);
+                                                            finalIntent.putExtra(User.USERNAME, username);
                                                             finalIntent.putExtra(Request.ID, notification.getRequest());
                                                             finalIntent.putExtra(Book.ID, bookIDHash.get(book.getIsbn()));
 

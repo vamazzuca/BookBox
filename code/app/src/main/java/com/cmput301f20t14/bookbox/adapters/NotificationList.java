@@ -1,6 +1,7 @@
 package com.cmput301f20t14.bookbox.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Notification;
+import com.google.firebase.Timestamp;
 
 import org.w3c.dom.Text;
 
@@ -76,13 +78,12 @@ public class NotificationList extends ArrayAdapter<Notification> {
 
         SimpleDateFormat parser = new SimpleDateFormat("EEE MMM, d HH:mm:ss zzz yyyy", Locale.getDefault());
         SimpleDateFormat format = new SimpleDateFormat("EEE MMM d HH:mm zzz yyyy", Locale.getDefault());
-        try {
-            Date parsedDate = parser.parse(notification.getDate());
-            String formattedDate = format.format(parsedDate);
-            date.setText(formattedDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        String stamp = notification.getDate();
+        String[] split = stamp.split(",");
+        String stampSeconds = stamp.substring(stamp.indexOf("=") + 1, stamp.indexOf(","));
+        Date parsedDate = new Date(Long.parseLong(stampSeconds));
+        String formattedDate = format.format(parsedDate);
+        date.setText(formattedDate);
 
         return view;
     }
