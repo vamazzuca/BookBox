@@ -28,6 +28,7 @@ import com.cmput301f20t14.bookbox.R;
 import com.cmput301f20t14.bookbox.entities.Book;
 import com.cmput301f20t14.bookbox.entities.Image;
 import com.cmput301f20t14.bookbox.entities.User;
+import com.cmput301f20t14.bookbox.fragments.ProfileFragment;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.internal.service.Common;
 import com.google.android.gms.tasks.Continuation;
@@ -63,13 +64,16 @@ import java.util.UUID;
  * @version 2020.11.03
  */
 
-public class EditBookActivity extends AppCompatActivity implements ImageFragment.OnFragmentInteractionListener{
+public class EditBookActivity extends AppCompatActivity implements
+        ImageFragment.OnFragmentInteractionListener,
+        ProfileFragment.OnFragmentInteractionListener{
     public static final int RESULT_CODE_DELETE = 10;
     public static final int REQUEST_VIEW_REQUESTS = 99;
     private String username;
     private TextView status;
     private TextView owner;
     private TextView borrower;
+    private User userOwner;
     private EditText titleEditText;
     private EditText authorEditText;
     private EditText isbnEditText;
@@ -84,6 +88,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
     private Book book;
     private ImageView bookImageView;
     private Uri imageUri;
+    private DocumentSnapshot documentUser;
     private StorageReference storageReference;
     private Image bookImage;
     private String imageUrl;
@@ -118,6 +123,7 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         // Create book Image object for book Image
         bookImage = new Image(null, null, null, "");
         imageUrl = "";
+
 
         // Retrieve book add button and remove button
         addImageButton = findViewById(R.id.add_book_picture_button);
@@ -267,6 +273,15 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
             bookImage.setUri(uri);
         }
 
+        //get user form the database for the user fragment
+        getFromDb(book.getOwner());
+
+        owner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFragment.newInstance(userOwner).show(getSupportFragmentManager(), "VIEW_PROFILE");
+            }
+        });
 
         //Add picture button listener
         addImageButton.setOnClickListener(new View.OnClickListener() {
@@ -740,6 +755,34 @@ public class EditBookActivity extends AppCompatActivity implements ImageFragment
         } else {
             recreate();
         }
+    }
+
+    /**
+     * Get the User form the Firebase Database
+     * @author Alex Mazzuca
+     * @version 2020.11.05
+     */
+    public void getFromDb(String ownerUsername){
+
+        DocumentReference documentRef = database.collection("USERS").document(ownerUsername);
+        documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    documentUser = task.getResult();
+
+                    String usernameUser = documentUser.getData().get(User.USERNAME).toString();
+                    String phoneUser = documentUser.getData().get(User.PHONE).toString();
+                    String imageUrlUser = documentUser.getData().get(User.IMAGE_URL).toString();
+                    String emailUser = documentUser.getData().get(User.EMAIL).toString();
+
+                    userOwner = new User(usernameUser, null, phoneUser, emailUser, null, null, imageUrlUser);
+                } else {
+                    Toast.makeText(EditBookActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     /**

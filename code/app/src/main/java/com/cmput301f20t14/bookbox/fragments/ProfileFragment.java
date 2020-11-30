@@ -105,7 +105,7 @@ public class ProfileFragment extends DialogFragment {
         //Download Image from Firebase and set it to ImageView
        if (imageUrl != "") {
 
-            Uri uri = Uri.parse(imageUrl);
+           Uri uri = Uri.parse(imageUrl);
            Glide.with(profileImageView.getContext())
                    .load(uri)
                    .into(profileImageView);
