@@ -8,4 +8,8 @@ Link to Wiki:
 
 https://github.com/CMPUT301F20T14/BookBox/wiki
 
+Video Demo:
+
+https://www.youtube.com/watch?v=hG62IGa24cA
+
 ***
