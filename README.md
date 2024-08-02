@@ -19,6 +19,4 @@ Images
 
 ![Screenshot 2024-08-02 014313](https://github.com/user-attachments/assets/ce09c774-80b7-4e02-be38-643f644495f5)
 
-![Screenshot 2024-08-02 014128](https://github.com/user-attachments/assets/aa7a0b92-3dc9-44ba-81c0-02c26c02c4cd)
-
 ![Screenshot 2024-08-02 014401](https://github.com/user-attachments/assets/8b8636b5-578e-4d0c-94fd-26b858286cd1)
